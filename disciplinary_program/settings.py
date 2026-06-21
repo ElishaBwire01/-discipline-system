@@ -73,16 +73,11 @@ WSGI_APPLICATION = 'disciplinary_program.wsgi.application'
 # ============================================
 # DATABASE CONFIGURATION
 # ============================================
-import os
-import dj_database_url
-
-# Use Supabase PostgreSQL
+# Using Supabase API only - dummy database
 DATABASES = {
-    'default': dj_database_url.config(
-        default=os.environ.get('DATABASE_URL'),
-        conn_max_age=600,
-        ssl_require=False
-    )
+    'default': {
+        'ENGINE': 'django.db.backends.dummy',
+    }
 }
 
 AUTH_PASSWORD_VALIDATORS = [
@@ -115,3 +110,4 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 SUPABASE_URL = os.environ.get('SUPABASE_URL')
 SUPABASE_PUBLISHABLE_KEY = os.environ.get('SUPABASE_PUBLISHABLE_KEY')
 SUPABASE_SECRET_KEY = os.environ.get('SUPABASE_SECRET_KEY')
+
