@@ -1,0 +1,368 @@
+﻿{% extends 'base.html' %}
+
+{% block title %}Class Teacher Dashboard{% endblock %}
+
+{% block content %}
+<div class="alert-modern alert alert-info mb-4" data-aos="fade-up">
+    <span class="alert-icon"><i class="fas fa-chalkboard-teacher"></i></span>
+    <div>
+        <strong>{{ assigned_stream.get_name_display }}</strong> - {{ assigned_form|default:"All Forms" }}
+        {% if not user.teacher_profile.is_approved %}<span class="badge-modern badge-warning ms-2">Pending Approval</span>{% endif %}
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<!-- Excel Upload -->
+<div class="card-modern mb-4" data-aos="fade-up">
+    <div class="card-header-modern">
+        <span class="header-icon"><i class="fas fa-file-excel"></i></span>
+        Upload Students from Excel
+    </div>
+    <div class="card-body p-4">
+        <form method="post" action="{% url 'class_teacher_dashboard' %}" enctype="multipart/form-data">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="excel_upload">
+            <div class="row g-3 align-items-end">
+                <div class="col-md-8">
+                    <label class="form-label-modern">Select Excel File (.xlsx or .xls)</label>
+                    <input type="file" name="excel_file" class="form-control-modern" accept=".xlsx,.xls" required>
+                    <small class="text-muted">
+                        <i class="fas fa-info-circle"></i> 
+                        Required: <strong>name</strong>, <strong>admission_number</strong>, <strong>form</strong> 
+                        | Optional: <strong>year</strong>, <strong>optional_notes</strong>
+                    </small>
+                </div>
+                <div class="col-md-4">
+                    <button type="submit" class="btn-modern btn-modern-success w-100">
+                        <i class="fas fa-cloud-upload-alt"></i> Upload & Create Students
+                    </button>
+                </div>
+            </div>
+        </form>
+        <div class="mt-3">
+            <button class="btn-modern btn-modern-secondary btn-modern-sm" onclick="downloadTemplate()">
+                <i class="fas fa-download"></i> Download Excel Template
+            </button>
+        </div>
+    </div>
+</div><div class="card-modern mb-4" data-aos="fade-up">
+    <div class="card-body p-3">
+        <div class="d-flex flex-wrap gap-2">
+            <a href="{% url 'user_profile_settings' %}" class="btn-modern btn-modern-secondary"><i class="fas fa-user-cog"></i> Profile</a>
+            <a href="{% url 'class_teacher_dashboard' %}" class="btn-modern btn-modern-primary"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+        </div>
+    </div>
+</div>
+
+<!-- Stats -->
+<div class="stat-grid" data-aos="fade-up">
+    <div class="stat-card">
+        <div class="stat-bg-icon"><i class="fas fa-users"></i></div>
+        <div class="stat-icon primary"><i class="fas fa-users"></i></div>
+        <div class="stat-value">{{ class_stats.total }}</div>
+        <div class="stat-label">My Students</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-bg-icon"><i class="fas fa-exclamation-triangle"></i></div>
+        <div class="stat-icon danger"><i class="fas fa-exclamation-triangle"></i></div>
+        <div class="stat-value">{{ class_stats.critical }}</div>
+        <div class="stat-label">Critical Cases</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-bg-icon"><i class="fas fa-chart-line"></i></div>
+        <div class="stat-icon warning"><i class="fas fa-chart-line"></i></div>
+        <div class="stat-value">{{ class_stats.avg_risk|floatformat:0 }}%</div>
+        <div class="stat-label">Average Risk</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-bg-icon"><i class="fas fa-bell"></i></div>
+        <div class="stat-icon info"><i class="fas fa-bell"></i></div>
+        <div class="stat-value">{{ notification_count }}</div>
+        <div class="stat-label">Notifications</div>
+    </div>
+</div>
+
+<!-- ============================================ -->
+<!-- ADD STUDENT FORM - CLEAN VERSION              -->
+<!-- ============================================ -->
+<div class="card-modern mb-4" data-aos="fade-up">
+    <div class="card-header-modern">
+        <span class="header-icon"><i class="fas fa-plus-circle"></i></span>
+        Add Student to {{ assigned_stream.get_name_display }}
+    </div>
+    <div class="card-body p-4">
+        <form method="post" action="{% url 'class_teacher_dashboard' %}" id="addStudentForm">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="add_student">
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <input type="text" name="admission_number" class="form-control-modern" placeholder="Admission Number" required>
+                </div>
+                <div class="col-md-3">
+                    <input type="text" name="name" class="form-control-modern" placeholder="Full Name" required>
+                </div>
+                <div class="col-md-2">
+                    <select name="form" class="form-control-modern" required>
+                        <option value="">Form</option>
+                        {% for form_key, form_name in forms %}
+                        <option value="{{ form_key }}" {% if assigned_form == form_key %}selected{% endif %}>{{ form_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <input type="number" name="year" class="form-control-modern" placeholder="Year" value="2026">
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn-modern btn-modern-primary w-100">
+                        <i class="fas fa-plus"></i> Add Student
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- ============================================ -->
+<!-- BULK UPLOAD - CLEAN VERSION                   -->
+<!-- ============================================ -->
+<div class="card-modern mb-4" data-aos="fade-up">
+    <div class="card-header-modern">
+        <span class="header-icon"><i class="fas fa-upload"></i></span>
+        Bulk Upload Students
+    </div>
+    <div class="card-body p-4">
+        <form method="post" action="{% url 'class_teacher_dashboard' %}" id="bulkUploadForm">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="bulk_upload">
+            <div class="row g-3">
+                <div class="col-md-9">
+                    <textarea name="bulk_data" class="form-control-modern" rows="3" placeholder="name,admission_number,form,year,notes&#10;John Doe,ADM001,Form 1,2026,Good student"></textarea>
+                    <small class="text-muted">Format: name,admission_number,form,year,notes (one per line)</small>
+                </div>
+                <div class="col-md-3 d-flex align-items-end">
+                    <button type="submit" class="btn-modern btn-modern-primary w-100">
+                        <i class="fas fa-cloud-upload-alt"></i> Upload Students
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- ============================================ -->
+<!-- SEARCH SECTION                                -->
+<!-- ============================================ -->
+<div class="card-modern mb-4" data-aos="fade-up">
+    <div class="card-header-modern">
+        <span class="header-icon"><i class="fas fa-search"></i></span>
+        Search & Report Students
+    </div>
+    <div class="card-body p-4">
+        <div class="search-box">
+            <span class="search-icon"><i class="fas fa-search"></i></span>
+            <input type="text" id="searchStudent" placeholder="Search by name or admission number...">
+        </div>
+        <div id="searchResults" class="mt-3"></div>
+    </div>
+</div>
+
+<!-- ============================================ -->
+<!-- MY STUDENTS TABLE                            -->
+<!-- ============================================ -->
+<div class="card-modern" data-aos="fade-up">
+    <div class="card-header-modern">
+        <span class="header-icon"><i class="fas fa-chalkboard"></i></span>
+        My Students - {{ assigned_stream.get_name_display }}
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table-modern">
+                <thead>
+                    <tr>
+                        <th>Admission</th>
+                        <th>Name</th>
+                        <th>Form</th>
+                        <th>Reports</th>
+                        <th>Risk Score</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for student in my_students %}
+                    <tr>
+                        <td>{{ student.admission_number }}</td>
+                        <td>{{ student.name }}</td>
+                        <td>{{ student.form }}</td>
+                        <td>{{ student.total_reports }}</td>
+                        <td>
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="progress-modern">
+                                    <div class="progress-bar-modern" style="width: {{ student.risk_score }}%; background: {% if student.risk_score >= 60 %}linear-gradient(135deg, #ef4444, #dc2626){% elif student.risk_score >= 30 %}linear-gradient(135deg, #f59e0b, #d97706){% else %}linear-gradient(135deg, #10b981, #059669){% endif %}">
+                                    </div>
+                                </div>
+                                <span class="fw-bold" style="font-size:0.813rem;">{{ student.risk_score }}%</span>
+                            </div>
+                        </td>
+                        <td>
+                            {% if student.is_critical %}
+                            <span class="badge-modern badge-critical">Critical</span>
+                            {% elif student.risk_score >= 30 %}
+                            <span class="badge-modern badge-warning">Warning</span>
+                            {% else %}
+                            <span class="badge-modern badge-success">Good</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <button class="btn-modern btn-modern-primary btn-modern-sm" onclick="openReportModal({{ student.id }}, '{{ student.name }}')">
+                                <i class="fas fa-flag"></i>
+                            </button>
+                            <a href="{% url 'student_profile' student.id %}" class="btn-modern btn-modern-secondary btn-modern-sm">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="text-center py-4 text-muted">No students in your class</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================ -->
+<!-- REPORT MODAL                                 -->
+<!-- ============================================ -->
+<div class="modal fade" id="reportModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4">
+            <div class="modal-header border-0">
+                <h5 class="modal-title fw-bold"><i class="fas fa-flag text-primary me-2"></i>Report Student</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="post" action="{% url 'class_teacher_dashboard' %}" id="reportForm">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="report_student">
+                <input type="hidden" name="student_id" id="reportStudentId" value="0">
+                <div class="modal-body">
+                    <p class="mb-3">Reporting: <strong id="reportStudentName"></strong></p>
+                    {% include 'includes/custom_case.html' %}
+                </div>
+                <div class="modal-footer border-0">
+                    <button type="button" class="btn-modern btn-modern-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn-modern btn-modern-primary" id="submitReportBtn">
+                        <i class="fas fa-paper-plane"></i> Submit Report
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================ -->
+<!-- JAVASCRIPT                                   -->
+<!-- ============================================ -->
+<script>
+function openReportModal(id, name) {
+    console.log('Opening modal for student:', id, name);
+    
+    var field = document.getElementById('reportStudentId');
+    if (field) {
+        field.value = id;
+        console.log('Student ID set to:', id);
+    } else {
+        var form = document.getElementById('reportForm');
+        if (form) {
+            var input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'student_id';
+            input.id = 'reportStudentId';
+            input.value = id;
+            form.appendChild(input);
+        }
+    }
+    
+    var nameField = document.getElementById('reportStudentName');
+    if (nameField) {
+        nameField.textContent = name;
+    }
+    
+    try {
+        var modal = new bootstrap.Modal(document.getElementById('reportModal'));
+        modal.show();
+    } catch(e) {
+        document.getElementById('reportModal').style.display = 'block';
+        document.getElementById('reportModal').classList.add('show');
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    var form = document.getElementById('reportForm');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            var studentId = document.getElementById('reportStudentId');
+            if (!studentId || !studentId.value || studentId.value === '0') {
+                e.preventDefault();
+                alert('Please select a student first!');
+                return false;
+            }
+            console.log('Submitting with student_id:', studentId.value);
+            return true;
+        });
+    }
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+    var searchInput = document.getElementById('searchStudent');
+    var searchResults = document.getElementById('searchResults');
+    var searchTimeout;
+    
+    if (searchInput) {
+        searchInput.addEventListener('keyup', function() {
+            clearTimeout(searchTimeout);
+            var query = this.value.trim();
+            if (query.length < 2) {
+                searchResults.innerHTML = '';
+                return;
+            }
+            searchTimeout = setTimeout(function() {
+                fetch('/api/search-students/?q=' + encodeURIComponent(query))
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.students && data.students.length > 0) {
+                            var html = '<h6 class="mb-2">Results:</h6>';
+                            data.students.forEach(function(s) {
+                                html += '<div class="card p-3 mb-2">' +
+                                    '<div class="d-flex justify-content-between align-items-center">' +
+                                    '<div><strong>' + s.name + '</strong><br><small>' + s.admission_number + ' | ' + s.stream + ' | Risk: ' + s.risk_score + '%</small></div>' +
+                                    '<div>' +
+                                    '<button class="btn-modern btn-modern-primary btn-modern-sm" onclick="openReportModal(' + s.id + ', \'' + s.name + '\')"><i class="fas fa-flag"></i></button> ' +
+                                    '<a href="/student/' + s.id + '/" class="btn-modern btn-modern-secondary btn-modern-sm"><i class="fas fa-eye"></i></a>' +
+                                    '</div>' +
+                                    '</div>' +
+                                    '</div>';
+                            });
+                            searchResults.innerHTML = html;
+                        } else {
+                            searchResults.innerHTML = '<div class="alert alert-info">No students found</div>';
+                        }
+                    })
+                    .catch(function(error) {
+                        console.error('Search error:', error);
+                        searchResults.innerHTML = '<div class="alert alert-danger">Search error</div>';
+                    });
+            }, 500);
+        });
+    }
+});
+</script>
+{% endblock %}
+
+
+
+
+
+

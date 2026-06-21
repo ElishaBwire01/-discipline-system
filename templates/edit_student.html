@@ -1,0 +1,81 @@
+﻿{% extends 'base.html' %}
+
+{% block title %}Edit Student - {{ student.name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .profile-pic-container { position: relative; display: inline-block; }
+    .profile-pic-container img { width: 150px; height: 150px; border-radius: 50%; object-fit: cover; border: 3px solid #2563eb; }
+    .profile-pic-placeholder { width: 150px; height: 150px; border-radius: 50%; background: linear-gradient(135deg, #2563eb, #7c3aed); display: flex; align-items: center; justify-content: center; margin: 0 auto; border: 3px solid #2563eb; }
+    .profile-pic-placeholder i { font-size: 4rem; color: white; }
+    .form-section { border-bottom: 1px solid #e2e8f0; padding-bottom: 1.5rem; margin-bottom: 1.5rem; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8" data-aos="fade-up">
+        <div class="card-modern">
+            <div class="card-body p-4">
+                <div class="text-center mb-4">
+                    <h2 class="fw-bold"><i class="fas fa-user-edit text-primary me-2"></i>Edit Student</h2>
+                    <p class="text-muted">{{ student.name }} ({{ student.admission_number }})</p>
+                </div>
+
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}<input type="hidden" name="action" value="update_student">
+                    
+                    <!-- Profile Picture -->
+                    <div class="form-section">
+                        <h5><i class="fas fa-camera text-primary me-2"></i>Profile Picture</h5>
+                        <div class="row align-items-center g-3">
+                            <div class="col-md-3 text-center">
+                                <div class="profile-pic-container">
+                                    {% if student.profile_picture %}
+                                    <img src="{{ student.profile_picture.url }}" alt="{{ student.name }}">
+                                    {% else %}
+                                    <div class="profile-pic-placeholder"><i class="fas fa-user-graduate"></i></div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-9"><input type="file" name="profile_picture" class="form-control-modern" accept="image/*"></div>
+                        </div>
+                    </div>
+
+                    <!-- Student Info -->
+                    <div class="row g-3">
+                        <div class="col-md-6"><label class="form-label-modern">Full Name</label><input type="text" name="name" class="form-control-modern" value="{{ student.name }}" required></div>
+                        <div class="col-md-6"><label class="form-label-modern">Admission Number</label><input type="text" class="form-control-modern" value="{{ student.admission_number }}" disabled></div>
+                        <div class="col-md-4"><label class="form-label-modern">Stream</label><input type="text" class="form-control-modern" value="{{ student.stream.get_name_display }}" disabled></div>
+                        <div class="col-md-4">
+                            <label class="form-label-modern">Form</label>
+                            <select name="form" class="form-control-modern" required>
+                                {% for form_key, form_name in forms %}<option value="{{ form_key }}" {% if student.form == form_key %}selected{% endif %}>{{ form_name }}</option>{% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-4"><label class="form-label-modern">Year</label><input type="number" name="year" class="form-control-modern" value="{{ student.year }}" required></div>
+                        <div class="col-12"><label class="form-label-modern">Optional Notes</label><textarea name="optional_notes" class="form-control-modern" rows="3">{{ student.optional_notes }}</textarea></div>
+                    </div>
+
+                    <div class="d-flex gap-2 mt-4 flex-wrap">
+                        <button type="submit" class="btn-modern btn-modern-primary"><i class="fas fa-save"></i> Update Student</button>
+                        <a href="{% url 'student_profile' student.id %}" class="btn-modern btn-modern-secondary"><i class="fas fa-times"></i> Cancel</a>
+                    </div>
+                </form>
+
+                <!-- Danger Zone -->
+                <hr class="my-4">
+                <div class="text-center">
+                    <h5 class="text-danger"><i class="fas fa-exclamation-triangle me-2"></i>Danger Zone</h5>
+                    <form method="post" onsubmit="return confirm('Delete {{ student.name }} permanently?')">
+                        {% csrf_token %}<input type="hidden" name="action" value="delete_student">
+                        <button type="submit" class="btn-modern btn-modern-danger">
+                            <i class="fas fa-trash"></i> {% if user.is_superuser %}Permanently Delete{% else %}Deactivate{% endif %}
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

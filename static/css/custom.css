@@ -1,0 +1,39 @@
+﻿/* Custom styles for Disciplinary Program */
+.stat-card {
+    transition: all 0.3s;
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+}
+
+.btn-modern {
+    transition: all 0.3s;
+}
+
+.btn-modern:hover {
+    transform: translateY(-2px);
+}
+
+.progress-modern {
+    overflow: hidden;
+}
+
+.progress-bar-modern {
+    transition: width 0.5s ease;
+}
+
+.alert-modern {
+    animation: slideInRight 0.3s ease-out;
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}

@@ -1,0 +1,245 @@
+﻿{% extends 'base.html' %}
+
+{% block title %}Teacher Dashboard{% endblock %}
+
+{% block content %}
+<div class="row g-2 mb-3">
+    <div class="col-12">
+        <div class="card-modern">
+            <div class="card-body p-3">
+                <div class="d-flex flex-wrap gap-2">
+                    <a href="{% url 'user_profile_settings' %}" class="btn-modern btn-modern-secondary"><i class="fas fa-user-cog"></i> Profile</a>
+                    <a href="{% url 'teacher_dashboard' %}" class="btn-modern btn-modern-primary"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Search -->
+<div class="card-modern mb-4" data-aos="fade-up">
+    <div class="card-header-modern">
+        <span class="header-icon"><i class="fas fa-search"></i></span>
+        Search Student
+    </div>
+    <div class="card-body p-4">
+        <div class="search-box">
+            <span class="search-icon"><i class="fas fa-search"></i></span>
+            <input type="text" id="searchStudent" placeholder="Search by name or admission number...">
+        </div>
+        <div id="searchResults" class="mt-3"></div>
+    </div>
+</div>
+
+<!-- Students -->
+<div class="card-modern" data-aos="fade-up">
+    <div class="card-header-modern">
+        <span class="header-icon"><i class="fas fa-list"></i></span>
+        All Students
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table-modern">
+                <thead><tr>
+                    <th>Admission</th><th>Name</th><th>Stream</th><th>Form</th>
+                    <th>Reports</th><th>Risk Score</th><th>Action</th>
+                </tr></thead>
+                <tbody>
+                    {% for student in students %}
+                    <tr>
+                        <td>{{ student.admission_number }}</td>
+                        <td>{{ student.name }}</td>
+                        <td>{{ student.stream.get_name_display }}</td>
+                        <td>{{ student.form }}</td>
+                        <td>{{ student.total_reports }}</td>
+                        <td>
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="progress-modern"><div class="progress-bar-modern" style="width: {{ student.risk_score }}%; background: {% if student.risk_score >= 60 %}linear-gradient(135deg, #ef4444, #dc2626){% elif student.risk_score >= 30 %}linear-gradient(135deg, #f59e0b, #d97706){% else %}linear-gradient(135deg, #10b981, #059669){% endif %}"></div></div>
+                                <span class="fw-bold" style="font-size:0.813rem;">{{ student.risk_score }}%</span>
+                            </div>
+                        </td>
+                        <td>
+                            <button class="btn-modern btn-modern-primary btn-modern-sm" onclick="openReportModal({{ student.id }}, '{{ student.name }}')"><i class="fas fa-flag"></i> Report</button>
+                            <a href="{% url 'student_profile' student.id %}" class="btn-modern btn-modern-secondary btn-modern-sm"><i class="fas fa-eye"></i></a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="7" class="text-center py-4 text-muted">No students found</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Report Modal -->
+<div class="modal fade" id="reportModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4">
+            <div class="modal-header border-0">
+                <h5 class="modal-title fw-bold"><i class="fas fa-flag text-primary me-2"></i>Report Student</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="post" action="{% url 'teacher_dashboard' %}" id="reportForm">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="report_student">
+                <input type="hidden" name="student_id" id="reportStudentId" value="0">
+                <div class="modal-body">
+                    <p class="mb-3">Reporting: <strong id="reportStudentName"></strong></p>
+                    
+                    <div class="mb-3">
+                        <label class="form-label-modern">Offense Category</label>
+                        <select name="category" class="form-control-modern" required>
+                            <option value="">Select a category...</option>
+                            {% for category in categories %}
+                            <option value="{{ category.id }}">{{ category.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label-modern">Severity Rating</label>
+                        <select name="rating" class="form-control-modern">
+                            <option value="VERY_MINOR">Very Minor</option>
+                            <option value="MINOR">Minor</option>
+                            <option value="MODERATE" selected>Moderate</option>
+                            <option value="SERIOUS">Serious</option>
+                            <option value="VERY_SERIOUS">Very Serious</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label-modern">Additional Comments</label>
+                        <textarea name="comments" class="form-control-modern" rows="2" placeholder="Add any additional details..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer border-0">
+                    <button type="button" class="btn-modern btn-modern-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn-modern btn-modern-primary" id="submitReportBtn">
+                        <i class="fas fa-paper-plane"></i> Submit Report
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+
+<script>
+function openReportModal(id, name) {
+    console.log('Opening modal for student:', id, name);
+    
+    // Set the student ID
+    var field = document.getElementById('reportStudentId');
+    if (field) {
+        field.value = id;
+        console.log('Student ID set to:', id);
+    } else {
+        console.log('Field not found, creating it...');
+        var form = document.getElementById('reportForm');
+        if (form) {
+            var input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'student_id';
+            input.id = 'reportStudentId';
+            input.value = id;
+            form.appendChild(input);
+            console.log('Created field with value:', id);
+        }
+    }
+    
+    // Set name
+    var nameField = document.getElementById('reportStudentName');
+    if (nameField) {
+        nameField.textContent = name;
+    }
+    
+    // Show modal
+    try {
+        var modal = new bootstrap.Modal(document.getElementById('reportModal'));
+        modal.show();
+    } catch(e) {
+        document.getElementById('reportModal').style.display = 'block';
+        document.getElementById('reportModal').classList.add('show');
+    }
+}
+
+// Form validation
+document.addEventListener('DOMContentLoaded', function() {
+    var form = document.getElementById('reportForm');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            var studentId = document.getElementById('reportStudentId');
+            if (!studentId || !studentId.value) {
+                e.preventDefault();
+                alert('Please select a student first!');
+                return false;
+            }
+            console.log('Submitting with student_id:', studentId.value);
+            return true;
+        });
+    }
+});
+
+// Search
+document.addEventListener('DOMContentLoaded', function() {
+    var searchInput = document.getElementById('searchStudent');
+    var searchResults = document.getElementById('searchResults');
+    var searchTimeout;
+    
+    if (searchInput) {
+        searchInput.addEventListener('keyup', function() {
+            clearTimeout(searchTimeout);
+            var query = this.value.trim();
+            if (query.length < 2) {
+                searchResults.innerHTML = '';
+                return;
+            }
+            searchTimeout = setTimeout(function() {
+                fetch('/api/search-students/?q=' + encodeURIComponent(query))
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.students && data.students.length > 0) {
+                            var html = '<h6 class="mb-2">Results:</h6>';
+                            data.students.forEach(function(s) {
+                                html += '<div class="card p-3 mb-2">' +
+                                    '<div class="d-flex justify-content-between align-items-center">' +
+                                    '<div><strong>' + s.name + '</strong><br><small>' + s.admission_number + ' | ' + s.stream + ' | Risk: ' + s.risk_score + '%</small></div>' +
+                                    '<div><button class="btn-modern btn-modern-primary btn-modern-sm" onclick="openReportModal(' + s.id + ', \'' + s.name + '\')"><i class="fas fa-flag"></i></button> <a href="/student/' + s.id + '/" class="btn-modern btn-modern-secondary btn-modern-sm"><i class="fas fa-eye"></i></a></div>' +
+                                    '</div>' +
+                                    '</div>';
+                            });
+                            searchResults.innerHTML = html;
+                        } else {
+                            searchResults.innerHTML = '<div class="alert alert-info">No students found</div>';
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Search error:', error);
+                        searchResults.innerHTML = '<div class="alert alert-danger">Search error</div>';
+                    });
+            }, 500);
+        });
+    }
+});
+</script>
+{% endblock %}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
