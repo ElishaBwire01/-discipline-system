@@ -74,25 +74,13 @@ WSGI_APPLICATION = 'disciplinary_program.wsgi.application'
 # ============================================
 # DATABASE CONFIGURATION
 # ============================================
-# For Vercel: Use /tmp for writable storage (temporary)
-# For Local: Use the absolute path
-
-# Check if running on Vercel
-if os.environ.get('VERCEL'):
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': os.path.join('/tmp', 'db.sqlite3'),
-        }
+# Use the committed database file
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
-else:
-    # Local development
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
-        }
-    }
+}
 
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
