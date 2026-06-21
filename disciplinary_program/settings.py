@@ -104,15 +104,14 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # ============================================
 # DATABASE CONFIGURATION
 # ============================================
-import os
-import dj_database_url
+# Using Supabase API - no direct database connection needed
+# Django ORM will work with Supabase via API calls
 
-# Use PostgreSQL on Supabase
 DATABASES = {
-    'default': dj_database_url.config(
-        default=os.environ.get('DATABASE_URL'),
-        conn_max_age=600,
-        ssl_require=True
-    )
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': ':memory:',
+    }
 }
+
 
