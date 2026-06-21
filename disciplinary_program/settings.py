@@ -106,3 +106,17 @@ LOGIN_REDIRECT_URL = '/dashboard/'
 LOGOUT_REDIRECT_URL = '/login/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# ============================================
+# SUPABASE CONFIGURATION
+# ============================================
+SUPABASE_URL = os.environ.get('SUPABASE_URL')
+SUPABASE_PUBLISHABLE_KEY = os.environ.get('SUPABASE_PUBLISHABLE_KEY')
+SUPABASE_SECRET_KEY = os.environ.get('SUPABASE_SECRET_KEY')
+
+# ============================================
+# SUPABASE CONFIGURATION
+# ============================================
+SUPABASE_URL = os.environ.get('SUPABASE_URL')
+SUPABASE_PUBLISHABLE_KEY = os.environ.get('SUPABASE_PUBLISHABLE_KEY')
+SUPABASE_SECRET_KEY = os.environ.get('SUPABASE_SECRET_KEY')

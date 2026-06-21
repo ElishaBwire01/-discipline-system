@@ -43,6 +43,15 @@ urlpatterns = [
     path('delete-user/<int:user_id>/', views.delete_user_permanent, name='delete_user_permanent'),
     path('ban-user/<int:user_id>/', views.ban_user_permanent, name='ban_user_permanent'),
     
+
+        # ============================================
+    # SUPABASE API ROUTES
+    # ============================================
+    path('api/supabase/sync-students/', views.supabase_sync_students, name='supabase_sync_students'),
+    path('api/supabase/sync-reports/', views.supabase_sync_reports, name='supabase_sync_reports'),
+    path('api/supabase/students/', views.supabase_get_students, name='supabase_get_students'),
+    path('api/supabase/reports/', views.supabase_get_reports, name='supabase_get_reports'),
+
     # ============================================
     # USER PROFILE
     # ============================================
@@ -60,4 +69,5 @@ urlpatterns = [
     path('api/online-teachers/', views.online_teachers_api, name='online_teachers_api'),
     path('api/admin-notifications/', views.get_admin_notifications, name='get_admin_notifications'),
 ]
+
 

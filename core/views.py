@@ -12,6 +12,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.cache import never_cache
 from django.utils.crypto import get_random_string
 import pandas as pd
+from supabase import create_client
 from .models import (
     Student, DisciplineReport, DisciplineCategory, Notification,
     Stream, TeacherProfile, UserSession, PasswordReset,
@@ -20,6 +21,17 @@ from .models import (
 # ============================================
 # HELPERS
 # ============================================
+# ============================================
+# SUPABASE HELPER
+# ============================================
+
+def get_supabase_client():
+    """Initialize and return Supabase client."""
+    from django.conf import settings
+    return create_client(
+        settings.SUPABASE_URL,
+        settings.SUPABASE_SECRET_KEY
+    )
 
 def admin_required(user):
     return user.is_superuser
@@ -231,6 +243,96 @@ def dashboard_redirect(request):
 # ============================================
 # DASHBOARD VIEWS
 # ============================================
+# ============================================
+# SUPABASE API ENDPOINTS
+# ============================================
+
+@csrf_exempt
+@login_required
+def supabase_sync_students(request):
+    """Sync students to Supabase."""
+    if request.method != 'POST':
+        return JsonResponse({'error': 'POST required'}, status=405)
+    
+    supabase = get_supabase_client()
+    students = Student.objects.filter(is_active=True).select_related('stream')
+    
+    results = []
+    for student in students:
+        try:
+            data = {
+                'id': student.id,
+                'admission_number': student.admission_number,
+                'name': student.name,
+                'form': student.form,
+                'stream': student.stream.name if student.stream else None,
+                'risk_score': student.risk_score,
+                'is_active': student.is_active,
+                'year': student.year,
+            }
+            response = supabase.table('students').upsert(data).execute()
+            results.append({'id': student.id, 'status': 'success'})
+        except Exception as e:
+            results.append({'id': student.id, 'status': 'error', 'error': str(e)})
+    
+    return JsonResponse({
+        'message': f'Processed {len(results)} students',
+        'results': results
+    })
+
+@csrf_exempt
+@login_required
+def supabase_sync_reports(request):
+    """Sync reports to Supabase."""
+    if request.method != 'POST':
+        return JsonResponse({'error': 'POST required'}, status=405)
+    
+    supabase = get_supabase_client()
+    reports = DisciplineReport.objects.select_related('student', 'category', 'reported_by')[:100]
+    
+    results = []
+    for report in reports:
+        try:
+            data = {
+                'id': report.id,
+                'student_id': report.student.id,
+                'student_name': report.student.name,
+                'category': report.category.name if report.category else None,
+                'points': report.points,
+                'rating': report.rating,
+                'comments': report.comments,
+                'reported_by': report.reported_by.username,
+                'reported_at': report.reported_at.isoformat(),
+            }
+            response = supabase.table('reports').upsert(data).execute()
+            results.append({'id': report.id, 'status': 'success'})
+        except Exception as e:
+            results.append({'id': report.id, 'status': 'error', 'error': str(e)})
+    
+    return JsonResponse({
+        'message': f'Processed {len(results)} reports',
+        'results': results
+    })
+
+@login_required
+def supabase_get_students(request):
+    """Get students from Supabase."""
+    supabase = get_supabase_client()
+    try:
+        response = supabase.table('students').select('*').execute()
+        return JsonResponse({'students': response.data, 'count': len(response.data)})
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+
+@login_required
+def supabase_get_reports(request):
+    """Get reports from Supabase."""
+    supabase = get_supabase_client()
+    try:
+        response = supabase.table('reports').select('*').order('reported_at', desc=True).limit(100).execute()
+        return JsonResponse({'reports': response.data, 'count': len(response.data)})
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
 
 @login_required
 @user_passes_test(admin_required)
@@ -1090,6 +1192,9 @@ def get_admin_notifications(request):
         })
 
     return JsonResponse({'notifications': notifications, 'total': len(notifications)})
+
+
+
 
 
 
