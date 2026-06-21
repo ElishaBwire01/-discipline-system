@@ -71,13 +71,29 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'disciplinary_program.wsgi.application'
 
+# ============================================
+# DATABASE CONFIGURATION FOR VERCEL
+# ============================================
+# Vercel uses /tmp for writable storage
+# Data is temporary and resets on each deployment
+# For production, use PostgreSQL via DATABASE_URL env var
+
+# Option 1: Use SQLite with /tmp (works on Vercel, temporary)
 DATABASES = {
-    'default': dj_database_url.config(
-        default='sqlite:///' + str(BASE_DIR / 'db.sqlite3'),
-        conn_max_age=600,
-        ssl_require=False
-    )
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join('/tmp', 'db.sqlite3'),
+    }
 }
+
+# Option 2: Use PostgreSQL (uncomment if DATABASE_URL is set)
+# DATABASES = {
+#     'default': dj_database_url.config(
+#         default=os.path.join('/tmp', 'db.sqlite3'),
+#         conn_max_age=600,
+#         ssl_require=False
+#     )
+# }
 
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
