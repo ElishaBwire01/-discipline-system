@@ -1,0 +1,233 @@
+﻿{% extends 'base.html' %}
+
+{% block title %}Class Teacher Dashboard{% endblock %}
+
+{% block content %}
+<div class="alert-modern alert alert-info mb-4" data-aos="fade-up">
+    <span class="alert-icon"><i class="fas fa-chalkboard-teacher"></i></span>
+    <div>
+        <strong>{{ assigned_stream.get_name_display }}</strong> - {{ assigned_form|default:"All Forms" }}
+        {% if not user.teacher_profile.is_approved %}
+        <span class="badge-modern badge-warning ms-2">Pending Approval</span>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Stats -->
+<div class="stat-grid" data-aos="fade-up">
+    <div class="stat-card">
+        <div class="stat-bg-icon"><i class="fas fa-users"></i></div>
+        <div class="stat-icon primary"><i class="fas fa-users"></i></div>
+        <div class="stat-value">{{ class_stats.total }}</div>
+        <div class="stat-label">My Students</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-bg-icon"><i class="fas fa-exclamation-triangle"></i></div>
+        <div class="stat-icon danger"><i class="fas fa-exclamation-triangle"></i></div>
+        <div class="stat-value">{{ class_stats.critical }}</div>
+        <div class="stat-label">Critical Cases</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-bg-icon"><i class="fas fa-chart-line"></i></div>
+        <div class="stat-icon warning"><i class="fas fa-chart-line"></i></div>
+        <div class="stat-value">{{ class_stats.avg_risk|floatformat:0 }}%</div>
+        <div class="stat-label">Average Risk</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-bg-icon"><i class="fas fa-bell"></i></div>
+        <div class="stat-icon info"><i class="fas fa-bell"></i></div>
+        <div class="stat-value">{{ notification_count }}</div>
+        <div class="stat-label">Notifications</div>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="card-modern mb-4" data-aos="fade-up">
+    <div class="card-body p-3">
+        <div class="d-flex flex-wrap gap-2">
+            <a href="{% url 'user_profile_settings' %}" class="btn-modern btn-modern-secondary"><i class="fas fa-user-cog"></i> Profile</a>
+            <a href="{% url 'class_teacher_dashboard' %}" class="btn-modern btn-modern-primary"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+        </div>
+    </div>
+</div>
+
+<!-- Add Student -->
+<div class="card-modern mb-4" data-aos="fade-up">
+    <div class="card-header-modern">
+        <span class="header-icon"><i class="fas fa-plus-circle"></i></span>
+        Add Student to {{ assigned_stream.get_name_display }}
+    </div>
+    <div class="card-body p-4">
+        <form method="post" action="{% url 'class_teacher_dashboard' %}">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="add_student">
+            <div class="row g-3">
+                <div class="col-md-3"><input type="text" name="admission_number" class="form-control-modern" placeholder="Admission Number" required></div>
+                <div class="col-md-3"><input type="text" name="name" class="form-control-modern" placeholder="Full Name" required></div>
+                <div class="col-md-2">
+                    <select name="form" class="form-control-modern" required>
+                        <option value="">Form</option>
+                        {% for form_key, form_name in forms %}
+                        <option value="{{ form_key }}" {% if assigned_form == form_key %}selected{% endif %}>{{ form_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2"><input type="number" name="year" class="form-control-modern" placeholder="Year" value="2026"></div>
+                <div class="col-md-2"><button type="submit" class="btn-modern btn-modern-primary w-100"><i class="fas fa-plus"></i> Add</button></div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Search -->
+<div class="card-modern mb-4" data-aos="fade-up">
+    <div class="card-header-modern">
+        <span class="header-icon"><i class="fas fa-search"></i></span>
+        Search & Report Students
+    </div>
+    <div class="card-body p-4">
+        <div class="search-box">
+            <span class="search-icon"><i class="fas fa-search"></i></span>
+            <input type="text" id="searchStudent" placeholder="Search by name or admission number...">
+        </div>
+        <div id="searchResults" class="mt-3"></div>
+    </div>
+</div>
+
+<!-- My Students -->
+<div class="card-modern" data-aos="fade-up">
+    <div class="card-header-modern">
+        <span class="header-icon"><i class="fas fa-chalkboard"></i></span>
+        My Students - {{ assigned_stream.get_name_display }}
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table-modern">
+                <thead>
+                    <tr>
+                        <th>Admission</th>
+                        <th>Name</th>
+                        <th>Form</th>
+                        <th>Reports</th>
+                        <th>Risk Score</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for student in my_students %}
+                    <tr>
+                        <td>{{ student.admission_number }}</td>
+                        <td>{{ student.name }}</td>
+                        <td>{{ student.form }}</td>
+                        <td>{{ student.total_reports }}</td>
+                        <td>
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="progress-modern"><div class="progress-bar-modern" style="width: {{ student.risk_score }}%; background: {% if student.risk_score >= 60 %}linear-gradient(135deg, #ef4444, #dc2626){% elif student.risk_score >= 30 %}linear-gradient(135deg, #f59e0b, #d97706){% else %}linear-gradient(135deg, #10b981, #059669){% endif %}"></div></div>
+                                <span class="fw-bold" style="font-size:0.813rem;">{{ student.risk_score }}%</span>
+                            </div>
+                        </td>
+                        <td>
+                            {% if student.is_critical %}
+                            <span class="badge-modern badge-critical">Critical</span>
+                            {% elif student.risk_score >= 30 %}
+                            <span class="badge-modern badge-warning">Warning</span>
+                            {% else %}
+                            <span class="badge-modern badge-success">Good</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <button class="btn-modern btn-modern-primary btn-modern-sm" onclick="openReportModal({{ student.id }}, '{{ student.name }}')"><i class="fas fa-flag"></i></button>
+                            <a href="{% url 'student_profile' student.id %}" class="btn-modern btn-modern-secondary btn-modern-sm"><i class="fas fa-eye"></i></a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="7" class="text-center py-4 text-muted">No students in your class</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Pagination -->
+<nav aria-label="Page navigation">
+    <ul class="pagination justify-content-center">
+        {% if my_students.has_previous %}
+        <li class="page-item">
+            <a class="page-link" href="?page={{ my_students.previous_page_number }}">&laquo;</a>
+        </li>
+        {% else %}
+        <li class="page-item disabled"><span class="page-link">&laquo;</span></li>
+        {% endif %}
+
+        {% for num in my_students.paginator.page_range %}
+            {% if my_students.number == num %}
+            <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+            {% elif num > my_students.number|add:'-3' and num < my_students.number|add:'3' %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+            </li>
+            {% endif %}
+        {% endfor %}
+
+        {% if my_students.has_next %}
+        <li class="page-item">
+            <a class="page-link" href="?page={{ my_students.next_page_number }}">&raquo;</a>
+        </li>
+        {% else %}
+        <li class="page-item disabled"><span class="page-link">&raquo;</span></li>
+        {% endif %}
+    </ul>
+    <div class="text-center text-muted">
+        <small>Page {{ my_students.number }} of {{ my_students.paginator.num_pages }} ({{ my_students.paginator.count }} total)</small>
+    </div>
+</nav>
+
+<!-- Report Modal -->
+<div class="modal fade" id="reportModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4">
+            <div class="modal-header border-0">
+                <h5 class="modal-title fw-bold"><i class="fas fa-flag text-primary me-2"></i>Report Student</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="post" action="{% url 'class_teacher_dashboard' %}" id="reportForm">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="report_student">
+                <input type="hidden" name="student_id" id="reportStudentId" value="0">
+                <div class="modal-body">
+                    <p class="mb-3">Reporting: <strong id="reportStudentName"></strong></p>
+                    {% include 'includes/custom_case.html' %}
+                </div>
+                <div class="modal-footer border-0">
+                    <button type="button" class="btn-modern btn-modern-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn-modern btn-modern-primary" id="submitReportBtn"><i class="fas fa-paper-plane"></i> Submit</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+function openReportModal(id, name) {
+    document.getElementById('reportStudentId').value = id;
+    document.getElementById('reportStudentName').textContent = name;
+    new bootstrap.Modal(document.getElementById('reportModal')).show();
+}
+
+document.getElementById('searchStudent')?.addEventListener('keyup', function() {
+    var query = this.value.trim();
+    if (query.length < 2) { document.getElementById('searchResults').innerHTML = ''; return; }
+    fetch('/api/search-students/?q=' + encodeURIComponent(query))
+        .then(r => r.json())
+        .then(data => {
+            var html = data.students.length ? '<h6>Results:</h6>' : '<div class="alert alert-info">No students found</div>';
+            data.students.forEach(function(s) {
+                html += '<div class="card p-2 mb-2"><div class="d-flex justify-content-between"><div><strong>'+s.name+'</strong><br><small>'+s.admission_number+' | '+s.stream+' | Risk: '+s.risk_score+'%</small></div><div><button class="btn-modern btn-modern-primary btn-modern-sm" onclick="openReportModal('+s.id+', \''+s.name+'\')"><i class="fas fa-flag"></i></button></div></div></div>';
+            });
+            document.getElementById('searchResults').innerHTML = html;
+        });
+});
+</script>
+{% endblock %}

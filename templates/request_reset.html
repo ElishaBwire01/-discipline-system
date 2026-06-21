@@ -1,0 +1,32 @@
+﻿{% extends 'base.html' %}
+
+{% block title %}Forgot Password{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center" style="min-height: 70vh; align-items: center;">
+    <div class="col-lg-5 col-md-7" data-aos="fade-up">
+        <div class="card-modern">
+            <div class="card-body p-4 p-lg-5 text-center">
+                <div style="width: 64px; height: 64px; background: linear-gradient(135deg, #2563eb, #7c3aed); border-radius: 16px; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.25rem;">
+                    <i class="fas fa-key fa-2x text-white"></i>
+                </div>
+                <h2 class="fw-bold">Forgot Password?</h2>
+                <p class="text-muted">Enter your username to request a reset</p>
+                
+                <div class="alert alert-info text-start"><i class="fas fa-info-circle me-2"></i><strong>How it works:</strong><br>1. Enter your username<br>2. Admin will review your request<br>3. You'll receive a new password</div>
+                
+                <form method="post" action="{% url 'request_password_reset' %}">
+                    {% csrf_token %}
+                    <div class="mb-3 text-start">
+                        <label class="form-label-modern">Username</label>
+                        <input type="text" name="username" class="form-control-modern" placeholder="Enter your username" required>
+                    </div>
+                    <button type="submit" class="btn-modern btn-modern-primary w-100"><i class="fas fa-paper-plane me-2"></i>Request Reset</button>
+                </form>
+                
+                <div class="mt-3"><a href="{% url 'login' %}" class="text-muted"><i class="fas fa-arrow-left me-1"></i>Back to Login</a></div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,157 @@
+﻿================================================================================
+                    COMPLETE DIAGNOSTIC REPORT
+                    Generated: 2026-06-21 06:36:12
+================================================================================
+[PYTHON SYNTAX] Checking Python files...
+[PYTHON FILES] ✅ C:\Windows\System32\discipline\core\migrations\0001_initial.py - OK
+[PYTHON FILES] ✅ C:\Windows\System32\discipline\core\migrations\__init__.py - OK
+[PYTHON FILES] ✅ C:\Windows\System32\discipline\core\admin.py - OK
+[PYTHON FILES] ✅ C:\Windows\System32\discipline\core\apps.py - OK
+[PYTHON FILES] ✅ C:\Windows\System32\discipline\core\context_processors.py - OK
+[PYTHON FILES] ✅ C:\Windows\System32\discipline\core\decorators.py - OK
+[PYTHON FILES] ✅ C:\Windows\System32\discipline\core\forms.py - OK
+[PYTHON FILES] ✅ C:\Windows\System32\discipline\core\models.py - OK
+[PYTHON FILES] ✅ C:\Windows\System32\discipline\core\models_backup.py - OK
+[PYTHON FILES] ✅ C:\Windows\System32\discipline\core\signals.py - OK
+[PYTHON FILES] ✅ C:\Windows\System32\discipline\core\urls.py - OK
+[PYTHON FILES] ✅ C:\Windows\System32\discipline\core\views.py - OK
+[PYTHON FILES] ✅ C:\Windows\System32\discipline\core\__init__.py - OK
+[PYTHON FILES] ✅ C:\Windows\System32\discipline\disciplinary_program\asgi.py - OK
+[PYTHON FILES] ✅ C:\Windows\System32\discipline\disciplinary_program\settings.py - OK
+[PYTHON FILES] ✅ C:\Windows\System32\discipline\disciplinary_program\urls.py - OK
+[PYTHON FILES] ✅ C:\Windows\System32\discipline\disciplinary_program\wsgi.py - OK
+[PYTHON FILES] ✅ C:\Windows\System32\discipline\disciplinary_program\__init__.py - OK
+[PYTHON FILES] ✅ C:\Windows\System32\discipline\add_columns.py - OK
+[PYTHON FILES] ✅ C:\Windows\System32\discipline\add_custom_category.py - OK
+[PYTHON FILES] ✅ C:\Windows\System32\discipline\add_rating.py - OK
+[PYTHON FILES] ✅ C:\Windows\System32\discipline\add_rating_column.py - OK
+[PYTHON FILES] ✅ C:\Windows\System32\discipline\check_fields.py - OK
+[PYTHON FILES] ✅ C:\Windows\System32\discipline\create_admin.py - OK
+[PYTHON FILES] ✅ C:\Windows\System32\discipline\create_sample_reports.py - OK
+[PYTHON FILES] ✅ C:\Windows\System32\discipline\ensure_streams.py - OK
+[PYTHON FILES] ✅ C:\Windows\System32\discipline\fix_rating_column.py - OK
+[PYTHON FILES] ✅ C:\Windows\System32\discipline\init_data.py - OK
+[PYTHON FILES] ✅ C:\Windows\System32\discipline\init_setup.py - OK
+[PYTHON FILES] ✅ C:\Windows\System32\discipline\manage.py - OK
+[PYTHON FILES] ✅ C:\Windows\System32\discipline\setup_admin.py - OK
+[PYTHON FILES] ✅ C:\Windows\System32\discipline\update_db_schema.py - OK
+[PYTHON FILES] ✅ C:\Windows\System32\discipline\verify_fields.py - OK
+[PYTHON FILES] ✅ C:\Windows\System32\discipline\verify_table.py - OK
+[
+TEMPLATE FILES] Checking HTML templates...
+[TEMPLATE ERRORS] ❌ 500.html: TAG MISMATCH: Open=17, Close=12
+[TEMPLATE ERRORS] ❌ admin_dashboard.html: TAG MISMATCH: Open=145, Close=136
+[TEMPLATE ERRORS] ❌ admin_profile.html: TAG MISMATCH: Open=77, Close=61
+[TEMPLATE FILES] ✅ admin_reset_requests.html - OK
+[TEMPLATE ERRORS] ❌ base.html: TAG MISMATCH: Open=99, Close=82
+[TEMPLATE FILES] ✅ choose_stream.html - OK
+[TEMPLATE ERRORS] ❌ class_teacher_dashboard.html: TAG MISMATCH: Open=176, Close=163
+[TEMPLATE ERRORS] ❌ edit_student.html: TAG MISMATCH: Open=58, Close=46
+[TEMPLATE ERRORS] ❌ index.html: TAG MISMATCH: Open=8, Close=6
+[TEMPLATE ERRORS] ❌ login.html: TAG MISMATCH: Open=44, Close=36
+[TEMPLATE ERRORS] ❌ manage_users.html: TAG MISMATCH: Open=83, Close=81
+[TEMPLATE ERRORS] ❌ register.html: TAG MISMATCH: Open=81, Close=69
+[TEMPLATE ERRORS] ❌ request_reset.html: TAG MISMATCH: Open=23, Close=19
+[TEMPLATE ERRORS] ❌ student_profile.html: TAG MISMATCH: Open=85, Close=80
+[TEMPLATE ERRORS] ❌ teacher_dashboard.html: TAG MISMATCH: Open=106, Close=98
+[TEMPLATE ERRORS] ❌ user_profile.html: TAG MISMATCH: Open=108, Close=86
+[TEMPLATE ERRORS] ❌ custom_case.html: TAG MISMATCH: Open=38, Close=31
+[TEMPLATE ERRORS] ❌ custom_category.html: TAG MISMATCH: Open=39, Close=31
+[TEMPLATE ERRORS] ❌ report_form.html: TAG MISMATCH: Open=16, Close=15
+[
+MODEL vs MIGRATION] Checking for mismatches...
+[
+URL vs VIEW] Checking URL routes...
+[URL/VIEW OK] ✅ login/ -> custom_login
+[URL/VIEW OK] ✅ logout/ -> custom_logout
+[URL/VIEW OK] ✅ register/ -> register
+[URL/VIEW OK] ✅ request-reset/ -> request_password_reset
+[URL/VIEW OK] ✅ admin-reset-requests/ -> admin_reset_requests
+[URL/VIEW OK] ✅ approve-reset/<int:reset_id>/ -> approve_reset
+[URL/VIEW OK] ✅ reject-reset/<int:reset_id>/ -> reject_reset
+[URL/VIEW OK] ✅ dashboard/ -> dashboard_redirect
+[URL/VIEW OK] ✅ choose-stream/ -> choose_stream
+[URL/VIEW OK] ✅ admin-dashboard/ -> admin_dashboard
+[URL/VIEW OK] ✅ class-teacher-dashboard/ -> class_teacher_dashboard
+[URL/VIEW OK] ✅ teacher-dashboard/ -> teacher_dashboard
+[URL/VIEW OK] ✅ student/<int:student_id>/ -> student_profile
+[URL/VIEW OK] ✅ student/<int:student_id>/edit/ -> edit_student
+[URL/VIEW OK] ✅ manage-users/ -> manage_users
+[URL/VIEW OK] ✅ approve-user/<int:user_id>/ -> approve_user
+[URL/VIEW OK] ✅ suspend-user/<int:user_id>/ -> suspend_user
+[URL/VIEW OK] ✅ unsuspend-user/<int:user_id>/ -> unsuspend_user
+[URL/VIEW OK] ✅ delete-user/<int:user_id>/ -> delete_user_permanent
+[URL/VIEW OK] ✅ ban-user/<int:user_id>/ -> ban_user_permanent
+[URL/VIEW OK] ✅ profile/ -> user_profile_settings
+[URL/VIEW OK] ✅ admin-profile/ -> admin_profile
+[URL/VIEW OK] ✅ upload-profile-picture/ -> upload_profile_picture
+[URL/VIEW OK] ✅ api/search-students/ -> search_students_api
+[URL/VIEW OK] ✅ api/notifications/ -> get_notifications_api
+[URL/VIEW OK] ✅ api/notifications/read/<int:notification_id>/ -> mark_notification_read
+[URL/VIEW OK] ✅ api/online-teachers/ -> online_teachers_api
+[URL/VIEW OK] ✅ api/admin-notifications/ -> get_admin_notifications
+[
+FORM vs MODEL] Checking form fields...
+[FORM/MODEL MISMATCH] ⚠️ Form field 'stream' not found in models.py
+[FORM/MODEL MISMATCH] ⚠️ Form field 'student' not found in models.py
+[FORM/MODEL MISMATCH] ⚠️ Form field 'category' not found in models.py
+[
+TEMPLATE VARIABLES] Checking template variables...
+[
+STATIC FILES] Checking static files...
+[STATIC FILES] ✅ Static files found: 4
+[
+DATABASE] Checking database...
+[DATABASE] ✅ Categories: 22
+[DATABASE] ✅ Streams: 9
+[DATABASE] ✅ Students: 1
+[
+SETTINGS] Checking settings.py...
+[SETTINGS] ⚠️ DEBUG is True (should be False in production)
+[SETTINGS] ⚠️ ALLOWED_HOSTS is ['*'] (should be restricted)
+[SETTINGS] ✅ CSRF_TRUSTED_ORIGINS is configured
+[SETTINGS] ✅ CSRF Middleware is enabled
+[
+COMMON ERRORS] Checking for common errors...
+[MODEL CHECK] ✅ DisciplineReport has category FK
+[VIEW CHECK] ✅ teacher_dashboard gets student_id from POST
+[
+JAVASCRIPT] Checking JavaScript...
+[JAVASCRIPT ERRORS] ⚠️ base.html: getElementById without null check
+[JAVASCRIPT ERRORS] ⚠️ class_teacher_dashboard.html: getElementById without null check
+[JAVASCRIPT ERRORS] ⚠️ login.html: Missing DOMContentLoaded event listener
+[JAVASCRIPT ERRORS] ⚠️ manage_users.html: getElementById without null check
+[JAVASCRIPT ERRORS] ⚠️ register.html: Missing DOMContentLoaded event listener
+[JAVASCRIPT ERRORS] ⚠️ student_profile.html: getElementById without null check
+[JAVASCRIPT ERRORS] ⚠️ teacher_dashboard.html: getElementById without null check
+[
+REPORT FORM] Checking report form...
+[REPORT FORM] ✅ student_id field has a default value
+[REPORT FORM] ❌ openReportModal may NOT set student_id correctly
+[REPORT FORM] ✅ Form has action URL
+[
+================================================================================
+                    SUMMARY
+================================================================================
+
+Total Issues Found:] 
+
+✅ Working items: 74
+⚠️ Warnings: 12
+❌ Errors: 18
+
+================================================================================
+                    RECOMMENDATIONS
+================================================================================
+
+1. Fix all ❌ errors first - these are critical issues
+2. Address ⚠️ warnings - these may cause problems
+3. Ensure all database tables exist
+4. Verify all URL routes match views
+5. Check that form fields match model fields
+6. Make sure CSRF tokens are included in all forms
+7. Ensure student_id is properly set in JavaScript
+
+================================================================================
+                    END OF REPORT
+================================================================================

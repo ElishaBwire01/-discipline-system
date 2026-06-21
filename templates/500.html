@@ -1,0 +1,57 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>500 - Server Error</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #0f172a, #1e293b);
+            padding: 1.5rem;
+        }
+        .error-box {
+            background: rgba(255,255,255,0.95);
+            border-radius: 24px;
+            padding: 3rem;
+            max-width: 480px;
+            text-align: center;
+            box-shadow: 0 25px 60px rgba(0,0,0,0.3);
+        }
+        .error-box .error-icon {
+            width: 80px; height: 80px;
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 1.5rem;
+            font-size: 2.5rem; color: white;
+        }
+        .error-box h1 { font-size: 2rem; font-weight: 800; color: #0f172a; margin-bottom: 0.5rem; }
+        .error-box p { color: #64748b; margin-bottom: 1.5rem; }
+        .error-box .btn-home {
+            display: inline-flex; align-items: center; gap: 0.5rem;
+            padding: 0.75rem 2rem;
+            background: linear-gradient(135deg, #2563eb, #7c3aed);
+            color: white; border: none; border-radius: 12px;
+            text-decoration: none; font-weight: 600;
+            transition: all 0.3s;
+        }
+        .error-box .btn-home:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(37,99,235,0.35); }
+    </style>
+</head>
+<body>
+    <div class="error-box">
+        <div class="error-icon"><i class="fas fa-exclamation-triangle"></i></div>
+        <h1>500</h1>
+        <p>Something went wrong on our end. Please try again later.</p>
+        <a href="/" class="btn-home"><i class="fas fa-home"></i> Go Home</a>
+    </div>
+</body>
+</html>

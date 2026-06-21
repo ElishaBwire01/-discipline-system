@@ -1,0 +1,42 @@
+﻿{% extends 'base.html' %}
+
+{% block title %}Choose Your Class{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center" style="min-height: 70vh; align-items: center;">
+    <div class="col-lg-6 col-md-8" data-aos="fade-up">
+        <div class="card-modern">
+            <div class="card-body p-4 p-lg-5 text-center">
+                <div style="width: 72px; height: 72px; background: linear-gradient(135deg, #2563eb, #7c3aed); border-radius: 18px; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem;">
+                    <i class="fas fa-chalkboard-teacher fa-2x text-white"></i>
+                </div>
+                <h2 class="fw-bold">Welcome, {{ user.get_full_name|default:user.username }}</h2>
+                <p class="text-muted mb-4">Select your assigned class stream to continue</p>
+                
+                <div class="alert alert-info text-start"><i class="fas fa-info-circle me-2"></i>After selecting your stream, your account will be pending admin approval.</div>
+                
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="mb-3 text-start">
+                        <label class="form-label-modern">Select Stream</label>
+                        <select name="stream" class="form-control-modern" required>
+                            <option value="">-- Choose your stream --</option>
+                            {% for stream in streams %}<option value="{{ stream.id }}">{{ stream.get_name_display }}</option>{% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3 text-start">
+                        <label class="form-label-modern">Select Form</label>
+                        <select name="form" class="form-control-modern" required>
+                            <option value="">-- Choose your form --</option>
+                            {% for form_key, form_name in forms %}<option value="{{ form_key }}">{{ form_name }}</option>{% endfor %}
+                        </select>
+                    </div>
+                    <button type="submit" class="btn-modern btn-modern-primary w-100"><i class="fas fa-check-circle me-2"></i>Submit & Wait for Approval</button>
+                </form>
+                
+                <div class="mt-3"><small class="text-muted">Streams: {% for stream in streams %}{{ stream.get_name_display }}{% if not forloop.last %}, {% endif %}{% endfor %}</small></div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

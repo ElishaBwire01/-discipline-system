@@ -1,0 +1,219 @@
+﻿{% extends 'base.html' %}
+
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block content %}
+<!-- Pending Approvals Alert -->
+{% if pending_approvals > 0 %}
+<div class="alert-modern alert alert-warning mb-4" data-aos="fade-up">
+    <span class="alert-icon"><i class="fas fa-user-clock text-warning"></i></span>
+    <div>
+        <strong>{{ pending_approvals }}</strong> teacher(s) waiting for approval.
+        <a href="{% url 'manage_users' %}?status=pending" class="btn btn-sm btn-warning ms-2">Review Now</a>
+    </div>
+</div>
+{% endif %}
+
+<!-- Stats Grid -->
+<div class="stat-grid" data-aos="fade-up">
+    <div class="stat-card">
+        <div class="stat-bg-icon"><i class="fas fa-users"></i></div>
+        <div class="stat-icon primary"><i class="fas fa-users"></i></div>
+        <div class="stat-value">{{ total_students }}</div>
+        <div class="stat-label">Total Students</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-bg-icon"><i class="fas fa-exclamation-triangle"></i></div>
+        <div class="stat-icon danger"><i class="fas fa-exclamation-triangle"></i></div>
+        <div class="stat-value">{{ critical_students }}</div>
+        <div class="stat-label">Critical Cases</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-bg-icon"><i class="fas fa-flag"></i></div>
+        <div class="stat-icon success"><i class="fas fa-flag"></i></div>
+        <div class="stat-value">{{ total_reports }}</div>
+        <div class="stat-label">Total Reports</div>
+        <div class="stat-change up">{{ reports_today }} today</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-bg-icon"><i class="fas fa-user-clock"></i></div>
+        <div class="stat-icon info"><i class="fas fa-user-clock"></i></div>
+        <div class="stat-value">{{ online_count }}</div>
+        <div class="stat-label">Online Teachers</div>
+    </div>
+</div>
+
+<!-- Management Actions -->
+<div class="card-modern mb-4" data-aos="fade-up">
+    <div class="card-header-modern">
+        <span class="header-icon"><i class="fas fa-cog"></i></span>
+        System Management
+    </div>
+    <div class="card-body p-3">
+        <div class="d-flex flex-wrap gap-2">
+            <a href="{% url 'manage_users' %}" class="btn-modern btn-modern-primary">
+                <i class="fas fa-users"></i> Manage Users
+                {% if pending_approvals > 0 %}<span class="badge bg-light text-dark ms-1">{{ pending_approvals }}</span>{% endif %}
+            </a>
+            <a href="{% url 'admin_reset_requests' %}" class="btn-modern btn-modern-warning">
+                <i class="fas fa-key"></i> Password Resets
+                <span class="badge bg-light text-dark ms-1" id="resetCount">0</span>
+            </a>
+            <a href="{% url 'admin_profile' %}" class="btn-modern btn-modern-secondary">
+                <i class="fas fa-user-cog"></i> My Profile
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Add Student -->
+<div class="card-modern mb-4" data-aos="fade-up">
+    <div class="card-header-modern">
+        <span class="header-icon"><i class="fas fa-plus-circle"></i></span>
+        Add Student
+    </div>
+    <div class="card-body p-4">
+        <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="add_student">
+            <div class="row g-3">
+                <div class="col-md-3"><input type="text" name="admission_number" class="form-control-modern" placeholder="Admission Number" required></div>
+                <div class="col-md-3"><input type="text" name="name" class="form-control-modern" placeholder="Full Name" required></div>
+                <div class="col-md-2">
+                    <select name="stream" class="form-control-modern" required>
+                        <option value="">Stream</option>
+                        {% for stream_key, stream_name in streams %}
+                        <option value="{{ stream_key }}">{{ stream_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <select name="form" class="form-control-modern" required>
+                        <option value="">Form</option>
+                        {% for form_key, form_name in forms %}
+                        <option value="{{ form_key }}">{{ form_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2"><button type="submit" class="btn-modern btn-modern-primary w-100"><i class="fas fa-plus"></i> Add</button></div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Students Table -->
+<div class="card-modern" data-aos="fade-up">
+    <div class="card-header-modern">
+        <span class="header-icon"><i class="fas fa-search"></i></span>
+        Students
+    </div>
+    <div class="card-body p-3">
+        <form method="get" class="row g-2 mb-3">
+            <div class="col-md-3"><input type="text" name="search" class="form-control-modern" placeholder="Search..." value="{{ search_query }}"></div>
+            <div class="col-md-2">
+                <select name="stream" class="form-control-modern">
+                    <option value="">All Streams</option>
+                    {% for stream_key, stream_name in streams %}
+                    <option value="{{ stream_key }}" {% if stream_filter == stream_key %}selected{% endif %}>{{ stream_name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2">
+                <select name="form" class="form-control-modern">
+                    <option value="">All Forms</option>
+                    {% for form_key, form_name in forms %}
+                    <option value="{{ form_key }}" {% if form_filter == form_key %}selected{% endif %}>{{ form_name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2">
+                <select name="risk" class="form-control-modern">
+                    <option value="">All Status</option>
+                    <option value="critical" {% if risk_filter == 'critical' %}selected{% endif %}>Critical</option>
+                    <option value="warning" {% if risk_filter == 'warning' %}selected{% endif %}>Warning</option>
+                    <option value="good" {% if risk_filter == 'good' %}selected{% endif %}>Good</option>
+                </select>
+            </div>
+            <div class="col-md-3"><button type="submit" class="btn-modern btn-modern-primary w-100"><i class="fas fa-filter"></i> Filter</button></div>
+        </form>
+        
+        <div class="table-responsive">
+            <table class="table-modern">
+                <thead>
+                    <tr>
+                        <th>Admission</th>
+                        <th>Name</th>
+                        <th>Stream</th>
+                        <th>Form</th>
+                        <th>Reports</th>
+                        <th>Risk Score</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for student in students %}
+                    <tr>
+                        <td>{{ student.admission_number }}</td>
+                        <td>{{ student.name }}</td>
+                        <td>{{ student.stream.get_name_display }}</td>
+                        <td>{{ student.form }}</td>
+                        <td><span class="badge-modern {% if student.total_reports >= 20 %}badge-critical{% else %}badge-info{% endif %}">{{ student.total_reports }}</span></td>
+                        <td>
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="progress-modern"><div class="progress-bar-modern" style="width: {{ student.risk_score }}%; background: {% if student.risk_score >= 60 %}linear-gradient(135deg, #ef4444, #dc2626){% elif student.risk_score >= 30 %}linear-gradient(135deg, #f59e0b, #d97706){% else %}linear-gradient(135deg, #10b981, #059669){% endif %}"></div></div>
+                                <span class="fw-bold" style="font-size:0.813rem;">{{ student.risk_score }}%</span>
+                            </div>
+                        </td>
+                        <td>
+                            {% if student.is_critical %}<span class="badge-modern badge-critical">Critical</span>
+                            {% elif student.risk_score >= 30 %}<span class="badge-modern badge-warning">Warning</span>
+                            {% else %}<span class="badge-modern badge-success">Good</span>{% endif %}
+                        </td>
+                        <td><a href="{% url 'student_profile' student.id %}" class="btn-modern btn-modern-primary btn-modern-sm"><i class="fas fa-eye"></i></a></td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="8" class="text-center py-4 text-muted">No students found</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Pagination -->
+        {% if students.has_other_pages %}
+        <nav aria-label="Page navigation">
+            <ul class="pagination justify-content-center">
+                {% if students.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ students.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if stream_filter %}&stream={{ stream_filter }}{% endif %}{% if form_filter %}&form={{ form_filter }}{% endif %}{% if risk_filter %}&risk={{ risk_filter }}{% endif %}">&laquo;</a>
+                </li>
+                {% else %}
+                <li class="page-item disabled"><span class="page-link">&laquo;</span></li>
+                {% endif %}
+
+                {% for num in students.paginator.page_range %}
+                    {% if students.number == num %}
+                    <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                    {% elif num > students.number|add:'-3' and num < students.number|add:'3' %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ num }}{% if search_query %}&search={{ search_query }}{% endif %}{% if stream_filter %}&stream={{ stream_filter }}{% endif %}{% if form_filter %}&form={{ form_filter }}{% endif %}{% if risk_filter %}&risk={{ risk_filter }}{% endif %}">{{ num }}</a>
+                    </li>
+                    {% endif %}
+                {% endfor %}
+
+                {% if students.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ students.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if stream_filter %}&stream={{ stream_filter }}{% endif %}{% if form_filter %}&form={{ form_filter }}{% endif %}{% if risk_filter %}&risk={{ risk_filter }}{% endif %}">&raquo;</a>
+                </li>
+                {% else %}
+                <li class="page-item disabled"><span class="page-link">&raquo;</span></li>
+                {% endif %}
+            </ul>
+            <div class="text-center text-muted">
+                <small>Page {{ students.number }} of {{ students.paginator.num_pages }} ({{ students.paginator.count }} total)</small>
+            </div>
+        </nav>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
