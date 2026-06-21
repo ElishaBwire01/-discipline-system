@@ -1,4 +1,4 @@
-﻿{
+{
   "builds": [
     {
       "src": "disciplinary_program/wsgi.py",
@@ -11,18 +11,15 @@
   "routes": [
     {
       "src": "/static/(.*)",
-      "dest": "/static/"
+      "dest": "/static/$1"
     },
     {
       "src": "/media/(.*)",
-      "dest": "/media/"
+      "dest": "/media/$1"
     },
     {
       "src": "/(.*)",
       "dest": "disciplinary_program/wsgi.py"
     }
-  ],
-  "env": {
-    "DJANGO_SECRET_KEY": "your-secret-key-here"
-  }
+  ]
 }
