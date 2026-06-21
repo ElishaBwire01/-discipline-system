@@ -1,0 +1,83 @@
+﻿{% if is_paginated %}
+<nav aria-label="Page navigation">
+    <ul class="pagination justify-content-center">
+        {% if page_obj.has_previous %}
+        <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if stream_filter %}&stream={{ stream_filter }}{% endif %}{% if form_filter %}&form={{ form_filter }}{% endif %}{% if risk_filter %}&risk={{ risk_filter }}{% endif %}">
+                <span aria-hidden="true">&laquo;</span>
+            </a>
+        </li>
+        {% else %}
+        <li class="page-item disabled">
+            <span class="page-link">&laquo;</span>
+        </li>
+        {% endif %}
+
+        {% for num in page_obj.paginator.page_range %}
+            {% if page_obj.number == num %}
+            <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ num }}{% if search_query %}&search={{ search_query }}{% endif %}{% if stream_filter %}&stream={{ stream_filter }}{% endif %}{% if form_filter %}&form={{ form_filter }}{% endif %}{% if risk_filter %}&risk={{ risk_filter }}{% endif %}">{{ num }}</a>
+            </li>
+            {% endif %}
+        {% endfor %}
+
+        {% if page_obj.has_next %}
+        <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if stream_filter %}&stream={{ stream_filter }}{% endif %}{% if form_filter %}&form={{ form_filter }}{% endif %}{% if risk_filter %}&risk={{ risk_filter }}{% endif %}">
+                <span aria-hidden="true">&raquo;</span>
+            </a>
+        </li>
+        {% else %}
+        <li class="page-item disabled">
+            <span class="page-link">&raquo;</span>
+        </li>
+        {% endif %}
+    </ul>
+    <div class="text-center text-muted">
+        <small>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }} ({{ page_obj.paginator.count }} total)</small>
+    </div>
+</nav>
+
+<style>
+    .pagination { gap: 0.25rem; flex-wrap: wrap; margin-top: 1rem; }
+    .pagination .page-item .page-link {
+        border-radius: 8px;
+        padding: 0.5rem 0.9rem;
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: #475569;
+        border: 1px solid #e2e8f0;
+        background: white;
+        transition: all 0.2s ease;
+        min-width: 38px;
+        text-align: center;
+    }
+    .pagination .page-item .page-link:hover {
+        background: #eff6ff;
+        border-color: #2563eb;
+        color: #2563eb;
+        transform: translateY(-1px);
+    }
+    .pagination .page-item.active .page-link {
+        background: linear-gradient(135deg, #2563eb, #7c3aed);
+        border-color: #2563eb;
+        color: white;
+        font-weight: 700;
+        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+    }
+    .pagination .page-item.disabled .page-link {
+        color: #cbd5e1;
+        cursor: not-allowed;
+        background: #f8fafc;
+    }
+    @media (max-width: 576px) {
+        .pagination .page-item .page-link {
+            padding: 0.35rem 0.65rem;
+            font-size: 0.75rem;
+            min-width: 32px;
+        }
+    }
+</style>
+{% endif %}

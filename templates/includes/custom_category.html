@@ -1,0 +1,74 @@
+﻿<div class="mb-3">
+    <label class="form-label-modern">Category Type</label>
+    <div class="d-flex gap-3">
+        <div class="form-check">
+            <input class="form-check-input" type="radio" name="category_type" id="standardCategory" value="standard" checked onclick="toggleCustomCategory(false)">
+            <label class="form-check-label" for="standardCategory">Standard Category</label>
+        </div>
+        <div class="form-check">
+            <input class="form-check-input" type="radio" name="category_type" id="customCategory" value="custom" onclick="toggleCustomCategory(true)">
+            <label class="form-check-label" for="customCategory">Custom Category</label>
+        </div>
+    </div>
+</div>
+
+<!-- Standard Category -->
+<div id="standardCategoryDiv">
+    <div class="mb-3">
+        <label class="form-label-modern">Select Category</label>
+        <select name="category_id" class="form-control-modern" id="categorySelect">
+            <option value="">Select a category...</option>
+            {% for category in categories %}
+            <option value="{{ category.id }}">{{ category.name }} (+{{ category.points }} points)</option>
+            {% endfor %}
+            <option value="custom">-- Custom Category --</option>
+        </select>
+    </div>
+</div>
+
+<!-- Custom Category -->
+<div id="customCategoryDiv" style="display: none;">
+    <div class="mb-3">
+        <label class="form-label-modern">Custom Category Name</label>
+        <input type="text" name="custom_category" class="form-control-modern" placeholder="Enter custom category name..." id="customCategoryInput">
+    </div>
+    <div class="mb-3">
+        <label class="form-label-modern">Points</label>
+        <input type="number" name="custom_points" class="form-control-modern" placeholder="Enter points (1-50)" id="customPointsInput" min="1" max="50">
+    </div>
+</div>
+
+<!-- Severity -->
+<div class="mb-3">
+    <label class="form-label-modern">Severity Rating</label>
+    <select name="rating" class="form-control-modern">
+        <option value="VERY_MINOR">Very Minor</option>
+        <option value="MINOR">Minor</option>
+        <option value="MODERATE" selected>Moderate</option>
+        <option value="SERIOUS">Serious</option>
+        <option value="VERY_SERIOUS">Very Serious</option>
+    </select>
+</div>
+
+<!-- Comments -->
+<div class="mb-3">
+    <label class="form-label-modern">Additional Comments</label>
+    <textarea name="comments" class="form-control-modern" rows="2" placeholder="Add any additional details..."></textarea>
+</div>
+
+<script>
+function toggleCustomCategory(isCustom) {
+    document.getElementById('standardCategoryDiv').style.display = isCustom ? 'none' : 'block';
+    document.getElementById('customCategoryDiv').style.display = isCustom ? 'block' : 'none';
+    document.getElementById('customCategoryInput').required = isCustom;
+    document.getElementById('categorySelect').required = !isCustom;
+    if (isCustom) document.getElementById('categorySelect').value = 'custom';
+}
+
+document.getElementById('categorySelect')?.addEventListener('change', function() {
+    if (this.value === 'custom') {
+        document.getElementById('customCategory').checked = true;
+        toggleCustomCategory(true);
+    }
+});
+</script>

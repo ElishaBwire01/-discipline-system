@@ -1,0 +1,61 @@
+﻿{% extends 'base.html' %}
+
+{% block title %}Password Reset Requests{% endblock %}
+
+{% block content %}
+<div class="card-modern" data-aos="fade-up">
+    <div class="card-header-modern">
+        <span class="header-icon"><i class="fas fa-key"></i></span>
+        Password Reset Requests
+        <span class="badge bg-light text-dark ms-2" id="pendingCount">{{ pending_resets|length }}</span>
+    </div>
+    <div class="card-body">
+        {% if pending_resets %}
+        <div class="table-responsive">
+            <table class="table-modern">
+                <thead><tr><th>Username</th><th>Full Name</th><th>Email</th><th>Requested At</th><th>Actions</th></tr></thead>
+                <tbody>
+                    {% for reset in pending_resets %}
+                    <tr>
+                        <td><strong>{{ reset.user.username }}</strong></td>
+                        <td>{{ reset.user.get_full_name|default:"-" }}</td>
+                        <td>{{ reset.user.email|default:"-" }}</td>
+                        <td>{{ reset.requested_at|date:"Y-m-d H:i" }}</td>
+                        <td>
+                            <div class="d-flex gap-2 flex-wrap">
+                                <form method="post" action="{% url 'approve_reset' reset.id %}">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn-modern btn-modern-success btn-modern-sm" onclick="return confirm('Reset password for {{ reset.user.username }}?')"><i class="fas fa-check"></i> Approve</button>
+                                </form>
+                                <form method="post" action="{% url 'reject_reset' reset.id %}">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn-modern btn-modern-danger btn-modern-sm" onclick="return confirm('Reject this request?')"><i class="fas fa-times"></i> Reject</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="alert alert-success"><i class="fas fa-check-circle me-2"></i>No pending requests</div>
+        {% endif %}
+    </div>
+</div>
+<div class="mt-3"><a href="{% url 'admin_dashboard' %}" class="btn-modern btn-modern-secondary"><i class="fas fa-arrow-left"></i> Back</a></div>
+
+<script>
+setInterval(function() {
+    $.get('/api/admin-notifications/', function(data) {
+        data.notifications.forEach(function(n) {
+            if (n.type === 'reset') {
+                $("#pendingCount").text(n.count || '0');
+            }
+        });
+    });
+}, 30000);
+</script>
+{% endblock %}
+
+

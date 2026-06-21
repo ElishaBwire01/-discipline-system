@@ -1,0 +1,22 @@
+﻿<div class="mb-3">
+    <label class="form-label-modern">Category Name</label>
+    <input type="text" name="category_name" class="form-control-modern" placeholder="Enter the category name (e.g., Bullying, Disrespect, Fighting, etc.)" required>
+    <small class="text-muted">Enter any category you want to report</small>
+</div>
+
+<div class="mb-3">
+    <label class="form-label-modern">Severity Rating</label>
+    <select name="rating" class="form-control-modern" required>
+        <option value="VERY_MINOR">Very Minor (5 points)</option>
+        <option value="MINOR">Minor (10 points)</option>
+        <option value="MODERATE" selected>Moderate (20 points)</option>
+        <option value="SERIOUS">Serious (30 points)</option>
+        <option value="VERY_SERIOUS">Very Serious (40 points)</option>
+    </select>
+    <small class="text-muted">Points are automatically assigned based on severity</small>
+</div>
+
+<div class="mb-3">
+    <label class="form-label-modern">Additional Comments</label>
+    <textarea name="comments" class="form-control-modern" rows="3" placeholder="Add any additional details..."></textarea>
+</div>

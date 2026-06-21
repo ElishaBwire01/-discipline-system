@@ -1,0 +1,1119 @@
+﻿from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.models import User, Group
+from django.contrib.auth.decorators import login_required, user_passes_test
+from django.contrib import messages
+from django.http import JsonResponse
+from django.db.models import Count, Sum, Q, Avg
+from django.core.paginator import Paginator
+from django.core.files.storage import default_storage
+from django.utils import timezone
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.cache import never_cache
+from django.utils.crypto import get_random_string
+import pandas as pd
+from .models import (
+    Student, DisciplineReport, DisciplineCategory, Notification,
+    Stream, TeacherProfile, UserSession, PasswordReset,
+)
+
+# ============================================
+# HELPERS
+# ============================================
+
+def admin_required(user):
+    return user.is_superuser
+
+def class_teacher_required(user):
+    return user.is_superuser or user.groups.filter(name='ClassTeacher').exists()
+
+def get_teacher_profile(user):
+    try:
+        return user.teacher_profile
+    except TeacherProfile.DoesNotExist:
+        return None
+
+def get_rating_label(rating):
+    labels = {
+        'VERY_MINOR':  'Very Minor',
+        'MINOR':       'Minor',
+        'MODERATE':    'Moderate',
+        'SERIOUS':     'Serious',
+        'VERY_SERIOUS':'Very Serious',
+    }
+    return labels.get(rating, 'Moderate')
+
+def _create_report(request, student, post):
+    """Shared helper used by both teacher and class-teacher report actions."""
+    category_id = post.get("category") or post.get("category_id")
+    comments    = post.get('comments', '')
+    rating      = post.get('rating', 'MODERATE')
+
+    if not category_id:
+        messages.error(request, 'Please select an offence category.')
+        return False
+
+    try:
+        category = DisciplineCategory.objects.get(id=category_id, is_active=True)
+    except DisciplineCategory.DoesNotExist:
+        messages.error(request, 'Invalid category selected.')
+        return False
+
+    valid_ratings = ['VERY_MINOR', 'MINOR', 'MODERATE', 'SERIOUS', 'VERY_SERIOUS']
+    if rating not in valid_ratings:
+        rating = category.default_rating
+
+    report = DisciplineReport.objects.create(
+        student=student,
+        reported_by=request.user,
+        category=category,
+        comments=comments,
+        rating=rating,
+    )
+    rating_label = get_rating_label(rating)
+    messages.success(
+        request,
+        f'✅ Report submitted for {student.name}: {category.name} '
+        f'(Points: +{report.points}, Rating: {rating_label})'
+    )
+    return True
+
+# ============================================
+# AUTHENTICATION VIEWS
+# ============================================
+
+@csrf_exempt
+@never_cache
+def custom_login(request):
+    if request.user.is_authenticated:
+        return redirect('dashboard')
+
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        user = authenticate(request, username=username, password=password)
+
+        if user is not None:
+            if not user.is_active:
+                messages.error(request, 'Account permanently banned. Contact admin.')
+                return render(request, 'login.html', {'error': 'Account permanently banned'})
+
+            profile = get_teacher_profile(user)
+            if profile:
+                if not profile.is_approved and user.groups.filter(name='ClassTeacher').exists():
+                    messages.error(request, 'Account pending admin approval.')
+                    return render(request, 'login.html', {'error': 'Account pending approval'})
+                if profile.is_suspended:
+                    messages.error(request, f'Account suspended. Reason: {profile.suspension_reason}')
+                    return render(request, 'login.html', {'error': 'Account suspended'})
+
+            login(request, user)
+
+            UserSession.objects.create(
+                user=user,
+                session_key=request.session.session_key,
+                ip_address=request.META.get('REMOTE_ADDR'),
+                user_agent=request.META.get('HTTP_USER_AGENT', '')[:500],
+            )
+
+            if profile:
+                profile.is_online = True
+                profile.last_activity = timezone.now()
+                profile.save()
+
+            if user.groups.filter(name='ClassTeacher').exists():
+                if not profile or not profile.has_chosen_stream:
+                    return redirect('choose_stream')
+
+            return redirect('dashboard')
+        else:
+            messages.error(request, 'Invalid username or password')
+            return render(request, 'login.html', {'error': 'Invalid credentials'})
+
+    return render(request, 'login.html')
+
+
+def custom_logout(request):
+    profile = get_teacher_profile(request.user)
+    if profile:
+        profile.is_online = False
+        profile.save()
+    UserSession.objects.filter(user=request.user, is_active=True).update(is_active=False)
+    logout(request)
+    return redirect('login')
+
+
+@csrf_exempt
+@never_cache
+def register(request):
+    if request.user.is_authenticated:
+        return redirect('dashboard')
+
+    if request.method == 'POST':
+        username  = request.POST.get('username')
+        password  = request.POST.get('password')
+        password2 = request.POST.get('password2')
+        full_name = request.POST.get('full_name')
+        email     = request.POST.get('email')
+        role      = request.POST.get('role', 'teacher')
+
+        if password != password2:
+            messages.error(request, 'Passwords do not match')
+            return render(request, 'register.html', {'error': 'Passwords do not match'})
+
+        if User.objects.filter(username=username).exists():
+            messages.error(request, 'Username already exists')
+            return render(request, 'register.html', {'error': 'Username already exists'})
+
+        user = User.objects.create_user(username=username, password=password, email=email)
+        if full_name:
+            name_parts = full_name.split()
+            user.first_name = name_parts[0] if name_parts else ''
+            user.last_name  = ' '.join(name_parts[1:]) if len(name_parts) > 1 else ''
+        user.save()
+
+        if role == 'class_teacher':
+            group, _ = Group.objects.get_or_create(name='ClassTeacher')
+            user.groups.add(group)
+            profile, _ = TeacherProfile.objects.get_or_create(user=user)
+            profile.is_approved = False
+            profile.is_suspended = False
+            profile.has_chosen_stream = False
+            profile.save()
+            messages.success(request, 'Registration successful! Waiting for admin approval.')
+        else:
+            group, _ = Group.objects.get_or_create(name='Teacher')
+            user.groups.add(group)
+            messages.success(request, 'Registration successful! You can now login.')
+
+        return redirect('login')
+
+    return render(request, 'register.html')
+
+
+@login_required
+def choose_stream(request):
+    if not request.user.groups.filter(name='ClassTeacher').exists():
+        return redirect('dashboard')
+
+    profile = get_teacher_profile(request.user)
+    if not profile or profile.has_chosen_stream:
+        return redirect('dashboard')
+
+    if request.method == 'POST':
+        stream_id = request.POST.get('stream')
+        form      = request.POST.get('form')
+        if stream_id:
+            profile.assigned_stream_id = stream_id
+            profile.assigned_form      = form
+            profile.has_chosen_stream  = True
+            profile.is_approved        = False
+            profile.save()
+            messages.success(request, 'Stream assigned! Waiting for admin approval.')
+            return redirect('dashboard')
+
+    return render(request, 'choose_stream.html', {
+        'streams': Stream.objects.all(),
+        'forms':   Student.FORM_CHOICES,
+    })
+
+
+@login_required
+def dashboard_redirect(request):
+    if request.user.is_superuser:
+        return redirect('admin_dashboard')
+    elif request.user.groups.filter(name='ClassTeacher').exists():
+        return redirect('class_teacher_dashboard')
+    else:
+        return redirect('teacher_dashboard')
+
+
+# ============================================
+# DASHBOARD VIEWS
+# ============================================
+
+@login_required
+@user_passes_test(admin_required)
+def admin_dashboard(request):
+    total_students    = Student.objects.filter(is_active=True).count()
+    critical_students = Student.objects.filter(risk_score__gte=60, is_active=True).count()
+    total_reports     = DisciplineReport.objects.count()
+    reports_today     = DisciplineReport.objects.filter(reported_at__date=timezone.now().date()).count()
+
+    high_report_students = Student.objects.filter(is_active=True).annotate(
+        report_count=Count('reports')
+    ).filter(report_count__gte=20)
+
+    online_teachers  = TeacherProfile.objects.filter(is_online=True).select_related('user')
+    online_count     = online_teachers.count()
+
+    recent_reports        = DisciplineReport.objects.select_related('student', 'reported_by', 'category')[:50]
+    unread_notifications  = request.user.notifications.filter(is_read=False)
+    notification_count    = unread_notifications.count()
+
+    search_query  = request.GET.get('search', '')
+    stream_filter = request.GET.get('stream', '')
+    form_filter   = request.GET.get('form', '')
+    risk_filter   = request.GET.get('risk', '')
+
+    students = Student.objects.filter(is_active=True).select_related('stream')
+    if search_query:
+        students = students.filter(
+            Q(name__icontains=search_query) | Q(admission_number__icontains=search_query)
+        )
+    if stream_filter:
+        students = students.filter(stream__name=stream_filter)
+    if form_filter:
+        students = students.filter(form=form_filter)
+    if risk_filter == 'critical':
+        students = students.filter(risk_score__gte=60)
+    elif risk_filter == 'warning':
+        students = students.filter(risk_score__range=(30, 59))
+    elif risk_filter == 'good':
+        students = students.filter(risk_score__lt=30)
+
+    paginator     = Paginator(students, 20)
+    page_number   = request.GET.get('page')
+    students_page = paginator.get_page(page_number)
+
+    good_count    = Student.objects.filter(is_active=True, risk_score__lt=30).count()
+    warning_count = Student.objects.filter(is_active=True, risk_score__range=(30, 59)).count()
+    critical_count= Student.objects.filter(is_active=True, risk_score__gte=60).count()
+    total_active  = Student.objects.filter(is_active=True).count()
+
+    good_percentage     = (good_count     / total_active * 100) if total_active > 0 else 0
+    warning_percentage  = (warning_count  / total_active * 100) if total_active > 0 else 0
+    critical_percentage = (critical_count / total_active * 100) if total_active > 0 else 0
+
+    if request.method == 'POST':
+        action = request.POST.get('action')
+        if action == 'add_student':
+            try:
+                stream = Stream.objects.get(name=request.POST.get('stream'))
+                Student.objects.create(
+                    admission_number=request.POST.get('admission_number'),
+                    name=request.POST.get('name'),
+                    stream=stream,
+                    form=request.POST.get('form'),
+                    year=int(request.POST.get('year', timezone.now().year)),
+                    optional_notes=request.POST.get('optional_notes', ''),
+                    created_by=request.user,
+                )
+                messages.success(request, 'Student added successfully')
+            except Exception as e:
+                messages.error(request, f'Error: {str(e)}')
+            return redirect('admin_dashboard')
+        elif action == 'delete_student':
+            Student.objects.filter(id=request.POST.get('student_id')).update(is_active=False)
+            messages.success(request, 'Student deactivated successfully')
+            return redirect('admin_dashboard')
+
+    context = {
+        'students':             students_page,
+        'total_students':       total_students,
+        'critical_students':    critical_students,
+        'total_reports':        total_reports,
+        'reports_today':        reports_today,
+        'high_report_students': high_report_students,
+        'online_teachers':      online_teachers,
+        'online_count':         online_count,
+        'recent_reports':       recent_reports,
+        'notification_count':   notification_count,
+        'unread_notifications': unread_notifications,
+        'streams':              Stream.STREAM_CHOICES,
+        'forms':                Student.FORM_CHOICES,
+        'search_query':         search_query,
+        'stream_filter':        stream_filter,
+        'form_filter':          form_filter,
+        'risk_filter':          risk_filter,
+        'good_percentage':      good_percentage,
+        'warning_percentage':   warning_percentage,
+        'critical_percentage':  critical_percentage,
+    }
+    return render(request, 'admin_dashboard.html', context)
+
+
+# ============================================
+# TEACHER DASHBOARD
+# ============================================
+
+@login_required
+def teacher_dashboard(request):
+    students   = Student.objects.filter(is_active=True).select_related('stream').order_by('name')
+    categories = DisciplineCategory.objects.filter(is_active=True)
+
+    if request.method == 'POST' and request.POST.get('action') == 'report_student':
+        student_id = request.POST.get('student_id')
+        student    = get_object_or_404(Student, id=student_id)
+        _create_report(request, student, request.POST)
+        return redirect('teacher_dashboard')
+
+    context = {
+        'students':   students,
+        'categories': categories,
+    }
+    return render(request, 'teacher_dashboard.html', context)
+
+
+# ============================================
+# CLASS TEACHER DASHBOARD
+# ============================================
+
+@login_required
+@user_passes_test(class_teacher_required)
+def class_teacher_dashboard(request):
+    profile = get_teacher_profile(request.user)
+    if not profile or not profile.has_chosen_stream or not profile.assigned_stream:
+        return redirect('choose_stream')
+
+    assigned_stream = profile.assigned_stream
+    assigned_form   = profile.assigned_form
+
+    my_students = Student.objects.filter(is_active=True, stream=assigned_stream)
+    
+    if assigned_form:
+        my_students = my_students.filter(form=assigned_form)
+    
+    # Paginate students
+    paginator = Paginator(my_students, 20)
+    page_number = request.GET.get('page')
+    my_students = paginator.get_page(page_number)
+        my_students = my_students.filter(form=assigned_form)
+
+    total_students    = my_students.count()
+    critical_count    = my_students.filter(risk_score__gte=60).count()
+    warning_count     = my_students.filter(risk_score__range=(30, 59)).count()
+    good_count        = my_students.filter(risk_score__lt=30).count()
+    avg_risk          = my_students.aggregate(Avg('risk_score'))['risk_score__avg'] or 0
+
+    good_percentage     = (good_count     / total_students * 100) if total_students > 0 else 0
+    warning_percentage  = (warning_count  / total_students * 100) if total_students > 0 else 0
+    critical_percentage = (critical_count / total_students * 100) if total_students > 0 else 0
+
+    class_stats = {
+        'total':               total_students,
+        'critical':            critical_count,
+        'warning':             warning_count,
+        'good':                good_count,
+        'avg_risk':            avg_risk,
+        'good_percentage':     good_percentage,
+        'warning_percentage':  warning_percentage,
+        'critical_percentage': critical_percentage,
+    }
+
+    my_students_display = my_students.select_related('stream')[:100]
+    my_reports          = DisciplineReport.objects.filter(
+        student__stream=assigned_stream
+    ).select_related('student', 'reported_by', 'category')[:30]
+    notifications       = request.user.notifications.filter(is_read=False)[:20]
+    notification_count  = notifications.count()
+    categories          = DisciplineCategory.objects.filter(is_active=True)
+
+    if request.method == 'POST':
+        action = request.POST.get('action')
+
+        if action == 'report_student':
+            student_id = request.POST.get('student_id')
+            student    = get_object_or_404(Student, id=student_id)
+            _create_report(request, student, request.POST)
+            return redirect('class_teacher_dashboard')
+
+        elif action == 'add_student':
+            try:
+                Student.objects.create(
+                    admission_number=request.POST.get('admission_number'),
+                    name=request.POST.get('name'),
+                    stream=assigned_stream,
+                    form=request.POST.get('form'),
+                    year=int(request.POST.get('year', timezone.now().year)),
+                    optional_notes=request.POST.get('optional_notes', ''),
+                    created_by=request.user,
+                )
+                messages.success(request, '✅ Student added to your class!')
+            except Exception as e:
+                messages.error(request, f'❌ Error: {str(e)}')
+            return redirect('class_teacher_dashboard')
+
+        elif action == 'bulk_upload':
+            data = request.POST.get('bulk_data', '')
+            lines = data.strip().split('\n')
+            added = 0
+            errors = []
+            
+            # Skip header row if it exists
+            start_index = 0
+            if lines and ('name' in lines[0].lower() or 'admission' in lines[0].lower()):
+                start_index = 1
+                messages.info(request, 'Header row detected and skipped.')
+            
+            for i in range(start_index, len(lines)):
+                line = lines[i].strip()
+                if not line:
+                    continue
+                    
+                parts = [p.strip() for p in line.split(',')]
+                if len(parts) >= 3:
+                    try:
+                        name = parts[0]
+                        admission = parts[1]
+                        form = parts[2]
+                        
+                        # Handle year
+                        if len(parts) > 3 and parts[3] and parts[3].lower() != 'year':
+                            try:
+                                year = int(parts[3])
+                            except ValueError:
+                                year = timezone.now().year
+                        else:
+                            year = timezone.now().year
+                        
+                        # Handle notes
+                        if len(parts) > 4 and parts[4].lower() != 'optional_notes':
+                            notes = parts[4]
+                        else:
+                            notes = ''
+                        
+                        if not name or not admission or not form:
+                            errors.append(f'Row {i + 1}: Missing required data')
+                            continue
+                        
+                        student, created = Student.objects.get_or_create(
+                            admission_number=admission,
+                            defaults={
+                                'name': name,
+                                'stream': assigned_stream,
+                                'form': form,
+                                'year': year,
+                                'optional_notes': notes,
+                                'created_by': request.user,
+                                'is_active': True
+                            }
+                        )
+                        
+                        if created:
+                            added += 1
+                        else:
+                            errors.append(f'Row {i + 1}: Student "{admission}" already exists')
+                            
+                    except Exception as e:
+                        errors.append(f'Row {i + 1}: {str(e)}')
+                else:
+                    errors.append(f'Row {i + 1}: Invalid format - need at least: name, admission_number, form')
+            
+            if added > 0:
+                messages.success(request, f'✅ Successfully added {added} students to your class!')
+            if errors:
+                for error in errors[:5]:
+                    messages.warning(request, f'⚠️ {error}')
+                if len(errors) > 5:
+                    messages.warning(request, f'⚠️ And {len(errors) - 5} more errors...')
+            if added == 0 and not errors:
+                messages.warning(request, 'No new students were added. Check your data format.')
+            
+            return redirect('class_teacher_dashboard')
+
+    context = {
+        'my_students': my_students_page,
+        'my_reports':        my_reports,
+        'notifications':     notifications,
+        'notification_count':notification_count,
+        'class_stats':       class_stats,
+        'assigned_stream':   assigned_stream,
+        'assigned_form':     assigned_form,
+        'forms':             Student.FORM_CHOICES,
+        'categories':        categories,
+    }
+    return render(request, 'class_teacher_dashboard.html', context)
+
+
+# ============================================
+# STUDENT PROFILE
+# ============================================
+
+@login_required
+def student_profile(request, student_id):
+    student = get_object_or_404(Student, id=student_id, is_active=True)
+    reports = student.reports.select_related('reported_by', 'category').all()
+
+    category_breakdown = reports.values(
+        'category__name'
+    ).annotate(count=Count('id'), total_points=Sum('points'))
+
+    teacher_breakdown = reports.values(
+        'reported_by__username',
+        'reported_by__first_name',
+        'reported_by__last_name',
+    ).annotate(count=Count('id'))
+
+    timeline = [
+        {
+            'date':     report.reported_at.strftime('%Y-%m-%d'),
+            'points':   report.points,
+            'category': report.category_name,
+        }
+        for report in reports[:30]
+    ]
+
+    context = {
+        'student':            student,
+        'reports':            reports,
+        'category_breakdown': category_breakdown,
+        'teacher_breakdown':  teacher_breakdown,
+        'timeline':           timeline,
+        'total_reports':      reports.count(),
+        'total_points':       student.risk_score,
+    }
+    return render(request, 'student_profile.html', context)
+
+
+# ============================================
+# API ENDPOINTS
+# ============================================
+
+@login_required
+def search_students_api(request):
+    query = request.GET.get('q', '')
+    if len(query) < 2:
+        return JsonResponse({'students': []})
+
+    students = Student.objects.filter(
+        Q(name__icontains=query) | Q(admission_number__icontains=query),
+        is_active=True,
+    ).select_related('stream')[:20]
+
+    data = [{
+        'id':               s.id,
+        'name':             s.name,
+        'admission_number': s.admission_number,
+        'stream':           s.stream.get_name_display(),
+        'form':             s.form,
+        'risk_score':       s.risk_score,
+        'risk_level':       s.risk_level,
+        'is_critical':      s.is_critical,
+        'total_reports':    s.total_reports,
+    } for s in students]
+
+    return JsonResponse({'students': data})
+
+
+@login_required
+def mark_notification_read(request, notification_id):
+    if request.method == 'POST':
+        notification = get_object_or_404(Notification, id=notification_id)
+        notification.mark_read(request.user)
+        return JsonResponse({'status': 'success'})
+    return JsonResponse({'status': 'error'}, status=400)
+
+
+@login_required
+def get_notifications_api(request):
+    notifications = request.user.notifications.filter(is_read=False)[:10]
+    data = [{
+        'id':         n.id,
+        'title':      n.title,
+        'message':    n.message[:100],
+        'type':       n.notification_type,
+        'created_at': n.created_at.strftime('%Y-%m-%d %H:%M'),
+        'student_id': n.student.id if n.student else None,
+    } for n in notifications]
+    return JsonResponse({'notifications': data, 'count': len(data)})
+
+
+@login_required
+def online_teachers_api(request):
+    online = TeacherProfile.objects.filter(is_online=True).select_related('user')
+    data = [{
+        'username':        t.user.username,
+        'full_name':       t.user.get_full_name() or t.user.username,
+        'assigned_stream': t.assigned_stream.get_name_display() if t.assigned_stream else 'Not Assigned',
+        'last_activity':   t.last_activity.strftime('%Y-%m-%d %H:%M'),
+    } for t in online]
+    return JsonResponse({'online_teachers': data})
+
+
+# ============================================
+# USER MANAGEMENT (Admin only)
+# ============================================
+
+@login_required
+@user_passes_test(admin_required)
+def manage_users(request):
+    teacher_users = User.objects.filter(
+        groups__name__in=['ClassTeacher', 'Teacher']
+    ).select_related('teacher_profile').distinct()
+
+    status_filter = request.GET.get('status', '')
+    if status_filter == 'pending':
+        teacher_users = teacher_users.filter(
+            teacher_profile__is_approved=False, teacher_profile__is_suspended=False
+        )
+    elif status_filter == 'approved':
+        teacher_users = teacher_users.filter(
+            teacher_profile__is_approved=True, teacher_profile__is_suspended=False
+        )
+    elif status_filter == 'suspended':
+        teacher_users = teacher_users.filter(teacher_profile__is_suspended=True)
+
+    return render(request, 'manage_users.html', {
+        'teacher_users': teacher_users,
+        'status_filter': status_filter,
+    })
+
+
+@login_required
+@user_passes_test(admin_required)
+def approve_user(request, user_id):
+    if request.method == 'POST':
+        user    = get_object_or_404(User, id=user_id)
+        profile = get_teacher_profile(user)
+        if profile:
+            profile.is_approved  = True
+            profile.approved_at  = timezone.now()
+            profile.approved_by  = request.user
+            profile.save()
+            notification = Notification.objects.create(
+                title='Account Approved',
+                message=f'Your account has been approved by {request.user.get_full_name() or request.user.username}.',
+                notification_type='info',
+            )
+            notification.target_users.add(user)
+            messages.success(request, f'User {user.username} approved')
+    return redirect('manage_users')
+
+
+@login_required
+@user_passes_test(admin_required)
+def suspend_user(request, user_id):
+    if request.method == 'POST':
+        user    = get_object_or_404(User, id=user_id)
+        reason  = request.POST.get('reason', 'No reason provided')
+        profile = get_teacher_profile(user)
+        if profile:
+            profile.is_suspended       = True
+            profile.suspension_reason  = reason
+            profile.suspended_at       = timezone.now()
+            profile.save()
+            messages.success(request, f'User {user.username} suspended')
+    return redirect('manage_users')
+
+
+@login_required
+@user_passes_test(admin_required)
+def unsuspend_user(request, user_id):
+    if request.method == 'POST':
+        user    = get_object_or_404(User, id=user_id)
+        profile = get_teacher_profile(user)
+        if profile:
+            profile.is_suspended      = False
+            profile.suspension_reason = ''
+            profile.suspended_at      = None
+            profile.save()
+            messages.success(request, f'User {user.username} reinstated')
+    return redirect('manage_users')
+
+
+@login_required
+@user_passes_test(admin_required)
+def delete_user_permanent(request, user_id):
+    if request.method == 'POST':
+        user = get_object_or_404(User, id=user_id)
+        if user.is_superuser:
+            messages.error(request, 'Cannot delete admin')
+            return redirect('manage_users')
+        username = user.username
+        user.delete()
+        messages.success(request, f'User {username} deleted')
+    return redirect('manage_users')
+
+
+@login_required
+@user_passes_test(admin_required)
+def ban_user_permanent(request, user_id):
+    if request.method == 'POST':
+        user    = get_object_or_404(User, id=user_id)
+        reason  = request.POST.get('reason', 'Permanent ban')
+        profile = get_teacher_profile(user)
+        if profile:
+            profile.is_suspended      = True
+            profile.suspension_reason = f'PERMANENT BAN: {reason}'
+            profile.suspended_at      = timezone.now()
+            profile.save()
+        user.is_active = False
+        user.save()
+        messages.success(request, f'User {user.username} permanently banned')
+    return redirect('manage_users')
+
+
+# ============================================
+# PASSWORD RESET VIEWS
+# ============================================
+
+@csrf_exempt
+@never_cache
+def request_password_reset(request):
+    if request.user.is_authenticated:
+        return redirect('dashboard')
+
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        if not username:
+            messages.error(request, 'Please enter your username')
+            return render(request, 'request_reset.html', {'error': 'Username required'})
+
+        try:
+            user     = User.objects.get(username=username)
+            existing = PasswordReset.objects.filter(user=user, status='pending').first()
+            if existing:
+                messages.warning(request, 'You already have a pending request.')
+                return render(request, 'request_reset.html', {'warning': 'Pending request exists'})
+
+            reset = PasswordReset.objects.create(user=user, status='pending')
+
+            admins = User.objects.filter(is_superuser=True)
+            if admins.exists():
+                notification = Notification.objects.create(
+                    title=f'🔑 Password Reset Request: {user.username}',
+                    message=(
+                        f'Teacher: {user.get_full_name() or user.username}\n'
+                        f'Username: {user.username}\n'
+                        f'Requested at: {reset.requested_at.strftime("%Y-%m-%d %H:%M")}'
+                    ),
+                    notification_type='warning',
+                )
+                notification.target_users.set(admins)
+
+            messages.success(request, 'Reset request submitted! Admin will review.')
+            return redirect('login')
+
+        except User.DoesNotExist:
+            messages.error(request, 'Username not found')
+            return render(request, 'request_reset.html', {'error': 'Username not found'})
+
+    return render(request, 'request_reset.html')
+
+
+@login_required
+@user_passes_test(admin_required)
+def admin_reset_requests(request):
+    pending_resets = PasswordReset.objects.filter(status='pending').select_related('user')
+    return render(request, 'admin_reset_requests.html', {'pending_resets': pending_resets})
+
+
+@login_required
+@user_passes_test(admin_required)
+def approve_reset(request, reset_id):
+    if request.method == 'POST':
+        reset        = get_object_or_404(PasswordReset, id=reset_id)
+        new_password = get_random_string(10)
+        user         = reset.user
+        user.set_password(new_password)
+        user.save()
+
+        reset.status      = 'approved'
+        reset.resolved_at = timezone.now()
+        reset.resolved_by = request.user
+        reset.new_password= new_password
+        reset.save()
+
+        notification = Notification.objects.create(
+            title='✅ Password Reset Completed',
+            message=f'New password: {new_password}\nPlease login and change your password immediately.',
+            notification_type='info',
+        )
+        notification.target_users.add(user)
+        messages.success(request, f'Password reset for {user.username}. New password: {new_password}')
+    return redirect('admin_reset_requests')
+
+
+@login_required
+@user_passes_test(admin_required)
+def reject_reset(request, reset_id):
+    if request.method == 'POST':
+        reset             = get_object_or_404(PasswordReset, id=reset_id)
+        reset.status      = 'rejected'
+        reset.resolved_at = timezone.now()
+        reset.resolved_by = request.user
+        reset.save()
+        messages.success(request, f'Reset request for {reset.user.username} rejected')
+    return redirect('admin_reset_requests')
+
+
+# ============================================
+# USER PROFILE SETTINGS
+# ============================================
+
+@login_required
+def user_profile_settings(request):
+    user = request.user
+
+    if request.method == 'POST':
+        action = request.POST.get('action')
+
+        if action == 'change_password':
+            current_password  = request.POST.get('current_password')
+            new_password      = request.POST.get('new_password')
+            confirm_password  = request.POST.get('confirm_password')
+
+            if not user.check_password(current_password):
+                messages.error(request, 'Current password is incorrect')
+                return render(request, 'user_profile.html', {'user': user})
+            if new_password != confirm_password:
+                messages.error(request, 'Passwords do not match')
+                return render(request, 'user_profile.html', {'user': user})
+            if len(new_password) < 8:
+                messages.error(request, 'Password must be at least 8 characters')
+                return render(request, 'user_profile.html', {'user': user})
+
+            user.set_password(new_password)
+            user.save()
+            from django.contrib.auth import update_session_auth_hash
+            update_session_auth_hash(request, user)
+            messages.success(request, 'Password changed successfully!')
+            return redirect('user_profile_settings')
+
+        elif action == 'change_username':
+            new_username     = request.POST.get('new_username')
+            current_password = request.POST.get('confirm_password')
+            if not user.check_password(current_password):
+                messages.error(request, 'Password is incorrect')
+                return render(request, 'user_profile.html', {'user': user})
+            if User.objects.exclude(id=user.id).filter(username=new_username).exists():
+                messages.error(request, 'Username already taken')
+                return render(request, 'user_profile.html', {'user': user})
+            user.username = new_username
+            user.save()
+            messages.success(request, 'Username changed!')
+            return redirect('user_profile_settings')
+
+        elif action == 'change_email':
+            new_email        = request.POST.get('new_email')
+            current_password = request.POST.get('confirm_password')
+            if not user.check_password(current_password):
+                messages.error(request, 'Password is incorrect')
+                return render(request, 'user_profile.html', {'user': user})
+            user.email = new_email
+            user.save()
+            messages.success(request, 'Email changed!')
+            return redirect('user_profile_settings')
+
+        elif action == 'change_full_name':
+            first_name       = request.POST.get('first_name')
+            last_name        = request.POST.get('last_name')
+            current_password = request.POST.get('confirm_password')
+            if not user.check_password(current_password):
+                messages.error(request, 'Password is incorrect')
+                return render(request, 'user_profile.html', {'user': user})
+            user.first_name = first_name
+            user.last_name  = last_name
+            user.save()
+            messages.success(request, 'Name updated!')
+            return redirect('user_profile_settings')
+
+    profile = get_teacher_profile(user)
+    context = {
+        'user':             user,
+        'profile':          profile,
+        'is_admin':         user.is_superuser,
+        'is_class_teacher': user.groups.filter(name='ClassTeacher').exists(),
+        'is_teacher':       user.groups.filter(name='Teacher').exists(),
+    }
+    return render(request, 'user_profile.html', context)
+
+
+@login_required
+
+
+
+
+@login_required
+def view_user_profile(request, user_id):
+    '''View another user's profile'''
+    try:
+        user = User.objects.get(id=user_id)
+        
+        # Allow access if:
+        # 1. User is superuser (admin)
+        # 2. User is a teacher (has Teacher or ClassTeacher group)
+        # 3. User is viewing their own profile
+        is_teacher = request.user.groups.filter(name__in=['Teacher', 'ClassTeacher']).exists()
+        
+        if request.user.is_superuser or is_teacher or request.user.id == user_id:
+            pass  # Allow access
+        else:
+            messages.error(request, 'You do not have permission to view this profile.')
+            return redirect('user_profile_settings')
+        
+        profile = get_teacher_profile(user)
+        context = {
+            'user': user,
+            'profile': profile,
+            'is_admin': user.is_superuser,
+            'is_class_teacher': user.groups.filter(name='ClassTeacher').exists(),
+            'is_teacher': user.groups.filter(name='Teacher').exists(),
+            'viewing_other': True,
+            'viewed_user': user,
+        }
+        return render(request, 'user_profile.html', context)
+    except User.DoesNotExist:
+        messages.error(request, 'User not found.')
+        return redirect('user_profile_settings')
+
+def admin_profile(request):
+    return redirect('user_profile_settings')
+
+
+# ============================================
+# PROFILE PICTURE UPLOAD
+# ============================================
+
+@login_required
+def upload_profile_picture(request):
+    if request.method == 'POST' and request.FILES.get('profile_picture'):
+        try:
+            profile = get_teacher_profile(request.user)
+            if not profile:
+                profile = TeacherProfile.objects.create(user=request.user)
+
+            if profile.profile_picture:
+                import os
+                if os.path.isfile(profile.profile_picture.path):
+                    os.remove(profile.profile_picture.path)
+
+            profile.profile_picture = request.FILES['profile_picture']
+            profile.save()
+            messages.success(request, 'Profile picture updated!')
+        except Exception as e:
+            messages.error(request, f'Error: {str(e)}')
+    return redirect('user_profile_settings')
+
+
+# ============================================
+# STUDENT EDIT & DELETE
+# ============================================
+
+@login_required
+def edit_student(request, student_id):
+    student    = get_object_or_404(Student, id=student_id)
+    is_allowed = False
+
+    if request.user.is_superuser:
+        is_allowed = True
+    else:
+        profile = get_teacher_profile(request.user)
+        if profile and profile.assigned_stream == student.stream:
+            is_allowed = True
+
+    if not is_allowed:
+        messages.error(request, 'Permission denied')
+        return redirect('student_profile', student_id=student_id)
+
+    if request.method == 'POST':
+        action = request.POST.get('action')
+
+        if action == 'update_student':
+            student.name          = request.POST.get('name')
+            student.form          = request.POST.get('form')
+            student.year          = int(request.POST.get('year', 2025))
+            student.optional_notes= request.POST.get('optional_notes', '')
+
+            if request.FILES.get('profile_picture'):
+                if student.profile_picture:
+                    import os
+                    if os.path.isfile(student.profile_picture.path):
+                        os.remove(student.profile_picture.path)
+                student.profile_picture = request.FILES['profile_picture']
+
+            student.save()
+            messages.success(request, 'Student updated!')
+            return redirect('student_profile', student_id=student.id)
+
+        elif action == 'delete_student':
+            if request.user.is_superuser:
+                student.delete()
+                messages.success(request, f'Student {student.name} deleted')
+            else:
+                student.is_active = False
+                student.save()
+                messages.success(request, f'Student {student.name} deactivated')
+            return redirect('class_teacher_dashboard')
+
+    return render(request, 'edit_student.html', {
+        'student': student,
+        'forms':   Student.FORM_CHOICES,
+    })
+
+
+# ============================================
+# ADMIN NOTIFICATIONS
+# ============================================
+
+@login_required
+@user_passes_test(admin_required)
+def get_admin_notifications(request):
+    notifications = []
+
+    pending_approvals = User.objects.filter(
+        teacher_profile__is_approved=False,
+        teacher_profile__is_suspended=False,
+        groups__name='ClassTeacher',
+    ).exclude(id=request.user.id).count()
+    if pending_approvals > 0:
+        notifications.append({
+            'type':  'approval',
+            'title': f'{pending_approvals} Pending Approvals',
+            'count': pending_approvals,
+            'url':   '/manage-users/?status=pending',
+        })
+
+    pending_resets = PasswordReset.objects.filter(status='pending').count()
+    if pending_resets > 0:
+        notifications.append({
+            'type':  'reset',
+            'title': f'{pending_resets} Password Reset Requests',
+            'count': pending_resets,
+            'url':   '/admin-reset-requests/',
+        })
+
+    high_report_students = Student.objects.filter(is_active=True).annotate(
+        report_count=Count('reports')
+    ).filter(report_count__gte=20).count()
+    if high_report_students > 0:
+        notifications.append({
+            'type':  'critical',
+            'title': f'{high_report_students} Students with 20+ Reports',
+            'count': high_report_students,
+            'url':   '/admin-dashboard/',
+        })
+
+    reports_today = DisciplineReport.objects.filter(
+        reported_at__date=timezone.now().date()
+    ).count()
+    if reports_today > 0:
+        notifications.append({
+            'type':  'info',
+            'title': f'{reports_today} New Reports Today',
+            'count': reports_today,
+            'url':   '/admin-dashboard/',
+        })
+
+    return JsonResponse({'notifications': notifications, 'total': len(notifications)})
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

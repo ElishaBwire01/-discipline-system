@@ -1,0 +1,485 @@
+﻿{% extends 'base.html' %}
+
+{% block title %}{% if viewing_other %}Viewing: {{ viewed_user.get_full_name|default:viewed_user.username }}{% else %}My Profile Settings{% endif %}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .profile-pic-container { position: relative; display: inline-block; }
+    .profile-pic-container img { 
+        width: 180px; 
+        height: 180px; 
+        border-radius: 50%; 
+        object-fit: cover; 
+        border: 5px solid #2563eb;
+        box-shadow: 0 8px 30px rgba(37, 99, 235, 0.3);
+        transition: all 0.3s ease;
+    }
+    .profile-pic-container img:hover {
+        transform: scale(1.02);
+        box-shadow: 0 12px 40px rgba(37, 99, 235, 0.4);
+    }
+    .profile-pic-placeholder { 
+        width: 180px; 
+        height: 180px; 
+        border-radius: 50%; 
+        background: linear-gradient(135deg, #2563eb, #7c3aed);
+        display: flex; 
+        align-items: center; 
+        justify-content: center; 
+        margin: 0 auto; 
+        border: 5px solid #2563eb;
+        box-shadow: 0 8px 30px rgba(37, 99, 235, 0.3);
+        transition: all 0.3s ease;
+    }
+    .profile-pic-placeholder:hover {
+        transform: scale(1.02);
+        box-shadow: 0 12px 40px rgba(37, 99, 235, 0.4);
+    }
+    .profile-pic-placeholder i { font-size: 5rem; color: white; }
+    
+    .profile-header {
+        text-align: center;
+        padding: 2rem 1rem 1.5rem;
+        background: linear-gradient(135deg, #f8fafc, #eef2ff);
+        border-radius: 20px 20px 0 0;
+        position: relative;
+    }
+    
+    .profile-header .viewing-badge {
+        display: inline-block;
+        background: rgba(37, 99, 235, 0.1);
+        color: #2563eb;
+        padding: 0.25rem 1.5rem;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        letter-spacing: 1px;
+        margin-bottom: 1rem;
+        border: 1px solid rgba(37, 99, 235, 0.2);
+    }
+    
+    .profile-header .viewing-badge i {
+        margin-right: 0.5rem;
+    }
+    
+    .profile-name {
+        font-size: 2.2rem;
+        font-weight: 800;
+        margin: 0.5rem 0 0.25rem;
+        background: linear-gradient(135deg, #0f172a, #2563eb);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+    
+    .profile-role {
+        display: inline-block;
+        padding: 0.25rem 1.25rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        margin-top: 0.25rem;
+    }
+    
+    .profile-role.admin { background: #fef2f2; color: #ef4444; }
+    .profile-role.class-teacher { background: #eff6ff; color: #2563eb; }
+    .profile-role.teacher { background: #ecfdf5; color: #10b981; }
+    
+    .profile-role i { margin-right: 0.5rem; }
+    
+    .readonly-badge-large {
+        display: inline-block;
+        background: #fef3c7;
+        color: #92400e;
+        padding: 0.25rem 1rem;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        margin-left: 0.5rem;
+    }
+    
+    .pending-badge {
+        display: inline-block;
+        background: #fffbeb;
+        color: #d97706;
+        padding: 0.25rem 1rem;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        margin-left: 0.5rem;
+        border: 1px solid #fcd34d;
+    }
+    
+    .profile-stats {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1rem;
+        margin: 1.5rem 0;
+        padding: 1rem;
+        background: white;
+        border-radius: 16px;
+        border: 1px solid #e2e8f0;
+    }
+    
+    .profile-stat-item {
+        text-align: center;
+    }
+    
+    .profile-stat-item .stat-number {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #0f172a;
+    }
+    
+    .profile-stat-item .stat-label {
+        font-size: 0.75rem;
+        color: #64748b;
+        font-weight: 500;
+    }
+    
+    .profile-info-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+        padding: 1.5rem;
+        background: white;
+        border-radius: 16px;
+        border: 1px solid #e2e8f0;
+        margin: 1rem 0;
+    }
+    
+    .profile-info-item {
+        padding: 0.75rem;
+        background: #f8fafc;
+        border-radius: 12px;
+    }
+    
+    .profile-info-item .label {
+        font-size: 0.7rem;
+        color: #94a3b8;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-weight: 600;
+    }
+    
+    .profile-info-item .value {
+        font-size: 1rem;
+        font-weight: 600;
+        color: #0f172a;
+        margin-top: 0.25rem;
+    }
+    
+    .profile-actions {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        padding: 1.5rem;
+        flex-wrap: wrap;
+    }
+    
+    .btn-profile {
+        padding: 0.6rem 1.5rem;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 0.875rem;
+        transition: all 0.3s ease;
+        border: none;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .btn-profile-primary {
+        background: linear-gradient(135deg, #2563eb, #7c3aed);
+        color: white;
+    }
+    
+    .btn-profile-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(37, 99, 235, 0.35);
+        color: white;
+    }
+    
+    .btn-profile-secondary {
+        background: #e2e8f0;
+        color: #475569;
+    }
+    
+    .btn-profile-secondary:hover {
+        background: #cbd5e1;
+        transform: translateY(-2px);
+        color: #475569;
+    }
+    
+    .btn-profile-outline {
+        background: transparent;
+        color: #2563eb;
+        border: 2px solid #2563eb;
+    }
+    
+    .btn-profile-outline:hover {
+        background: #2563eb;
+        color: white;
+        transform: translateY(-2px);
+    }
+    
+    @media (max-width: 768px) {
+        .profile-info-grid {
+            grid-template-columns: 1fr;
+        }
+        .profile-stats {
+            grid-template-columns: 1fr 1fr 1fr;
+        }
+        .profile-pic-container img {
+            width: 140px;
+            height: 140px;
+        }
+        .profile-pic-placeholder {
+            width: 140px;
+            height: 140px;
+        }
+        .profile-name {
+            font-size: 1.5rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card-modern" data-aos="fade-up">
+            <!-- Profile Header -->
+            <div class="profile-header">
+                {% if viewing_other %}
+                <div class="viewing-badge">
+                    <i class="fas fa-eye"></i> VIEWING PROFILE
+                </div>
+                {% endif %}
+                
+                <!-- Profile Picture -->
+                <div class="profile-pic-container">
+                    {% if viewing_other %}
+                        {% if viewed_user.teacher_profile.profile_picture %}
+                        <img src="{{ viewed_user.teacher_profile.profile_picture.url }}" alt="{{ viewed_user.get_full_name|default:viewed_user.username }}">
+                        {% else %}
+                        <div class="profile-pic-placeholder">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        {% endif %}
+                    {% else %}
+                        {% if user.teacher_profile.profile_picture %}
+                        <img src="{{ user.teacher_profile.profile_picture.url }}" alt="{{ user.get_full_name|default:user.username }}">
+                        {% else %}
+                        <div class="profile-pic-placeholder">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        {% endif %}
+                    {% endif %}
+                </div>
+                
+                <!-- Name -->
+                <h1 class="profile-name">
+                    {% if viewing_other %}
+                        {{ viewed_user.get_full_name|default:viewed_user.username }}
+                    {% else %}
+                        {{ user.get_full_name|default:user.username }}
+                    {% endif %}
+                </h1>
+                
+                <!-- Role & Status -->
+                <div>
+                    {% if viewing_other %}
+                        <span class="profile-role {% if viewed_user.is_superuser %}admin{% elif viewed_user.groups.filter.name == 'ClassTeacher' %}class-teacher{% else %}teacher{% endif %}">
+                            <i class="fas fa-{% if viewed_user.is_superuser %}crown{% elif viewed_user.groups.filter.name == 'ClassTeacher' %}chalkboard-teacher{% else %}user-graduate{% endif %}"></i>
+                            {% if viewed_user.is_superuser %}Administrator{% elif viewed_user.groups.filter.name == 'ClassTeacher' %}Class Teacher{% else %}Teacher{% endif %}
+                        </span>
+                        <span class="readonly-badge-large"><i class="fas fa-lock me-1"></i>Read Only</span>
+                    {% else %}
+                        <span class="profile-role {% if user.is_superuser %}admin{% elif is_class_teacher %}class-teacher{% else %}teacher{% endif %}">
+                            <i class="fas fa-{% if user.is_superuser %}crown{% elif is_class_teacher %}chalkboard-teacher{% else %}user-graduate{% endif %}"></i>
+                            {% if user.is_superuser %}Administrator{% elif is_class_teacher %}Class Teacher{% else %}Teacher{% endif %}
+                        </span>
+                        {% if user.teacher_profile and not user.teacher_profile.is_approved %}
+                        <span class="pending-badge"><i class="fas fa-clock me-1"></i>Pending Approval</span>
+                        {% endif %}
+                    {% endif %}
+                </div>
+                
+                <!-- Quick Stats -->
+                <div class="profile-stats">
+                    <div class="profile-stat-item">
+                        <div class="stat-number">
+                            {% if viewing_other %}
+                                {{ viewed_user.teacher_profile.last_activity|date:"M d, Y"|default:"N/A" }}
+                            {% else %}
+                                {{ user.teacher_profile.last_activity|date:"M d, Y"|default:"N/A" }}
+                            {% endif %}
+                        </div>
+                        <div class="stat-label">Last Active</div>
+                    </div>
+                    <div class="profile-stat-item">
+                        <div class="stat-number">
+                            {% if viewing_other %}
+                                {% if viewed_user.teacher_profile.is_online %}🟢 Online{% else %}⚪ Offline{% endif %}
+                            {% else %}
+                                {% if user.teacher_profile.is_online %}🟢 Online{% else %}⚪ Offline{% endif %}
+                            {% endif %}
+                        </div>
+                        <div class="stat-label">Status</div>
+                    </div>
+                    <div class="profile-stat-item">
+                        <div class="stat-number">
+                            {% if viewing_other %}
+                                {{ viewed_user.teacher_profile.assigned_stream.get_name_display|default:"—" }}
+                            {% else %}
+                                {{ user.teacher_profile.assigned_stream.get_name_display|default:"—" }}
+                            {% endif %}
+                        </div>
+                        <div class="stat-label">Stream</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Profile Content -->
+            <div class="card-body p-4">
+                {% if viewing_other %}
+                <div class="alert alert-warning alert-modern mb-4">
+                    <i class="fas fa-lock me-2"></i>
+                    <strong>Read-Only Mode:</strong> You are viewing <strong>{{ viewed_user.get_full_name|default:viewed_user.username }}</strong>'s profile.
+                    You cannot make changes to this account.
+                    <a href="{% url 'user_profile_settings' %}" class="btn-profile btn-profile-primary btn-sm ms-3">
+                        <i class="fas fa-arrow-left"></i> Back to My Profile
+                    </a>
+                </div>
+                {% endif %}
+
+                <!-- Account Information -->
+                <div class="profile-info-grid">
+                    <div class="profile-info-item">
+                        <div class="label"><i class="fas fa-user me-1"></i>Username</div>
+                        <div class="value">{% if viewing_other %}{{ viewed_user.username }}{% else %}{{ user.username }}{% endif %}</div>
+                    </div>
+                    <div class="profile-info-item">
+                        <div class="label"><i class="fas fa-envelope me-1"></i>Email</div>
+                        <div class="value">{% if viewing_other %}{{ viewed_user.email|default:"Not set" }}{% else %}{{ user.email|default:"Not set" }}{% endif %}</div>
+                    </div>
+                    <div class="profile-info-item">
+                        <div class="label"><i class="fas fa-user-tag me-1"></i>Full Name</div>
+                        <div class="value">{% if viewing_other %}{{ viewed_user.get_full_name|default:"Not set" }}{% else %}{{ user.get_full_name|default:"Not set" }}{% endif %}</div>
+                    </div>
+                    <div class="profile-info-item">
+                        <div class="label"><i class="fas fa-phone me-1"></i>Phone</div>
+                        <div class="value">{% if viewing_other %}{{ viewed_user.teacher_profile.phone_number|default:"Not set" }}{% else %}{{ user.teacher_profile.phone_number|default:"Not set" }}{% endif %}</div>
+                    </div>
+                </div>
+
+                <!-- Edit Section - Only for own profile -->
+                {% if not viewing_other %}
+                <div class="mt-4">
+                    <h5 class="fw-bold mb-3"><i class="fas fa-edit text-primary me-2"></i>Edit Profile</h5>
+                    
+                    <!-- Profile Picture Upload -->
+                    <div class="form-section">
+                        <h6><i class="fas fa-camera text-primary me-2"></i>Update Profile Picture</h6>
+                        <form method="post" enctype="multipart/form-data" action="{% url 'upload_profile_picture' %}">
+                            {% csrf_token %}
+                            <div class="row g-2 align-items-end">
+                                <div class="col-md-8">
+                                    <input type="file" name="profile_picture" class="form-control-modern" accept="image/*">
+                                </div>
+                                <div class="col-md-4">
+                                    <button type="submit" class="btn-profile btn-profile-primary w-100">
+                                        <i class="fas fa-upload"></i> Upload
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Update Name -->
+                    <div class="form-section">
+                        <h6><i class="fas fa-user-edit text-primary me-2"></i>Update Full Name</h6>
+                        <form method="post">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="change_full_name">
+                            <div class="row g-2">
+                                <div class="col-md-5"><input type="text" name="first_name" class="form-control-modern" value="{{ user.first_name }}" placeholder="First Name"></div>
+                                <div class="col-md-5"><input type="text" name="last_name" class="form-control-modern" value="{{ user.last_name }}" placeholder="Last Name"></div>
+                                <div class="col-md-2"><input type="password" name="confirm_password" class="form-control-modern" placeholder="Password" required></div>
+                                <div class="col-12"><button type="submit" class="btn-profile btn-profile-primary"><i class="fas fa-save"></i> Update Name</button></div>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Change Username -->
+                    <div class="form-section">
+                        <h6><i class="fas fa-user-tag text-primary me-2"></i>Change Username</h6>
+                        <form method="post">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="change_username">
+                            <div class="row g-2">
+                                <div class="col-md-8"><input type="text" name="new_username" class="form-control-modern" value="{{ user.username }}" required></div>
+                                <div class="col-md-4"><input type="password" name="confirm_password" class="form-control-modern" placeholder="Password" required></div>
+                                <div class="col-12"><button type="submit" class="btn-profile btn-profile-primary"><i class="fas fa-save"></i> Change Username</button></div>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Change Email -->
+                    <div class="form-section">
+                        <h6><i class="fas fa-envelope text-primary me-2"></i>Change Email</h6>
+                        <form method="post">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="change_email">
+                            <div class="row g-2">
+                                <div class="col-md-8"><input type="email" name="new_email" class="form-control-modern" value="{{ user.email|default:'' }}" required></div>
+                                <div class="col-md-4"><input type="password" name="confirm_password" class="form-control-modern" placeholder="Password" required></div>
+                                <div class="col-12"><button type="submit" class="btn-profile btn-profile-primary"><i class="fas fa-save"></i> Change Email</button></div>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Change Password -->
+                    <div class="form-section">
+                        <h6><i class="fas fa-key text-warning me-2"></i>Change Password</h6>
+                        <form method="post">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="change_password">
+                            <div class="row g-2">
+                                <div class="col-12"><input type="password" name="current_password" class="form-control-modern" placeholder="Current Password" required></div>
+                                <div class="col-md-6"><input type="password" name="new_password" class="form-control-modern" placeholder="New Password (min 8 chars)" required></div>
+                                <div class="col-md-6"><input type="password" name="confirm_password" class="form-control-modern" placeholder="Confirm Password" required></div>
+                                <div class="col-12"><button type="submit" class="btn-profile btn-profile-warning"><i class="fas fa-save"></i> Change Password</button></div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                {% else %}
+                <!-- Read-only message for viewed profiles -->
+                <div class="alert alert-secondary alert-modern text-center">
+                    <i class="fas fa-lock fa-2x d-block mb-2"></i>
+                    <h6>This profile is in <strong>read-only mode</strong></h6>
+                    <p class="mb-0 text-muted">You cannot make changes to this account.</p>
+                </div>
+                {% endif %}
+
+                <!-- Actions -->
+                <div class="profile-actions">
+                    <a href="{% url 'dashboard' %}" class="btn-profile btn-profile-secondary">
+                        <i class="fas fa-arrow-left"></i> Back to Dashboard
+                    </a>
+                    {% if viewing_other %}
+                    <a href="{% url 'user_profile_settings' %}" class="btn-profile btn-profile-primary">
+                        <i class="fas fa-user"></i> My Profile
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

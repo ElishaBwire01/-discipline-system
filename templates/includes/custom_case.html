@@ -1,0 +1,80 @@
+﻿
+    
+<div class="mb-3">
+    <label class="form-label-modern">Report Type</label>
+    <div class="d-flex gap-3">
+        <div class="form-check">
+            <input class="form-check-input" type="radio" name="report_type" id="standardReport" value="standard" checked onclick="toggleCustomCase(false)">
+            <label class="form-check-label" for="standardReport">Standard Offense</label>
+        </div>
+        <div class="form-check">
+            <input class="form-check-input" type="radio" name="report_type" id="customReport" value="custom" onclick="toggleCustomCase(true)">
+            <label class="form-check-label" for="customReport">Custom Case</label>
+        </div>
+    </div>
+</div>
+
+<!-- Standard Category -->
+<div id="standardCategoryDiv">
+    <div class="mb-3">
+        <label class="form-label-modern">Offense Category</label>
+        <select name="category" class="form-control-modern" id="categorySelect">
+            <option value="">Select a category...</option>
+            {% for category in categories %}
+            <option value="{{ category.id }}">{{ category.name }} </option>
+            {% endfor %}
+            <option value="custom">-- Custom Case --</option>
+        </select>
+    </div>
+</div>
+
+<!-- Custom Case -->
+<div id="customCaseDiv" style="display: none;">
+    <div class="mb-3">
+        <label class="form-label-modern">Custom Case Description</label>
+        <input type="text" name="custom_case" class="form-control-modern" placeholder="Describe the custom case..." id="customCaseInput">
+        <small class="text-muted">Example: "Disrespecting school property", "Bullying", etc.</small>
+    </div>
+</div>
+
+<!-- Severity -->
+<div class="mb-3">
+    <label class="form-label-modern">Severity Rating</label>
+    <select name="rating" class="form-control-modern">
+        <option value="VERY_MINOR">Very Minor</option>
+        <option value="MINOR">Minor</option>
+        <option value="MODERATE" selected>Moderate</option>
+        <option value="SERIOUS">Serious</option>
+        <option value="VERY_SERIOUS">Very Serious</option>
+    </select>
+</div>
+
+<!-- Comments -->
+<div class="mb-3">
+    <label class="form-label-modern">Additional Comments</label>
+    <textarea name="comments" class="form-control-modern" rows="2" placeholder="Add any additional details..."></textarea>
+</div>
+
+<script>
+function toggleCustomCase(isCustom) {
+    document.getElementById('standardCategoryDiv').style.display = isCustom ? 'none' : 'block';
+    document.getElementById('customCaseDiv').style.display = isCustom ? 'block' : 'none';
+    document.getElementById('customCaseInput').required = isCustom;
+    document.getElementById('categorySelect').required = !isCustom;
+    if (isCustom) document.getElementById('categorySelect').value = 'custom';
+}
+
+document.getElementById('categorySelect')?.addEventListener('change', function() {
+    if (this.value === 'custom') {
+        document.getElementById('customReport').checked = true;
+        toggleCustomCase(true);
+    }
+});
+</script>
+
+
+
+
+
+
+
