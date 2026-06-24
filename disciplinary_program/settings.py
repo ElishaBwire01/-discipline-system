@@ -76,14 +76,17 @@ WSGI_APPLICATION = 'disciplinary_program.wsgi.application'
 import os
 import dj_database_url
 
-# Force PostgreSQL from environment variable
-DATABASE_URL = os.environ.get('DATABASE_URL')
-if DATABASE_URL:
+# Use PostgreSQL on Vercel, SQLite locally
+if os.environ.get('VERCEL'):
     DATABASES = {
-        'default': dj_database_url.parse(DATABASE_URL)
+        'default': dj_database_url.config(
+            default=os.environ.get('DATABASE_URL'),
+            conn_max_age=600,
+            ssl_require=False
+        )
     }
 else:
-    # Fallback to SQLite (for local development only)
+    # Local development - use SQLite
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
@@ -121,4 +124,3 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 SUPABASE_URL = os.environ.get('SUPABASE_URL')
 SUPABASE_PUBLISHABLE_KEY = os.environ.get('SUPABASE_PUBLISHABLE_KEY')
 SUPABASE_SECRET_KEY = os.environ.get('SUPABASE_SECRET_KEY')
-
