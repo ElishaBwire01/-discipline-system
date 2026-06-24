@@ -21,14 +21,18 @@
                         <label class="form-label-modern">Select Stream</label>
                         <select name="stream" class="form-control-modern" required>
                             <option value="">-- Choose your stream --</option>
-                            {% for stream in streams %}<option value="{{ stream.id }}">{{ stream.get_name_display }}</option>{% endfor %}
+                            {% for stream in streams %}
+                            <option value="{{ stream.id }}">{{ stream.get_name_display }}</option>
+                            {% endfor %}
                         </select>
                     </div>
                     <div class="mb-3 text-start">
                         <label class="form-label-modern">Select Form</label>
                         <select name="form" class="form-control-modern" required>
                             <option value="">-- Choose your form --</option>
-                            {% for form_key, form_name in forms %}<option value="{{ form_key }}">{{ form_name }}</option>{% endfor %}
+                            {% for form_key, form_name in forms %}
+                            <option value="{{ form_key }}">{{ form_name }}</option>
+                            {% endfor %}
                         </select>
                     </div>
                     <button type="submit" class="btn-modern btn-modern-primary w-100"><i class="fas fa-check-circle me-2"></i>Submit & Wait for Approval</button>

@@ -541,140 +541,11 @@
         ::-webkit-scrollbar-track { background: var(--gray-100); }
         ::-webkit-scrollbar-thumb { background: var(--gray-300); border-radius: 999px; }
         ::-webkit-scrollbar-thumb:hover { background: var(--gray-400); }
-        
-    /* ===== USER AVATAR ===== */
-    .user-avatar {
-        width: 32px;
-        height: 32px;
-        border-radius: 50%;
-        object-fit: cover;
-        border: 2px solid #2563eb;
-        transition: all 0.3s ease;
-    }
-    .user-avatar:hover {
-        transform: scale(1.05);
-        border-color: #7c3aed;
-    }
-    
-    .user-avatar-placeholder {
-        width: 32px;
-        height: 32px;
-        border-radius: 50%;
-        background: linear-gradient(135deg, #2563eb, #7c3aed);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: white;
-        font-size: 0.75rem;
-        font-weight: 700;
-        border: 2px solid #2563eb;
-        transition: all 0.3s ease;
-    }
-    .user-avatar-placeholder:hover {
-        transform: scale(1.05);
-    }
-    
-    .user-name {
-        font-weight: 500;
-        font-size: 0.875rem;
-        color: #334155;
-        white-space: nowrap;
-    }
-    
-    .pending-badge {
-        font-size: 0.6rem;
-        padding: 2px 8px;
-    }
-    
-    /* ===== RESPONSIVE NAVBAR ===== */
-    @media (max-width: 991px) {
-        .navbar-nav {
-            padding: 1rem 0;
-            width: 100%;
-        }
-        .navbar-nav .nav-item {
-            width: 100%;
-            margin: 0.25rem 0;
-        }
-        .navbar-nav .nav-link {
-            padding: 0.5rem 1rem !important;
-            justify-content: flex-start;
-        }
-        .navbar-nav .dropdown-menu {
-            width: 100%;
-            position: static !important;
-            transform: none !important;
-            margin-top: 0.5rem;
-        }
-        .user-name {
-            font-size: 0.8rem;
-        }
-        .user-avatar, .user-avatar-placeholder {
-            width: 28px;
-            height: 28px;
-        }
-        .notification-dropdown {
-            right: auto !important;
-            left: 0 !important;
-            min-width: 100% !important;
-        }
-    }
-    
-    @media (max-width: 576px) {
-        .navbar-brand {
-            font-size: 1rem;
-        }
-        .navbar-brand .brand-icon {
-            width: 30px;
-            height: 30px;
-            font-size: 0.8rem;
-        }
-        .user-avatar, .user-avatar-placeholder {
-            width: 24px;
-            height: 24px;
-            font-size: 0.65rem;
-        }
-        .user-name {
-            font-size: 0.75rem;
-            max-width: 80px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        .notification-icon .bell-icon {
-            font-size: 1rem;
-        }
-        .notification-badge {
-            font-size: 8px;
-            min-width: 16px;
-            padding: 1px 4px;
-        }
-        .navbar-modern {
-            padding: 0.5rem 0;
-        }
-        .container {
-            padding-left: 0.75rem;
-            padding-right: 0.75rem;
-        }
-    }
-    
-    @media (max-width: 400px) {
-        .navbar-brand span:last-child {
-            font-size: 0.85rem;
-        }
-        .user-name {
-            max-width: 60px;
-            font-size: 0.7rem;
-        }
-        .nav-link {
-            font-size: 0.8rem !important;
-            padding: 0.35rem 0.75rem !important;
-        }
-    }
-</style>
+    </style>
     {% block extra_css %}{% endblock %}
 </head>
 <body>
-        {% if user.is_authenticated %}
+    {% if user.is_authenticated %}
     <nav class="navbar-modern navbar navbar-expand-lg">
         <div class="container">
             <a class="navbar-brand" href="{% url 'dashboard' %}">
@@ -738,6 +609,7 @@
                                             </div>
                                         </div>
                                         {% endif %}
+                                    {% endif %}
                                     
                                     {% if not unread_notifications and not pending_approvals and not pending_resets %}
                                     <div class="text-center py-4">
@@ -750,41 +622,36 @@
                         </div>
                     </li>
                     
-                    <!-- User Menu with Profile Picture -->
+                    <!-- User Menu -->
                     <li class="nav-item dropdown">
-                        <a class="nav-link d-flex align-items-center gap-2" href="#" role="button" data-bs-toggle="dropdown" id="userMenu">
+                        <a class="nav-link d-flex align-items-center gap-2" href="#" role="button" data-bs-toggle="dropdown">
                             {% if request.user.teacher_profile.profile_picture %}
                             <img src="{{ request.user.teacher_profile.profile_picture.url }}" alt="Profile" 
-                                 class="user-avatar">
+                                 style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary);">
                             {% else %}
-                            <div class="user-avatar-placeholder">
+                            <div style="width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, var(--primary), var(--secondary)); display: flex; align-items: center; justify-content: center; color: white; font-size: 0.75rem; font-weight: 700;">
                                 {{ request.user.get_full_name|default:request.user.username|slice:":1"|upper }}
                             </div>
                             {% endif %}
-                            <span class="user-name">{{ request.user.get_full_name|default:request.user.username }}</span>
+                            <span>{{ request.user.get_full_name|default:request.user.username }}</span>
                             {% if request.user.teacher_profile and not request.user.teacher_profile.is_approved %}
-                            <span class="badge bg-warning text-dark ms-1 pending-badge">Pending</span>
+                            <span class="badge bg-warning text-dark ms-1">Pending</span>
                             {% endif %}
-                            <i class="fas fa-chevron-down ms-1" style="font-size: 0.7rem; opacity: 0.6;"></i>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 rounded-3 py-2">
-                            <li><a class="dropdown-item" href="{% url 'user_profile_settings' %}">
-                                <i class="fas fa-user-cog me-2 text-primary"></i>My Profile
-                            </a></li>
-                            <li><a class="dropdown-item" href="{% url 'dashboard' %}">
-                                <i class="fas fa-tachometer-alt me-2 text-info"></i>Dashboard
-                            </a></li>
+                            <li><a class="dropdown-item" href="{% url 'user_profile_settings' %}"><i class="fas fa-user-cog me-2 text-primary"></i>My Profile</a></li>
+                            <li><a class="dropdown-item" href="{% url 'dashboard' %}"><i class="fas fa-tachometer-alt me-2 text-info"></i>Dashboard</a></li>
                             <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item text-danger" href="{% url 'logout' %}">
-                                <i class="fas fa-sign-out-alt me-2"></i>Logout
-                            </a></li>
+                            <li><a class="dropdown-item text-danger" href="{% url 'logout' %}"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
                         </ul>
                     </li>
                 </ul>
             </div>
         </div>
     </nav>
-    {% endif %}<div class="container py-4">
+    {% endif %}
+    
+    <div class="container py-4">
         {% if messages %}
             {% for message in messages %}
             <div class="alert-modern alert alert-{{ message.tags }} fade-in-up" role="alert">
@@ -837,9 +704,3 @@
     {% block extra_js %}{% endblock %}
 </body>
 </html>
-
-
-
-
-
-
