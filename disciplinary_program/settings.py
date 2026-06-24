@@ -5,6 +5,7 @@ Django settings for disciplinary_program project.
 import os
 from pathlib import Path
 from django.core.management.utils import get_random_secret_key
+import dj_database_url
 import dotenv
 
 dotenv.load_dotenv()
@@ -72,14 +73,26 @@ WSGI_APPLICATION = 'disciplinary_program.wsgi.application'
 # ============================================
 # DATABASE CONFIGURATION
 # ============================================
-# Using SQLite for Django ORM (auth, admin, sessions)
-# Supabase API handles all student/discipline data
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+import os
+import dj_database_url
+
+# Use PostgreSQL on Vercel, SQLite locally
+if os.environ.get('VERCEL'):
+    DATABASES = {
+        'default': dj_database_url.config(
+            default=os.environ.get('DATABASE_URL'),
+            conn_max_age=600,
+            ssl_require=False
+        )
     }
-}
+else:
+    # Local development - use SQLite
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
 
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
