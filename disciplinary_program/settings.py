@@ -164,3 +164,28 @@ if DATABASE_URL:
 SUPABASE_URL = os.environ.get('SUPABASE_URL', 'https://murnebrvgejmxdxzxtfe.supabase.co')
 SUPABASE_PUBLISHABLE_KEY = os.environ.get('SUPABASE_PUBLISHABLE_KEY')
 SUPABASE_SECRET_KEY = os.environ.get('SUPABASE_SECRET_KEY')
+# ============================================
+# VERCEL & SUPABASE CONFIGURATION
+# ============================================
+
+# Detect Vercel environment
+IS_VERCEL = os.environ.get('VERCEL', '0') == '1'
+
+# Media files configuration
+if IS_VERCEL:
+    # Vercel has read-only filesystem - use temp directory
+    MEDIA_URL = '/media/'
+    MEDIA_ROOT = '/tmp/media'
+    os.makedirs(MEDIA_ROOT, exist_ok=True)
+    print(f"?? Vercel Media directory: {MEDIA_ROOT}")
+else:
+    # Local development
+    MEDIA_URL = '/media/'
+    MEDIA_ROOT = BASE_DIR / 'media'
+
+# Ensure WhiteNoise is in middleware
+if 'whitenoise.middleware.WhiteNoiseMiddleware' not in MIDDLEWARE:
+    MIDDLEWARE.insert(1, 'whitenoise.middleware.WhiteNoiseMiddleware')
+
+# Static files storage
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
