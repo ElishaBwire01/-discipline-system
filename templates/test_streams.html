@@ -1,0 +1,21 @@
+﻿{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-5">
+    <h2>Stream Test</h2>
+    <p>Total streams in context: <strong>{{ stream_count }}</strong></p>
+    
+    <div class="card">
+        <div class="card-header">Stream Dropdown Test</div>
+        <div class="card-body">
+            <select class="form-control" style="color: #000 !important; background: #fff !important;">
+                <option value="">-- Select Stream --</option>
+                {% for id, name in streams %}
+                <option value="{{ id }}" style="color: #000 !important; background: #fff !important;">{{ name }}</option>
+                {% empty %}
+                <option value="">No streams available</option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,33 +1,61 @@
-﻿# Python
+# Python
 __pycache__/
-*.pyc
-*.pyo
-*.pyd
+*.py[cod]
+*.class
+*.so
 .Python
 env/
 venv/
-.venv/
-pip-log.txt
-pip-delete-this-directory.txt
+ENV/
+env.bak/
+venv.bak/
+*.sqlite3
+*.db
 
 # Django
+*.log
+*.pot
+*.pyc
+local_settings.py
 db.sqlite3
 db.sqlite3-journal
-/media/
-/staticfiles/
-/static/
+media/
+staticfiles/
+static/
 
-# Vercel
-.vercel/
+# Environment variables
+.env
 .env.local
+.env.*.local
 
 # IDE
 .vscode/
 .idea/
 *.swp
 *.swo
-
-# System
 .DS_Store
 Thumbs.db
-.vercel
+
+# Backups
+*.bak
+backup_*/
+backups/
+*.backup
+
+# Temporary files
+temp/
+tmp/
+*.tmp
+*.temp
+
+# Cloudflare
+*.log
+*.txt
+
+# Uploads
+media/
+profile_pics/
+student_pics/
+
+# Database backups
+*.sqlite3.backup

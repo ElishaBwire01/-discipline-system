@@ -1,0 +1,34 @@
+﻿{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-4">
+    <h2>Debug Streams</h2>
+    
+    <div class="card mb-4">
+        <div class="card-header">Streams in Context</div>
+        <div class="card-body">
+            <p>Total streams: {{ streams|length }}</p>
+            <ul>
+            {% for stream in streams %}
+                <li>{{ stream.0 }}: {{ stream.1 }}</li>
+            {% empty %}
+                <li>No streams found</li>
+            {% endfor %}
+            </ul>
+        </div>
+    </div>
+    
+    <div class="card">
+        <div class="card-header">Forms in Context</div>
+        <div class="card-body">
+            <p>Total forms: {{ forms|length }}</p>
+            <ul>
+            {% for form_key, form_name in forms %}
+                <li>{{ form_key }}: {{ form_name }}</li>
+            {% empty %}
+                <li>No forms found</li>
+            {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}

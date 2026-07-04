@@ -3,483 +3,1082 @@
 {% block title %}{% if viewing_other %}Viewing: {{ viewed_user.get_full_name|default:viewed_user.username }}{% else %}My Profile Settings{% endif %}{% endblock %}
 
 {% block extra_css %}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-    .profile-pic-container { position: relative; display: inline-block; }
-    .profile-pic-container img { 
-        width: 180px; 
-        height: 180px; 
-        border-radius: 50%; 
-        object-fit: cover; 
-        border: 5px solid #2563eb;
-        box-shadow: 0 8px 30px rgba(37, 99, 235, 0.3);
-        transition: all 0.3s ease;
+    :root {
+        --ink: #0b1220;
+        --navy-1: #101a35;
+        --navy-2: #1b2a52;
+        --indigo: #3452eb;
+        --violet: #7c5cff;
+        --amber: #f5a524;
+        --amber-soft: #fff3dd;
+        --emerald: #16a34a;
+        --emerald-soft: #e9faf0;
+        --slate-50: #f8fafc;
+        --slate-100: #f1f5f9;
+        --slate-200: #e2e8f0;
+        --slate-300: #cbd5e1;
+        --slate-400: #94a3b8;
+        --slate-500: #64748b;
+        --slate-900: #0f172a;
+        --radius: 18px;
     }
-    .profile-pic-container img:hover {
-        transform: scale(1.02);
-        box-shadow: 0 12px 40px rgba(37, 99, 235, 0.4);
+
+    * { box-sizing: border-box; }
+
+    .profile-container {
+        max-width: 1320px;
+        margin: 0 auto;
+        width: 100%;
+        overflow-x: hidden;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     }
-    .profile-pic-placeholder { 
-        width: 180px; 
-        height: 180px; 
-        border-radius: 50%; 
-        background: linear-gradient(135deg, #2563eb, #7c3aed);
-        display: flex; 
-        align-items: center; 
-        justify-content: center; 
-        margin: 0 auto; 
-        border: 5px solid #2563eb;
-        box-shadow: 0 8px 30px rgba(37, 99, 235, 0.3);
-        transition: all 0.3s ease;
+
+    img, .panel { max-width: 100%; }
+
+    .profile-container h1, .profile-container h2, .profile-container h3,
+    .profile-name, .stat-value, .tab-btn, .accordion-title, .section-heading {
+        font-family: 'Space Grotesk', 'Inter', sans-serif;
     }
-    .profile-pic-placeholder:hover {
-        transform: scale(1.02);
-        box-shadow: 0 12px 40px rgba(37, 99, 235, 0.4);
+
+    /* ===== SHELL: two columns ===== */
+    .profile-shell {
+        display: grid;
+        grid-template-columns: minmax(300px, 360px) 1fr;
+        gap: 1.5rem;
+        align-items: start;
     }
-    .profile-pic-placeholder i { font-size: 5rem; color: white; }
-    
-    .profile-header {
-        text-align: center;
-        padding: 2rem 1rem 1.5rem;
-        background: linear-gradient(135deg, #f8fafc, #eef2ff);
-        border-radius: 20px 20px 0 0;
+
+    /* Tablet landscape (iPad landscape ~1024px) — narrower left column */
+    @media (max-width: 1180px) and (min-width: 993px) {
+        .profile-shell { grid-template-columns: minmax(280px, 320px) 1fr; gap: 1.25rem; }
+    }
+
+    /* Tablet portrait / small laptop (iPad portrait ~768-992px) — stack, drop sticky */
+    @media (max-width: 992px) {
+        .profile-shell { grid-template-columns: 1fr; gap: 1.25rem; }
+        .profile-left { position: static; }
+    }
+
+    .panel {
+        background: white;
+        border-radius: var(--radius);
+        border: 1px solid var(--slate-200);
+        box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+        overflow: hidden;
+    }
+
+    /* ===== LEFT PANEL ===== */
+    .profile-left { position: sticky; top: 1rem; }
+
+    .profile-cover {
+        height: 100px;
+        background:
+            radial-gradient(circle at 15% 10%, rgba(255,255,255,0.12), transparent 45%),
+            linear-gradient(135deg, var(--navy-1), var(--navy-2) 55%, var(--indigo));
         position: relative;
     }
-    
-    .profile-header .viewing-badge {
-        display: inline-block;
-        background: rgba(37, 99, 235, 0.1);
-        color: #2563eb;
-        padding: 0.25rem 1.5rem;
-        border-radius: 20px;
-        font-size: 0.75rem;
-        font-weight: 600;
-        letter-spacing: 1px;
-        margin-bottom: 1rem;
-        border: 1px solid rgba(37, 99, 235, 0.2);
+    .profile-cover::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background-image: radial-gradient(rgba(255,255,255,0.12) 1px, transparent 1px);
+        background-size: 16px 16px;
+        opacity: 0.55;
     }
-    
-    .profile-header .viewing-badge i {
-        margin-right: 0.5rem;
+
+    .profile-photo-wrap {
+        margin: -64px auto 0;
+        width: 168px;
+        height: 168px;
+        position: relative;
+        z-index: 2;
     }
-    
-    .profile-name {
-        font-size: 2.2rem;
-        font-weight: 800;
-        margin: 0.5rem 0 0.25rem;
-        background: linear-gradient(135deg, #0f172a, #2563eb);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
+
+    .profile-photo, .profile-photo-placeholder {
+        width: 168px;
+        height: 168px;
+        border-radius: 28px;
+        border: 5px solid white;
+        box-shadow: 0 14px 32px rgba(16, 26, 53, 0.22);
+        display: block;
+        background: var(--slate-100);
     }
-    
-    .profile-role {
-        display: inline-block;
-        padding: 0.25rem 1.25rem;
-        border-radius: 20px;
-        font-size: 0.8rem;
-        font-weight: 600;
-        margin-top: 0.25rem;
-    }
-    
-    .profile-role.admin { background: #fef2f2; color: #ef4444; }
-    .profile-role.class-teacher { background: #eff6ff; color: #2563eb; }
-    .profile-role.teacher { background: #ecfdf5; color: #10b981; }
-    
-    .profile-role i { margin-right: 0.5rem; }
-    
-    .readonly-badge-large {
-        display: inline-block;
-        background: #fef3c7;
-        color: #92400e;
-        padding: 0.25rem 1rem;
-        border-radius: 20px;
-        font-size: 0.75rem;
-        font-weight: 600;
-        margin-left: 0.5rem;
-    }
-    
-    .pending-badge {
-        display: inline-block;
-        background: #fffbeb;
-        color: #d97706;
-        padding: 0.25rem 1rem;
-        border-radius: 20px;
-        font-size: 0.75rem;
-        font-weight: 600;
-        margin-left: 0.5rem;
-        border: 1px solid #fcd34d;
-    }
-    
-    .profile-stats {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 1rem;
-        margin: 1.5rem 0;
-        padding: 1rem;
-        background: white;
-        border-radius: 16px;
-        border: 1px solid #e2e8f0;
-    }
-    
-    .profile-stat-item {
-        text-align: center;
-    }
-    
-    .profile-stat-item .stat-number {
-        font-size: 1.5rem;
-        font-weight: 700;
-        color: #0f172a;
-    }
-    
-    .profile-stat-item .stat-label {
-        font-size: 0.75rem;
-        color: #64748b;
-        font-weight: 500;
-    }
-    
-    .profile-info-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 1rem;
-        padding: 1.5rem;
-        background: white;
-        border-radius: 16px;
-        border: 1px solid #e2e8f0;
-        margin: 1rem 0;
-    }
-    
-    .profile-info-item {
-        padding: 0.75rem;
-        background: #f8fafc;
-        border-radius: 12px;
-    }
-    
-    .profile-info-item .label {
-        font-size: 0.7rem;
-        color: #94a3b8;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        font-weight: 600;
-    }
-    
-    .profile-info-item .value {
-        font-size: 1rem;
-        font-weight: 600;
-        color: #0f172a;
-        margin-top: 0.25rem;
-    }
-    
-    .profile-actions {
+
+    .profile-photo { object-fit: cover; }
+
+    .profile-photo-placeholder {
         display: flex;
-        gap: 1rem;
+        align-items: center;
         justify-content: center;
-        padding: 1.5rem;
-        flex-wrap: wrap;
+        background: linear-gradient(135deg, var(--indigo), var(--violet));
+        color: white;
+        font-size: 3.4rem;
     }
-    
-    .btn-profile {
-        padding: 0.6rem 1.5rem;
-        border-radius: 12px;
+
+    .profile-photo-badge {
+        position: absolute;
+        bottom: 6px;
+        right: 6px;
+        width: 26px;
+        height: 26px;
+        border-radius: 50%;
+        border: 3px solid white;
+        background: var(--slate-400);
+        z-index: 3;
+    }
+    .profile-photo-badge.online {
+        background: #22c55e;
+        animation: pulse-dot 2s infinite;
+    }
+    @keyframes pulse-dot {
+        0% { box-shadow: 0 0 0 0 rgba(34,197,94,0.55); }
+        70% { box-shadow: 0 0 0 8px rgba(34,197,94,0); }
+        100% { box-shadow: 0 0 0 0 rgba(34,197,94,0); }
+    }
+
+    .profile-headline {
+        text-align: center;
+        padding: 0.9rem 1.5rem 0;
+    }
+
+    .profile-name { font-size: 1.4rem; font-weight: 700; color: var(--slate-900); }
+
+    .profile-username {
+        color: var(--slate-500);
+        font-size: 0.88rem;
+        margin-top: 0.15rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+    }
+    .profile-username button {
+        background: var(--slate-100);
+        border: none;
+        border-radius: 6px;
+        width: 22px; height: 22px;
+        color: var(--slate-500);
+        cursor: pointer;
+        font-size: 0.65rem;
+    }
+    .profile-username button:hover { background: var(--slate-200); color: var(--slate-900); }
+
+    .idbadge-badges {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 0.4rem;
+        margin: 0.75rem 0 1.25rem;
+        padding: 0 1.25rem;
+    }
+
+    .badge-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        padding: 0.3rem 0.7rem;
+        border-radius: 999px;
+        font-size: 0.68rem;
+        font-weight: 700;
+        letter-spacing: 0.01em;
+    }
+    .badge-pill.role { background: #eef1ff; color: var(--indigo); }
+    .badge-pill.is-online { background: var(--emerald-soft); color: #059669; }
+    .badge-pill.is-offline { background: var(--slate-100); color: var(--slate-500); }
+    .badge-pill.is-pending { background: var(--amber-soft); color: #b45309; }
+    .badge-pill.is-viewing { background: #f1eaff; color: #7c3aed; }
+    .badge-pill.is-inactive { background: #fee2e2; color: #dc2626; }
+
+    .info-sections { padding: 0 1.5rem 1.5rem; }
+
+    .info-section { margin-bottom: 1.1rem; }
+    .info-section:last-child { margin-bottom: 0; }
+
+    .section-heading {
+        font-size: 0.68rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--slate-400);
+        margin-bottom: 0.5rem;
+        padding-bottom: 0.4rem;
+        border-bottom: 1px solid var(--slate-100);
+    }
+
+    .info-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.5rem 0.15rem;
+        border-radius: 8px;
+        transition: background 0.15s ease;
+    }
+    .info-row.copyable { cursor: pointer; }
+    .info-row.copyable:hover { background: var(--slate-50); }
+
+    .info-row .label {
+        font-size: 0.8rem;
+        color: var(--slate-500);
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        white-space: nowrap;
+    }
+    .info-row .label i { width: 16px; color: var(--indigo); font-size: 0.78rem; }
+
+    .info-row .value {
         font-weight: 600;
-        font-size: 0.875rem;
-        transition: all 0.3s ease;
+        color: var(--slate-900);
+        font-size: 0.85rem;
+        text-align: right;
+        word-break: break-word;
+    }
+    .info-row .value.muted { color: var(--slate-400); font-weight: 500; font-style: italic; }
+    .info-row .value .copy-icon { color: var(--slate-300); font-size: 0.7rem; margin-left: 0.4rem; }
+
+    .left-actions { padding: 1rem 1.5rem 1.5rem; border-top: 1px solid var(--slate-100); display: flex; flex-direction: column; gap: 0.5rem; }
+
+    .btn-profile {
+        padding: 0.6rem 1.2rem;
+        border-radius: 10px;
+        font-weight: 600;
+        font-size: 0.82rem;
+        transition: all 0.2s ease;
         border: none;
         cursor: pointer;
         text-decoration: none;
         display: inline-flex;
         align-items: center;
+        justify-content: center;
         gap: 0.5rem;
     }
-    
-    .btn-profile-primary {
-        background: linear-gradient(135deg, #2563eb, #7c3aed);
-        color: white;
+    .btn-profile-primary { background: linear-gradient(135deg, var(--indigo), var(--violet)); color: white; }
+    .btn-profile-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 22px rgba(52, 82, 235, 0.3); color: white; }
+    .btn-profile-secondary { background: var(--slate-100); color: var(--slate-500); }
+    .btn-profile-secondary:hover { background: var(--slate-200); color: var(--slate-900); }
+    .btn-profile-warning { background: linear-gradient(135deg, #d97706, var(--amber)); color: white; }
+    .btn-profile-warning:hover { transform: translateY(-2px); box-shadow: 0 10px 22px rgba(217, 119, 6, 0.3); color: white; }
+    .btn-profile-block { width: 100%; }
+
+    /* ===== RIGHT PANEL ===== */
+    .profile-right-inner { padding: 1.25rem 1.75rem 2rem; }
+
+    .right-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+        padding: 1.25rem 1.75rem 0;
     }
-    
-    .btn-profile-primary:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 25px rgba(37, 99, 235, 0.35);
-        color: white;
+    .right-header h2 { font-size: 1.15rem; font-weight: 700; color: var(--slate-900); margin: 0; }
+    .right-header p { font-size: 0.85rem; color: var(--slate-500); margin: 0.15rem 0 0; }
+
+    .tab-nav {
+        display: flex;
+        gap: 0.25rem;
+        padding: 1rem 1.75rem 0;
+        border-bottom: 1px solid var(--slate-100);
+        overflow-x: auto;
     }
-    
-    .btn-profile-secondary {
-        background: #e2e8f0;
-        color: #475569;
-    }
-    
-    .btn-profile-secondary:hover {
-        background: #cbd5e1;
-        transform: translateY(-2px);
-        color: #475569;
-    }
-    
-    .btn-profile-outline {
+
+    .tab-btn {
+        border: none;
         background: transparent;
-        color: #2563eb;
-        border: 2px solid #2563eb;
+        padding: 0.6rem 1.1rem;
+        border-radius: 10px 10px 0 0;
+        font-weight: 600;
+        font-size: 0.85rem;
+        color: var(--slate-500);
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.2s ease;
+        white-space: nowrap;
+        position: relative;
+        top: 1px;
     }
-    
-    .btn-profile-outline:hover {
-        background: #2563eb;
+    .tab-btn:hover { background: var(--slate-50); color: var(--slate-900); }
+    .tab-btn.active {
+        background: white;
+        color: var(--indigo);
+        border: 1px solid var(--slate-100);
+        border-bottom: 2px solid white;
+    }
+
+    .tab-panel { display: none; padding: 1.5rem 1.75rem 2rem; animation: fadeUp 0.25s ease; }
+    .tab-panel.active { display: block; }
+
+    @keyframes fadeUp {
+        from { opacity: 0; transform: translateY(6px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ===== ACCORDION ===== */
+    .accordion-item {
+        border: 1px solid var(--slate-200);
+        border-radius: 14px;
+        margin-bottom: 0.75rem;
+        overflow: hidden;
+    }
+
+    .accordion-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 1rem 1.25rem;
+        cursor: pointer;
+        background: var(--slate-50);
+        transition: background 0.2s ease;
+        user-select: none;
+    }
+    .accordion-header:hover { background: var(--slate-100); }
+
+    .accordion-title {
+        display: flex;
+        align-items: center;
+        gap: 0.65rem;
+        font-weight: 700;
+        font-size: 0.88rem;
+        color: var(--slate-900);
+    }
+
+    .accordion-title .icon {
+        width: 30px; height: 30px;
+        border-radius: 8px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 0.8rem;
+    }
+    .icon.primary { background: #eff6ff; color: #2563eb; }
+    .icon.warning { background: var(--amber-soft); color: #b45309; }
+    .icon.success { background: var(--emerald-soft); color: #059669; }
+
+    .accordion-chevron { color: var(--slate-400); transition: transform 0.25s ease; }
+    .accordion-item.open .accordion-chevron { transform: rotate(180deg); }
+
+    .accordion-body {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.3s ease;
+    }
+    .accordion-item.open .accordion-body { max-height: 680px; }
+
+    .accordion-body-inner { padding: 1.25rem; border-top: 1px solid var(--slate-200); }
+
+    /* ===== FORMS ===== */
+    .settings-form { display: flex; flex-direction: column; gap: 0.9rem; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.9rem; }
+    .form-row .full-width { grid-column: 1 / -1; }
+
+    .form-label-modern {
+        font-weight: 600;
+        font-size: 0.75rem;
+        color: var(--slate-500);
+        margin-bottom: 0.3rem;
+        display: block;
+    }
+
+    .form-control-modern {
+        width: 100%;
+        padding: 0.65rem 0.85rem;
+        border: 1.5px solid var(--slate-200);
+        border-radius: 10px;
+        font-size: 0.88rem;
+        transition: all 0.2s ease;
+        background: white;
+        color: var(--slate-900);
+    }
+    .form-control-modern:focus {
+        border-color: var(--indigo);
+        outline: none;
+        box-shadow: 0 0 0 4px rgba(52, 82, 235, 0.1);
+    }
+
+    .field-hint { font-size: 0.72rem; color: var(--slate-400); margin-top: 0.3rem; }
+    .field-hint.match-ok { color: var(--emerald); }
+    .field-hint.match-bad { color: #dc2626; }
+
+    .strength-meter {
+        height: 5px;
+        border-radius: 999px;
+        background: var(--slate-200);
+        margin-top: 0.5rem;
+        overflow: hidden;
+    }
+    .strength-meter-fill {
+        height: 100%;
+        width: 0%;
+        border-radius: 999px;
+        background: #dc2626;
+        transition: all 0.25s ease;
+    }
+
+    /* ===== PHOTO UPLOAD (right side, with live preview) ===== */
+    .photo-upload-row {
+        display: flex;
+        align-items: center;
+        gap: 1.25rem;
+        flex-wrap: wrap;
+    }
+
+    .photo-preview {
+        width: 84px;
+        height: 84px;
+        border-radius: 18px;
+        object-fit: cover;
+        border: 3px solid var(--slate-200);
+        background: var(--slate-100);
+        flex-shrink: 0;
+    }
+    .photo-preview-placeholder {
+        width: 84px;
+        height: 84px;
+        border-radius: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, var(--indigo), var(--violet));
         color: white;
-        transform: translateY(-2px);
+        font-size: 1.7rem;
+        flex-shrink: 0;
     }
-    
+
+    .file-drop {
+        flex: 1;
+        min-width: 200px;
+    }
+
+    .form-file-input {
+        padding: 0.6rem;
+        border: 1.5px dashed var(--slate-300);
+        border-radius: 10px;
+        background: var(--slate-50);
+        width: 100%;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        font-size: 0.85rem;
+    }
+    .form-file-input:hover { border-color: var(--indigo); background: #eff6ff; }
+
+    .alert-modern {
+        border-radius: 12px;
+        padding: 1rem 1.15rem;
+        font-size: 0.88rem;
+        border: none;
+    }
+
+    .readonly-block {
+        text-align: center;
+        padding: 3rem 1.5rem;
+        color: var(--slate-500);
+    }
+    .readonly-block i { color: var(--slate-300); }
+
+    /* ===== TOAST ===== */
+    #toast-stack {
+        position: fixed;
+        bottom: 1.5rem;
+        right: 1.5rem;
+        z-index: 2000;
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    .toast-item {
+        background: var(--ink);
+        color: white;
+        padding: 0.65rem 1rem;
+        border-radius: 10px;
+        font-size: 0.82rem;
+        font-weight: 600;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        animation: toastIn 0.25s ease;
+    }
+    @keyframes toastIn {
+        from { opacity: 0; transform: translateY(8px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ===== TABLET (iPad portrait / Android tablets, ~600-992px) ===== */
+    @media (max-width: 992px) {
+        .profile-container { padding: 0 0.25rem; }
+        .profile-photo-wrap { width: 150px; height: 150px; margin-top: -56px; }
+        .profile-photo, .profile-photo-placeholder { width: 150px; height: 150px; }
+        .profile-cover { height: 90px; }
+        .info-sections { padding-left: 1.25rem; padding-right: 1.25rem; }
+        .form-row { grid-template-columns: 1fr 1fr; }
+    }
+
+    /* ===== SMALL TABLET / LARGE PHONE (~768px) ===== */
     @media (max-width: 768px) {
-        .profile-info-grid {
-            grid-template-columns: 1fr;
+        .form-row { grid-template-columns: 1fr; }
+        .tab-panel, .right-header { padding-left: 1.1rem; padding-right: 1.1rem; }
+        .tab-nav { padding-left: 1.1rem; padding-right: 1.1rem; }
+        .photo-upload-row { flex-direction: column; align-items: stretch; text-align: center; }
+        .photo-preview, .photo-preview-placeholder { margin: 0 auto; }
+    }
+
+    /* ===== PHONE (Android / iPhone, ~576px and below) ===== */
+    @media (max-width: 576px) {
+        .profile-container { padding: 0; }
+        .profile-cover { height: 72px; }
+        .profile-photo-wrap { width: 116px; height: 116px; margin-top: -42px; }
+        .profile-photo, .profile-photo-placeholder { width: 116px; height: 116px; border-width: 4px; border-radius: 22px; }
+        .profile-photo-placeholder { font-size: 2.4rem; }
+        .profile-name { font-size: 1.2rem; }
+        .profile-username { font-size: 0.8rem; }
+        .info-sections { padding: 0 1rem 1.25rem; }
+        .info-row { flex-wrap: wrap; }
+        .info-row .label { white-space: normal; font-size: 0.76rem; }
+        .info-row .value { text-align: left; font-size: 0.82rem; }
+        .left-actions { padding: 0.85rem 1rem 1.25rem; }
+        .right-header, .tab-nav, .tab-panel { padding-left: 0.9rem; padding-right: 0.9rem; }
+        .tab-btn { padding: 0.6rem 0.8rem; font-size: 0.78rem; }
+        .accordion-header { padding: 0.85rem 1rem; }
+        .accordion-body-inner { padding: 1rem; }
+        #toast-stack { left: 1rem; right: 1rem; bottom: 1rem; }
+        .toast-item { width: 100%; }
+    }
+
+    /* Touch-friendly tap targets on any touch device */
+    @media (hover: none) and (pointer: coarse) {
+        .tab-btn, .accordion-header, .info-row.copyable, .btn-profile, .profile-username button {
+            min-height: 44px;
         }
-        .profile-stats {
-            grid-template-columns: 1fr 1fr 1fr;
-        }
-        .profile-pic-container img {
-            width: 140px;
-            height: 140px;
-        }
-        .profile-pic-placeholder {
-            width: 140px;
-            height: 140px;
-        }
-        .profile-name {
-            font-size: 1.5rem;
-        }
+        .info-row.copyable { padding: 0.65rem 0.15rem; }
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-lg-8">
-        <div class="card-modern" data-aos="fade-up">
-            <!-- Profile Header -->
-            <div class="profile-header">
+<div class="profile-container">
+    {% if viewing_other %}
+    <div class="alert alert-warning alert-modern mb-3">
+        <i class="fas fa-lock me-2"></i>
+        <strong>Read-only mode:</strong> you're viewing <strong>{{ viewed_user.get_full_name|default:viewed_user.username }}</strong>'s profile. Changes aren't possible here.
+    </div>
+    {% endif %}
+
+    <div class="profile-shell">
+
+        <!-- ================= LEFT: PHOTO + FULL INFORMATION ================= -->
+        <div class="panel profile-left">
+            <div class="profile-cover"></div>
+
+            <div class="profile-photo-wrap">
                 {% if viewing_other %}
-                <div class="viewing-badge">
-                    <i class="fas fa-eye"></i> VIEWING PROFILE
-                </div>
+                    {% if viewed_user.teacher_profile.profile_picture %}
+                        <img src="{{ viewed_user.teacher_profile.profile_picture.url }}"
+                             alt="{{ viewed_user.get_full_name|default:viewed_user.username }}"
+                             class="profile-photo">
+                    {% else %}
+                        <div class="profile-photo-placeholder"><i class="fas fa-user"></i></div>
+                    {% endif %}
+                    <span class="profile-photo-badge {% if viewed_user.teacher_profile.is_online %}online{% endif %}"></span>
+                {% else %}
+                    {% if user.teacher_profile.profile_picture %}
+                        <img src="{{ user.teacher_profile.profile_picture.url }}"
+                             alt="{{ user.get_full_name|default:user.username }}"
+                             class="profile-photo" id="current-profile-photo">
+                    {% else %}
+                        <div class="profile-photo-placeholder" id="current-profile-photo-placeholder"><i class="fas fa-user"></i></div>
+                    {% endif %}
+                    <span class="profile-photo-badge {% if user.teacher_profile.is_online %}online{% endif %}"></span>
                 {% endif %}
-                
-                <!-- Profile Picture -->
-                <div class="profile-pic-container">
-                    {% if viewing_other %}
-                        {% if viewed_user.teacher_profile.profile_picture %}
-                        <img src="{{ viewed_user.teacher_profile.profile_picture.url }}" alt="{{ viewed_user.get_full_name|default:viewed_user.username }}">
-                        {% else %}
-                        <div class="profile-pic-placeholder">
-                            <i class="fas fa-user"></i>
-                        </div>
-                        {% endif %}
-                    {% else %}
-                        {% if user.teacher_profile.profile_picture %}
-                        <img src="{{ user.teacher_profile.profile_picture.url }}" alt="{{ user.get_full_name|default:user.username }}">
-                        {% else %}
-                        <div class="profile-pic-placeholder">
-                            <i class="fas fa-user"></i>
-                        </div>
-                        {% endif %}
-                    {% endif %}
+            </div>
+
+            <div class="profile-headline">
+                <div class="profile-name">
+                    {% if viewing_other %}{{ viewed_user.get_full_name|default:viewed_user.username }}{% else %}{{ user.get_full_name|default:user.username }}{% endif %}
                 </div>
-                
-                <!-- Name -->
-                <h1 class="profile-name">
-                    {% if viewing_other %}
-                        {{ viewed_user.get_full_name|default:viewed_user.username }}
-                    {% else %}
-                        {{ user.get_full_name|default:user.username }}
-                    {% endif %}
-                </h1>
-                
-                <!-- Role & Status -->
-                <div>
-                    {% if viewing_other %}
-                        <span class="profile-role {% if viewed_user.is_superuser %}admin{% elif viewed_user.groups.filter.name == 'ClassTeacher' %}class-teacher{% else %}teacher{% endif %}">
-                            <i class="fas fa-{% if viewed_user.is_superuser %}crown{% elif viewed_user.groups.filter.name == 'ClassTeacher' %}chalkboard-teacher{% else %}user-graduate{% endif %}"></i>
-                            {% if viewed_user.is_superuser %}Administrator{% elif viewed_user.groups.filter.name == 'ClassTeacher' %}Class Teacher{% else %}Teacher{% endif %}
-                        </span>
-                        <span class="readonly-badge-large"><i class="fas fa-lock me-1"></i>Read Only</span>
-                    {% else %}
-                        <span class="profile-role {% if user.is_superuser %}admin{% elif is_class_teacher %}class-teacher{% else %}teacher{% endif %}">
-                            <i class="fas fa-{% if user.is_superuser %}crown{% elif is_class_teacher %}chalkboard-teacher{% else %}user-graduate{% endif %}"></i>
-                            {% if user.is_superuser %}Administrator{% elif is_class_teacher %}Class Teacher{% else %}Teacher{% endif %}
-                        </span>
-                        {% if user.teacher_profile and not user.teacher_profile.is_approved %}
-                        <span class="pending-badge"><i class="fas fa-clock me-1"></i>Pending Approval</span>
-                        {% endif %}
-                    {% endif %}
-                </div>
-                
-                <!-- Quick Stats -->
-                <div class="profile-stats">
-                    <div class="profile-stat-item">
-                        <div class="stat-number">
-                            {% if viewing_other %}
-                                {{ viewed_user.teacher_profile.last_activity|date:"M d, Y"|default:"N/A" }}
-                            {% else %}
-                                {{ user.teacher_profile.last_activity|date:"M d, Y"|default:"N/A" }}
-                            {% endif %}
-                        </div>
-                        <div class="stat-label">Last Active</div>
-                    </div>
-                    <div class="profile-stat-item">
-                        <div class="stat-number">
-                            {% if viewing_other %}
-                                {% if viewed_user.teacher_profile.is_online %}🟢 Online{% else %}⚪ Offline{% endif %}
-                            {% else %}
-                                {% if user.teacher_profile.is_online %}🟢 Online{% else %}⚪ Offline{% endif %}
-                            {% endif %}
-                        </div>
-                        <div class="stat-label">Status</div>
-                    </div>
-                    <div class="profile-stat-item">
-                        <div class="stat-number">
-                            {% if viewing_other %}
-                                {{ viewed_user.teacher_profile.assigned_stream.get_name_display|default:"—" }}
-                            {% else %}
-                                {{ user.teacher_profile.assigned_stream.get_name_display|default:"—" }}
-                            {% endif %}
-                        </div>
-                        <div class="stat-label">Stream</div>
-                    </div>
+                <div class="profile-username">
+                    @{% if viewing_other %}{{ viewed_user.username }}{% else %}{{ user.username }}{% endif %}
+                    <button type="button" onclick="copyToClipboard('{% if viewing_other %}{{ viewed_user.username }}{% else %}{{ user.username }}{% endif %}', 'Username copied')" title="Copy username">
+                        <i class="fas fa-copy"></i>
+                    </button>
                 </div>
             </div>
-            
-            <!-- Profile Content -->
-            <div class="card-body p-4">
+
+            <div class="idbadge-badges">
                 {% if viewing_other %}
-                <div class="alert alert-warning alert-modern mb-4">
-                    <i class="fas fa-lock me-2"></i>
-                    <strong>Read-Only Mode:</strong> You are viewing <strong>{{ viewed_user.get_full_name|default:viewed_user.username }}</strong>'s profile.
-                    You cannot make changes to this account.
-                    <a href="{% url 'user_profile_settings' %}" class="btn-profile btn-profile-primary btn-sm ms-3">
-                        <i class="fas fa-arrow-left"></i> Back to My Profile
-                    </a>
-                </div>
+                    <span class="badge-pill is-viewing"><i class="fas fa-eye"></i> Read only</span>
+                    <span class="badge-pill role">
+                        <i class="fas fa-{% if viewed_user.is_superuser %}crown{% elif viewed_user.groups.filter.name == 'ClassTeacher' %}chalkboard-teacher{% else %}user-graduate{% endif %}"></i>
+                        {% if viewed_user.is_superuser %}Administrator{% elif viewed_user.groups.filter.name == 'ClassTeacher' %}Class Teacher{% else %}Teacher{% endif %}
+                    </span>
+                    {% if viewed_user.teacher_profile.is_online %}
+                        <span class="badge-pill is-online"><i class="fas fa-circle"></i> Online</span>
+                    {% else %}
+                        <span class="badge-pill is-offline"><i class="fas fa-circle"></i> Offline</span>
+                    {% endif %}
+                {% else %}
+                    <span class="badge-pill role">
+                        <i class="fas fa-{% if user.is_superuser %}crown{% elif is_class_teacher %}chalkboard-teacher{% else %}user-graduate{% endif %}"></i>
+                        {% if user.is_superuser %}Administrator{% elif is_class_teacher %}Class Teacher{% else %}Teacher{% endif %}
+                    </span>
+                    {% if user.teacher_profile.is_online %}
+                        <span class="badge-pill is-online"><i class="fas fa-circle"></i> Online</span>
+                    {% else %}
+                        <span class="badge-pill is-offline"><i class="fas fa-circle"></i> Offline</span>
+                    {% endif %}
+                    {% if user.teacher_profile and not user.teacher_profile.is_approved %}
+                        <span class="badge-pill is-pending"><i class="fas fa-clock"></i> Pending approval</span>
+                    {% endif %}
+                    {% if not user.is_active %}
+                        <span class="badge-pill is-inactive"><i class="fas fa-ban"></i> Inactive</span>
+                    {% endif %}
                 {% endif %}
+            </div>
 
-                <!-- Account Information -->
-                <div class="profile-info-grid">
-                    <div class="profile-info-item">
-                        <div class="label"><i class="fas fa-user me-1"></i>Username</div>
-                        <div class="value">{% if viewing_other %}{{ viewed_user.username }}{% else %}{{ user.username }}{% endif %}</div>
+            <div class="info-sections">
+
+                <div class="info-section">
+                    <div class="section-heading">Contact</div>
+                    <div class="info-row copyable" onclick="copyToClipboard('{% if viewing_other %}{{ viewed_user.email|default:"" }}{% else %}{{ user.email|default:"" }}{% endif %}', 'Email copied')">
+                        <span class="label"><i class="fas fa-envelope"></i> Email</span>
+                        <span class="value {% if viewing_other %}{% if not viewed_user.email %}muted{% endif %}{% else %}{% if not user.email %}muted{% endif %}{% endif %}">
+                            {% if viewing_other %}{{ viewed_user.email|default:"Not set" }}{% else %}{{ user.email|default:"Not set" }}{% endif %}
+                            <i class="fas fa-copy copy-icon"></i>
+                        </span>
                     </div>
-                    <div class="profile-info-item">
-                        <div class="label"><i class="fas fa-envelope me-1"></i>Email</div>
-                        <div class="value">{% if viewing_other %}{{ viewed_user.email|default:"Not set" }}{% else %}{{ user.email|default:"Not set" }}{% endif %}</div>
-                    </div>
-                    <div class="profile-info-item">
-                        <div class="label"><i class="fas fa-user-tag me-1"></i>Full Name</div>
-                        <div class="value">{% if viewing_other %}{{ viewed_user.get_full_name|default:"Not set" }}{% else %}{{ user.get_full_name|default:"Not set" }}{% endif %}</div>
-                    </div>
-                    <div class="profile-info-item">
-                        <div class="label"><i class="fas fa-phone me-1"></i>Phone</div>
-                        <div class="value">{% if viewing_other %}{{ viewed_user.teacher_profile.phone_number|default:"Not set" }}{% else %}{{ user.teacher_profile.phone_number|default:"Not set" }}{% endif %}</div>
+                    <div class="info-row copyable" onclick="copyToClipboard('{% if viewing_other %}{{ viewed_user.teacher_profile.phone_number|default:"" }}{% else %}{{ user.teacher_profile.phone_number|default:"" }}{% endif %}', 'Phone copied')">
+                        <span class="label"><i class="fas fa-phone"></i> Phone</span>
+                        <span class="value {% if viewing_other %}{% if not viewed_user.teacher_profile.phone_number %}muted{% endif %}{% else %}{% if not user.teacher_profile.phone_number %}muted{% endif %}{% endif %}">
+                            {% if viewing_other %}{{ viewed_user.teacher_profile.phone_number|default:"Not set" }}{% else %}{{ user.teacher_profile.phone_number|default:"Not set" }}{% endif %}
+                            <i class="fas fa-copy copy-icon"></i>
+                        </span>
                     </div>
                 </div>
 
-                <!-- Edit Section - Only for own profile -->
-                {% if not viewing_other %}
-                <div class="mt-4">
-                    <h5 class="fw-bold mb-3"><i class="fas fa-edit text-primary me-2"></i>Edit Profile</h5>
-                    
-                    <!-- Profile Picture Upload -->
-                    <div class="form-section">
-                        <h6><i class="fas fa-camera text-primary me-2"></i>Update Profile Picture</h6>
-                        <form method="post" enctype="multipart/form-data" action="{% url 'upload_profile_picture' %}">
-                            {% csrf_token %}
-                            <div class="row g-2 align-items-end">
-                                <div class="col-md-8">
-                                    <input type="file" name="profile_picture" class="form-control-modern" accept="image/*">
-                                </div>
-                                <div class="col-md-4">
-                                    <button type="submit" class="btn-profile btn-profile-primary w-100">
-                                        <i class="fas fa-upload"></i> Upload
+                <div class="info-section">
+                    <div class="section-heading">Identity</div>
+                    <div class="info-row">
+                        <span class="label"><i class="fas fa-user-tag"></i> Username</span>
+                        <span class="value">@{% if viewing_other %}{{ viewed_user.username }}{% else %}{{ user.username }}{% endif %}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label"><i class="fas fa-signature"></i> Full name</span>
+                        <span class="value {% if viewing_other %}{% if not viewed_user.get_full_name %}muted{% endif %}{% else %}{% if not user.get_full_name %}muted{% endif %}{% endif %}">
+                            {% if viewing_other %}{{ viewed_user.get_full_name|default:"Not set" }}{% else %}{{ user.get_full_name|default:"Not set" }}{% endif %}
+                        </span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label"><i class="fas fa-user"></i> First name</span>
+                        <span class="value {% if viewing_other %}{% if not viewed_user.first_name %}muted{% endif %}{% else %}{% if not user.first_name %}muted{% endif %}{% endif %}">
+                            {% if viewing_other %}{{ viewed_user.first_name|default:"Not set" }}{% else %}{{ user.first_name|default:"Not set" }}{% endif %}
+                        </span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label"><i class="fas fa-user"></i> Last name</span>
+                        <span class="value {% if viewing_other %}{% if not viewed_user.last_name %}muted{% endif %}{% else %}{% if not user.last_name %}muted{% endif %}{% endif %}">
+                            {% if viewing_other %}{{ viewed_user.last_name|default:"Not set" }}{% else %}{{ user.last_name|default:"Not set" }}{% endif %}
+                        </span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label"><i class="fas fa-hashtag"></i> User ID</span>
+                        <span class="value">#{% if viewing_other %}{{ viewed_user.id }}{% else %}{{ user.id }}{% endif %}</span>
+                    </div>
+                </div>
+
+                <div class="info-section">
+                    <div class="section-heading">Role &amp; status</div>
+                    <div class="info-row">
+                        <span class="label"><i class="fas fa-user-shield"></i> Role</span>
+                        <span class="value">
+                            {% if viewing_other %}
+                                {% if viewed_user.is_superuser %}Administrator{% elif viewed_user.groups.filter.name == 'ClassTeacher' %}Class Teacher{% else %}Teacher{% endif %}
+                            {% else %}
+                                {% if user.is_superuser %}Administrator{% elif is_class_teacher %}Class Teacher{% else %}Teacher{% endif %}
+                            {% endif %}
+                        </span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label"><i class="fas fa-school"></i> Assigned stream</span>
+                        <span class="value {% if viewing_other %}{% if not viewed_user.teacher_profile.assigned_stream.name %}muted{% endif %}{% else %}{% if not user.teacher_profile.assigned_stream.name %}muted{% endif %}{% endif %}">
+                            {% if viewing_other %}{{ viewed_user.teacher_profile.assigned_stream.name|default:"Not assigned" }}{% else %}{{ user.teacher_profile.assigned_stream.name|default:"Not assigned" }}{% endif %}
+                        </span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label"><i class="fas fa-check-circle"></i> Approval</span>
+                        <span class="value">
+                            {% if viewing_other %}{% if viewed_user.teacher_profile.is_approved %}Approved{% else %}Pending{% endif %}{% else %}{% if user.teacher_profile.is_approved %}Approved{% else %}Pending{% endif %}{% endif %}
+                        </span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label"><i class="fas fa-toggle-on"></i> Account</span>
+                        <span class="value">
+                            {% if viewing_other %}{% if viewed_user.is_active %}Active{% else %}Inactive{% endif %}{% else %}{% if user.is_active %}Active{% else %}Inactive{% endif %}{% endif %}
+                        </span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label"><i class="fas fa-circle"></i> Presence</span>
+                        <span class="value">
+                            {% if viewing_other %}
+                                {% if viewed_user.teacher_profile.is_online %}<span style="color:var(--emerald)">Online now</span>{% else %}<span class="muted">Offline</span>{% endif %}
+                            {% else %}
+                                {% if user.teacher_profile.is_online %}<span style="color:var(--emerald)">Online now</span>{% else %}<span class="muted">Offline</span>{% endif %}
+                            {% endif %}
+                        </span>
+                    </div>
+                </div>
+
+                <div class="info-section">
+                    <div class="section-heading">Activity</div>
+                    <div class="info-row">
+                        <span class="label"><i class="fas fa-clock"></i> Last active</span>
+                        <span class="value">{% if viewing_other %}{{ viewed_user.teacher_profile.last_activity|date:"M d, Y H:i"|default:"N/A" }}{% else %}{{ user.teacher_profile.last_activity|date:"M d, Y H:i"|default:"N/A" }}{% endif %}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label"><i class="fas fa-sign-in-alt"></i> Last login</span>
+                        <span class="value">{% if viewing_other %}{{ viewed_user.last_login|date:"M d, Y H:i"|default:"N/A" }}{% else %}{{ user.last_login|date:"M d, Y H:i"|default:"N/A" }}{% endif %}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label"><i class="fas fa-calendar-plus"></i> Member since</span>
+                        <span class="value">{% if viewing_other %}{{ viewed_user.date_joined|date:"M d, Y"|default:"N/A" }}{% else %}{{ user.date_joined|date:"M d, Y"|default:"N/A" }}{% endif %}</span>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="left-actions">
+                <a href="{% url 'dashboard' %}" class="btn-profile btn-profile-secondary btn-profile-block">
+                    <i class="fas fa-arrow-left"></i> Back to dashboard
+                </a>
+                {% if viewing_other %}
+                <a href="{% url 'user_profile_settings' %}" class="btn-profile btn-profile-primary btn-profile-block">
+                    <i class="fas fa-user"></i> My profile
+                </a>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- ================= RIGHT: INTERACTIVE SETTINGS ================= -->
+        <div class="panel profile-right">
+            {% if not viewing_other %}
+            <div class="right-header">
+                <div>
+                    <h2>Account &amp; security</h2>
+                    <p>Manage how you sign in and how others see you.</p>
+                </div>
+            </div>
+
+            <div class="tab-nav" role="tablist">
+                <button class="tab-btn active" data-tab="account" onclick="switchTab('account')">
+                    <i class="fas fa-id-badge"></i> Account
+                </button>
+                <button class="tab-btn" data-tab="security" onclick="switchTab('security')">
+                    <i class="fas fa-shield-alt"></i> Security
+                </button>
+            </div>
+
+            <!-- ===== ACCOUNT TAB ===== -->
+            <div class="tab-panel active" id="tab-account">
+
+                <div class="accordion-item open" id="acc-photo">
+                    <div class="accordion-header" onclick="toggleAccordion('acc-photo')">
+                        <div class="accordion-title"><span class="icon success"><i class="fas fa-camera"></i></span> Profile photo</div>
+                        <i class="fas fa-chevron-down accordion-chevron"></i>
+                    </div>
+                    <div class="accordion-body">
+                        <div class="accordion-body-inner">
+                            <form method="post" enctype="multipart/form-data" action="{% url 'upload_profile_picture' %}">
+                                {% csrf_token %}
+                                <div class="settings-form">
+                                    <div class="photo-upload-row">
+                                        {% if user.teacher_profile.profile_picture %}
+                                            <img src="{{ user.teacher_profile.profile_picture.url }}" alt="Current photo" class="photo-preview" id="photo-preview-img">
+                                        {% else %}
+                                            <div class="photo-preview-placeholder" id="photo-preview-placeholder"><i class="fas fa-user"></i></div>
+                                            <img src="" alt="" class="photo-preview" id="photo-preview-img" style="display:none;">
+                                        {% endif %}
+                                        <div class="file-drop">
+                                            <input type="file" name="profile_picture" id="photo-input" class="form-file-input" accept="image/*" onchange="previewPhoto(this)">
+                                            <div class="field-hint" id="photo-filename">JPG or PNG, shown large on your profile</div>
+                                        </div>
+                                    </div>
+                                    <button type="submit" class="btn-profile btn-profile-primary btn-profile-block">
+                                        <i class="fas fa-upload"></i> Upload photo
                                     </button>
                                 </div>
-                            </div>
-                        </form>
-                    </div>
-
-                    <!-- Update Name -->
-                    <div class="form-section">
-                        <h6><i class="fas fa-user-edit text-primary me-2"></i>Update Full Name</h6>
-                        <form method="post">
-                            {% csrf_token %}
-                            <input type="hidden" name="action" value="change_full_name">
-                            <div class="row g-2">
-                                <div class="col-md-5"><input type="text" name="first_name" class="form-control-modern" value="{{ user.first_name }}" placeholder="First Name"></div>
-                                <div class="col-md-5"><input type="text" name="last_name" class="form-control-modern" value="{{ user.last_name }}" placeholder="Last Name"></div>
-                                <div class="col-md-2"><input type="password" name="confirm_password" class="form-control-modern" placeholder="Password" required></div>
-                                <div class="col-12"><button type="submit" class="btn-profile btn-profile-primary"><i class="fas fa-save"></i> Update Name</button></div>
-                            </div>
-                        </form>
-                    </div>
-
-                    <!-- Change Username -->
-                    <div class="form-section">
-                        <h6><i class="fas fa-user-tag text-primary me-2"></i>Change Username</h6>
-                        <form method="post">
-                            {% csrf_token %}
-                            <input type="hidden" name="action" value="change_username">
-                            <div class="row g-2">
-                                <div class="col-md-8"><input type="text" name="new_username" class="form-control-modern" value="{{ user.username }}" required></div>
-                                <div class="col-md-4"><input type="password" name="confirm_password" class="form-control-modern" placeholder="Password" required></div>
-                                <div class="col-12"><button type="submit" class="btn-profile btn-profile-primary"><i class="fas fa-save"></i> Change Username</button></div>
-                            </div>
-                        </form>
-                    </div>
-
-                    <!-- Change Email -->
-                    <div class="form-section">
-                        <h6><i class="fas fa-envelope text-primary me-2"></i>Change Email</h6>
-                        <form method="post">
-                            {% csrf_token %}
-                            <input type="hidden" name="action" value="change_email">
-                            <div class="row g-2">
-                                <div class="col-md-8"><input type="email" name="new_email" class="form-control-modern" value="{{ user.email|default:'' }}" required></div>
-                                <div class="col-md-4"><input type="password" name="confirm_password" class="form-control-modern" placeholder="Password" required></div>
-                                <div class="col-12"><button type="submit" class="btn-profile btn-profile-primary"><i class="fas fa-save"></i> Change Email</button></div>
-                            </div>
-                        </form>
-                    </div>
-
-                    <!-- Change Password -->
-                    <div class="form-section">
-                        <h6><i class="fas fa-key text-warning me-2"></i>Change Password</h6>
-                        <form method="post">
-                            {% csrf_token %}
-                            <input type="hidden" name="action" value="change_password">
-                            <div class="row g-2">
-                                <div class="col-12"><input type="password" name="current_password" class="form-control-modern" placeholder="Current Password" required></div>
-                                <div class="col-md-6"><input type="password" name="new_password" class="form-control-modern" placeholder="New Password (min 8 chars)" required></div>
-                                <div class="col-md-6"><input type="password" name="confirm_password" class="form-control-modern" placeholder="Confirm Password" required></div>
-                                <div class="col-12"><button type="submit" class="btn-profile btn-profile-warning"><i class="fas fa-save"></i> Change Password</button></div>
-                            </div>
-                        </form>
+                            </form>
+                        </div>
                     </div>
                 </div>
-                {% else %}
-                <!-- Read-only message for viewed profiles -->
-                <div class="alert alert-secondary alert-modern text-center">
-                    <i class="fas fa-lock fa-2x d-block mb-2"></i>
-                    <h6>This profile is in <strong>read-only mode</strong></h6>
-                    <p class="mb-0 text-muted">You cannot make changes to this account.</p>
-                </div>
-                {% endif %}
 
-                <!-- Actions -->
-                <div class="profile-actions">
-                    <a href="{% url 'dashboard' %}" class="btn-profile btn-profile-secondary">
-                        <i class="fas fa-arrow-left"></i> Back to Dashboard
-                    </a>
-                    {% if viewing_other %}
-                    <a href="{% url 'user_profile_settings' %}" class="btn-profile btn-profile-primary">
-                        <i class="fas fa-user"></i> My Profile
-                    </a>
-                    {% endif %}
+                <div class="accordion-item" id="acc-name">
+                    <div class="accordion-header" onclick="toggleAccordion('acc-name')">
+                        <div class="accordion-title"><span class="icon primary"><i class="fas fa-user-edit"></i></span> Full name</div>
+                        <i class="fas fa-chevron-down accordion-chevron"></i>
+                    </div>
+                    <div class="accordion-body">
+                        <div class="accordion-body-inner">
+                            <form method="post">
+                                {% csrf_token %}
+                                <input type="hidden" name="action" value="change_full_name">
+                                <div class="settings-form">
+                                    <div class="form-row">
+                                        <div>
+                                            <label class="form-label-modern">First name</label>
+                                            <input type="text" name="first_name" class="form-control-modern" value="{{ user.first_name }}" placeholder="First name">
+                                        </div>
+                                        <div>
+                                            <label class="form-label-modern">Last name</label>
+                                            <input type="text" name="last_name" class="form-control-modern" value="{{ user.last_name }}" placeholder="Last name">
+                                        </div>
+                                        <div class="full-width">
+                                            <label class="form-label-modern">Confirm password</label>
+                                            <input type="password" name="confirm_password" class="form-control-modern" placeholder="Enter password to confirm" required>
+                                        </div>
+                                        <div class="full-width">
+                                            <button type="submit" class="btn-profile btn-profile-primary btn-profile-block">
+                                                <i class="fas fa-save"></i> Save name
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
                 </div>
             </div>
+
+            <!-- ===== SECURITY TAB ===== -->
+            <div class="tab-panel" id="tab-security">
+
+                <div class="accordion-item" id="acc-username">
+                    <div class="accordion-header" onclick="toggleAccordion('acc-username')">
+                        <div class="accordion-title"><span class="icon primary"><i class="fas fa-user-tag"></i></span> Change username</div>
+                        <i class="fas fa-chevron-down accordion-chevron"></i>
+                    </div>
+                    <div class="accordion-body">
+                        <div class="accordion-body-inner">
+                            <form method="post">
+                                {% csrf_token %}
+                                <input type="hidden" name="action" value="change_username">
+                                <div class="settings-form">
+                                    <div class="form-row">
+                                        <div class="full-width">
+                                            <label class="form-label-modern">New username</label>
+                                            <input type="text" name="new_username" class="form-control-modern" value="{{ user.username }}" required>
+                                        </div>
+                                        <div class="full-width">
+                                            <label class="form-label-modern">Confirm password</label>
+                                            <input type="password" name="confirm_password" class="form-control-modern" placeholder="Enter password to confirm" required>
+                                        </div>
+                                        <div class="full-width">
+                                            <button type="submit" class="btn-profile btn-profile-primary btn-profile-block">
+                                                <i class="fas fa-save"></i> Save username
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item" id="acc-email">
+                    <div class="accordion-header" onclick="toggleAccordion('acc-email')">
+                        <div class="accordion-title"><span class="icon primary"><i class="fas fa-envelope"></i></span> Change email</div>
+                        <i class="fas fa-chevron-down accordion-chevron"></i>
+                    </div>
+                    <div class="accordion-body">
+                        <div class="accordion-body-inner">
+                            <form method="post">
+                                {% csrf_token %}
+                                <input type="hidden" name="action" value="change_email">
+                                <div class="settings-form">
+                                    <div class="form-row">
+                                        <div class="full-width">
+                                            <label class="form-label-modern">New email</label>
+                                            <input type="email" name="new_email" class="form-control-modern" value="{{ user.email|default:'' }}" required>
+                                        </div>
+                                        <div class="full-width">
+                                            <label class="form-label-modern">Confirm password</label>
+                                            <input type="password" name="confirm_password" class="form-control-modern" placeholder="Enter password to confirm" required>
+                                        </div>
+                                        <div class="full-width">
+                                            <button type="submit" class="btn-profile btn-profile-primary btn-profile-block">
+                                                <i class="fas fa-save"></i> Save email
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item" id="acc-password">
+                    <div class="accordion-header" onclick="toggleAccordion('acc-password')">
+                        <div class="accordion-title"><span class="icon warning"><i class="fas fa-key"></i></span> Change password</div>
+                        <i class="fas fa-chevron-down accordion-chevron"></i>
+                    </div>
+                    <div class="accordion-body">
+                        <div class="accordion-body-inner">
+                            <form method="post" id="password-form">
+                                {% csrf_token %}
+                                <input type="hidden" name="action" value="change_password">
+                                <div class="settings-form">
+                                    <div class="form-row">
+                                        <div class="full-width">
+                                            <label class="form-label-modern">Current password</label>
+                                            <input type="password" name="current_password" class="form-control-modern" placeholder="Enter current password" required>
+                                        </div>
+                                        <div>
+                                            <label class="form-label-modern">New password</label>
+                                            <input type="password" name="new_password" id="new-password" class="form-control-modern" placeholder="Min 8 characters" minlength="8" required oninput="checkPasswordStrength(); checkPasswordMatch();">
+                                            <div class="strength-meter"><div class="strength-meter-fill" id="strength-fill"></div></div>
+                                            <div class="field-hint" id="strength-label">Strength will appear here</div>
+                                        </div>
+                                        <div>
+                                            <label class="form-label-modern">Confirm password</label>
+                                            <input type="password" name="confirm_password" id="confirm-new-password" class="form-control-modern" placeholder="Confirm new password" required oninput="checkPasswordMatch();">
+                                            <div class="field-hint" id="match-label"></div>
+                                        </div>
+                                        <div class="full-width">
+                                            <button type="submit" class="btn-profile btn-profile-warning btn-profile-block">
+                                                <i class="fas fa-save"></i> Save new password
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {% else %}
+            <div class="readonly-block">
+                <i class="fas fa-lock fa-3x d-block mb-3"></i>
+                <h6 class="fw-bold">This profile is in <span style="color: var(--indigo);">read-only mode</span></h6>
+                <p class="mb-0">You cannot make changes to this account.</p>
+            </div>
+            {% endif %}
         </div>
     </div>
 </div>
-{% endblock %}
 
+<div id="toast-stack"></div>
+
+<script>
+    function switchTab(name) {
+        document.querySelectorAll('.tab-btn').forEach(function (btn) {
+            btn.classList.toggle('active', btn.dataset.tab === name);
+        });
+        document.querySelectorAll('.tab-panel').forEach(function (panel) {
+            panel.classList.toggle('active', panel.id === 'tab-' + name);
+        });
+    }
+
+    function toggleAccordion(id) {
+        var item = document.getElementById(id);
+        var wasOpen = item.classList.contains('open');
+        item.closest('.tab-panel').querySelectorAll('.accordion-item').forEach(function (el) {
+            el.classList.remove('open');
+        });
+        if (!wasOpen) item.classList.add('open');
+    }
+
+    function showToast(message, icon) {
+        var stack = document.getElementById('toast-stack');
+        var el = document.createElement('div');
+        el.className = 'toast-item';
+        el.innerHTML = '<i class="fas fa-' + (icon || 'check') + '"></i> ' + message;
+        stack.appendChild(el);
+        setTimeout(function () {
+            el.style.opacity = '0';
+            el.style.transition = 'opacity 0.3s ease';
+            setTimeout(function () { el.remove(); }, 300);
+        }, 2200);
+    }
+
+    function copyToClipboard(text, message) {
+        if (!text) { showToast('Nothing to copy', 'exclamation-circle'); return; }
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(text).then(function () {
+                showToast(message || 'Copied', 'check');
+            }).catch(function () {
+                showToast('Could not copy', 'exclamation-circle');
+            });
+        }
+    }
+
+    function checkPasswordStrength() {
+        var val = document.getElementById('new-password').value;
+        var fill = document.getElementById('strength-fill');
+        var label = document.getElementById('strength-label');
+        var score = 0;
+        if (val.length >= 8) score++;
+        if (val.length >= 12) score++;
+        if (/[A-Z]/.test(val) && /[a-z]/.test(val)) score++;
+        if (/[0-9]/.test(val)) score++;
+        if (/[^A-Za-z0-9]/.test(val)) score++;
+
+        var pct = Math.min(100, (score / 5) * 100);
+        var colors = ['#dc2626', '#dc2626', '#f5a524', '#f5a524', '#16a34a', '#16a34a'];
+        var labels = ['Too short', 'Weak', 'Fair', 'Fair', 'Strong', 'Very strong'];
+
+        fill.style.width = val.length ? pct + '%' : '0%';
+        fill.style.background = colors[score];
+        label.textContent = val.length ? labels[score] : 'Strength will appear here';
+    }
+
+    function checkPasswordMatch() {
+        var pass = document.getElementById('new-password').value;
+        var confirm = document.getElementById('confirm-new-password').value;
+        var label = document.getElementById('match-label');
+        if (!confirm) { label.textContent = ''; label.className = 'field-hint'; return; }
+        if (pass === confirm) {
+            label.textContent = 'Passwords match';
+            label.className = 'field-hint match-ok';
+        } else {
+            label.textContent = 'Passwords do not match';
+            label.className = 'field-hint match-bad';
+        }
+    }
+
+    function previewPhoto(input) {
+        var filenameLabel = document.getElementById('photo-filename');
+        var img = document.getElementById('photo-preview-img');
+        var placeholder = document.getElementById('photo-preview-placeholder');
+
+        if (!input.files || !input.files[0]) {
+            filenameLabel.textContent = 'JPG or PNG, shown large on your profile';
+            return;
+        }
+
+        var file = input.files[0];
+        filenameLabel.textContent = file.name + ' — will appear large once uploaded';
+
+        var reader = new FileReader();
+        reader.onload = function (e) {
+            img.src = e.target.result;
+            img.style.display = 'block';
+            if (placeholder) placeholder.style.display = 'none';
+
+            var bigPhoto = document.getElementById('current-profile-photo');
+            var bigPlaceholder = document.getElementById('current-profile-photo-placeholder');
+            if (bigPhoto) {
+                bigPhoto.src = e.target.result;
+            } else if (bigPlaceholder) {
+                var newImg = document.createElement('img');
+                newImg.src = e.target.result;
+                newImg.className = 'profile-photo';
+                newImg.id = 'current-profile-photo';
+                bigPlaceholder.replaceWith(newImg);
+            }
+        };
+        reader.readAsDataURL(file);
+    }
+</script>
+{% endblock %}

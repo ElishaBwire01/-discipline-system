@@ -78,3 +78,4 @@ function suspendUser(id) { document.getElementById('suspendForm').action = '/sus
 function deleteUser(id, name) { document.getElementById('deleteForm').action = '/ban-user/'+id+'/'; document.getElementById('deleteUserName').textContent = name; new bootstrap.Modal(document.getElementById('deleteModal')).show(); }
 </script>
 {% endblock %}
+

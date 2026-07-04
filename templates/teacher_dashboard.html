@@ -1,15 +1,39 @@
 ﻿{% extends 'base.html' %}
+{% load static %}
 
-{% block title %}Teacher Dashboard{% endblock %}
+{% block title %}Teacher Dashboard - Charles Lwanga High School{% endblock %}
 
 {% block content %}
+<!-- AI Insights Banner -->
+<div class="alert-modern alert alert-info mb-4" data-aos="fade-up" style="background: linear-gradient(135deg, #7c3aed, #2563eb); color: white; border: none;">
+    <div class="d-flex justify-content-between align-items-center flex-wrap">
+        <div>
+            <i class="fas fa-robot fa-2x me-3"></i>
+            <strong>AI-Powered Discipline Reporting</strong>
+            <span class="ms-2 badge bg-light text-dark">Active</span>
+            <p class="mb-0 mt-1 small opacity-75">Get AI insights while reporting students</p>
+        </div>
+        <a href="/ai/dashboard/" class="btn btn-light btn-sm mt-2 mt-md-0">
+            <i class="fas fa-robot"></i> AI Insights
+        </a>
+    </div>
+</div>
+
+<!-- Quick Actions -->
 <div class="row g-2 mb-3">
     <div class="col-12">
         <div class="card-modern">
             <div class="card-body p-3">
                 <div class="d-flex flex-wrap gap-2">
-                    <a href="{% url 'user_profile_settings' %}" class="btn-modern btn-modern-secondary"><i class="fas fa-user-cog"></i> Profile</a>
-                    <a href="{% url 'teacher_dashboard' %}" class="btn-modern btn-modern-primary"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+                    <a href="/ai/dashboard/" class="btn-modern" style="background: linear-gradient(135deg, #7c3aed, #2563eb); color: white;">
+                        <i class="fas fa-robot"></i> AI Analysis
+                    </a>
+                    <a href="{% url 'user_profile_settings' %}" class="btn-modern btn-modern-secondary">
+                        <i class="fas fa-user-cog"></i> Profile
+                    </a>
+                    <a href="{% url 'teacher_dashboard' %}" class="btn-modern btn-modern-primary">
+                        <i class="fas fa-tachometer-alt"></i> Dashboard
+                    </a>
                 </div>
             </div>
         </div>
@@ -20,12 +44,12 @@
 <div class="card-modern mb-4" data-aos="fade-up">
     <div class="card-header-modern">
         <span class="header-icon"><i class="fas fa-search"></i></span>
-        Search Student
+        Search & Report Students
     </div>
     <div class="card-body p-4">
         <div class="search-box">
             <span class="search-icon"><i class="fas fa-search"></i></span>
-            <input type="text" id="searchStudent" placeholder="Search by name or admission number...">
+            <input type="text" id="searchStudent" placeholder="Search by name or admission number..." autocomplete="off">
         </div>
         <div id="searchResults" class="mt-3"></div>
     </div>
@@ -36,6 +60,7 @@
     <div class="card-header-modern">
         <span class="header-icon"><i class="fas fa-list"></i></span>
         All Students
+        <span class="badge bg-light text-dark ms-2">{{ students.paginator.count }}</span>
     </div>
     <div class="card-body p-0">
         <div class="table-responsive">
@@ -48,30 +73,60 @@
                         <th>Form</th>
                         <th>Reports</th>
                         <th>Risk Score</th>
+                        <th>Status</th>
                         <th>Action</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for student in students %}
                     <tr>
-                        <td>{{ student.admission_number }}</td>
+                        <td><strong>{{ student.admission_number }}</strong></td>
                         <td>{{ student.name }}</td>
-                        <td>{{ student.stream.get_name_display }}</td>
+                        <td><span class="badge-modern badge-info">{{ student.stream.name }}</span></td>
                         <td>{{ student.form }}</td>
-                        <td>{{ student.total_reports }}</td>
+                        <td>
+                            <span class="badge-modern {% if student.total_reports >= 20 %}badge-critical{% elif student.total_reports >= 10 %}badge-warning{% else %}badge-info{% endif %}">
+                                {{ student.total_reports }}
+                            </span>
+                        </td>
                         <td>
                             <div class="d-flex align-items-center gap-2">
-                                <div class="progress-modern"><div class="progress-bar-modern" style="width: {{ student.risk_score }}%; background: {% if student.risk_score >= 60 %}linear-gradient(135deg, #ef4444, #dc2626){% elif student.risk_score >= 30 %}linear-gradient(135deg, #f59e0b, #d97706){% else %}linear-gradient(135deg, #10b981, #059669){% endif %}"></div></div>
+                                <div class="progress-modern" style="width: 80px;">
+                                    <div class="progress-bar-modern" style="width: {{ student.risk_score }}%; background: {% if student.risk_score >= 60 %}linear-gradient(135deg, #ef4444, #dc2626){% elif student.risk_score >= 30 %}linear-gradient(135deg, #f59e0b, #d97706){% else %}linear-gradient(135deg, #10b981, #059669){% endif %};"></div>
+                                </div>
                                 <span class="fw-bold" style="font-size:0.813rem;">{{ student.risk_score }}%</span>
                             </div>
                         </td>
                         <td>
-                            <button class="btn-modern btn-modern-primary btn-modern-sm" onclick="openReportModal({{ student.id }}, '{{ student.name }}')"><i class="fas fa-flag"></i></button>
-                            <a href="{% url 'student_profile' student.id %}" class="btn-modern btn-modern-secondary btn-modern-sm"><i class="fas fa-eye"></i></a>
+                            {% if student.is_critical %}
+                            <span class="badge-modern badge-critical"><i class="fas fa-exclamation-circle"></i> Critical</span>
+                            {% elif student.risk_score >= 30 %}
+                            <span class="badge-modern badge-warning"><i class="fas fa-exclamation-triangle"></i> Warning</span>
+                            {% else %}
+                            <span class="badge-modern badge-success"><i class="fas fa-check-circle"></i> Good</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="d-flex gap-1">
+                                <a href="{% url 'student_profile' student.id %}" class="btn-modern btn-modern-primary btn-modern-sm" title="View Profile">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                <a href="{% url 'student_profile' student.id %}?ai=true" class="btn-modern btn-modern-sm" style="background: linear-gradient(135deg, #7c3aed, #2563eb); color: white;" title="AI Analysis">
+                                    <i class="fas fa-robot"></i>
+                                </a>
+                                <button class="btn-modern btn-modern-danger btn-modern-sm" onclick="openReportModal({{ student.id }}, '{{ student.name }}')" title="Report">
+                                    <i class="fas fa-flag"></i>
+                                </button>
+                            </div>
                         </td>
                     </tr>
                     {% empty %}
-                    <tr><td colspan="7" class="text-center py-4 text-muted">No students found</td></tr>
+                    <tr>
+                        <td colspan="8" class="text-center py-4 text-muted">
+                            <i class="fas fa-inbox fa-2x d-block mb-2"></i>
+                            No students found.
+                        </td>
+                    </tr>
                     {% endfor %}
                 </tbody>
             </table>
@@ -80,58 +135,29 @@
 </div>
 
 <!-- Pagination -->
-<nav aria-label="Page navigation">
-    <ul class="pagination justify-content-center">
-        {% if students.has_previous %}
-        <li class="page-item">
-            <a class="page-link" href="?page={{ students.previous_page_number }}">&laquo;</a>
-        </li>
-        {% else %}
-        <li class="page-item disabled"><span class="page-link">&laquo;</span></li>
-        {% endif %}
-
-        {% for num in students.paginator.page_range %}
-            {% if students.number == num %}
-            <li class="page-item active"><span class="page-link">{{ num }}</span></li>
-            {% elif num > students.number|add:'-3' and num < students.number|add:'3' %}
-            <li class="page-item">
-                <a class="page-link" href="?page={{ num }}">{{ num }}</a>
-            </li>
-            {% endif %}
-        {% endfor %}
-
-        {% if students.has_next %}
-        <li class="page-item">
-            <a class="page-link" href="?page={{ students.next_page_number }}">&raquo;</a>
-        </li>
-        {% else %}
-        <li class="page-item disabled"><span class="page-link">&raquo;</span></li>
-        {% endif %}
-    </ul>
-    <div class="text-center text-muted">
-        <small>Page {{ students.number }} of {{ students.paginator.num_pages }} ({{ students.paginator.count }} total)</small>
-    </div>
-</nav>
+{% include 'includes/pagination.html' with page_obj=students %}
 
 <!-- Report Modal -->
 <div class="modal fade" id="reportModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 shadow-lg rounded-4">
-            <div class="modal-header border-0">
-                <h5 class="modal-title fw-bold"><i class="fas fa-flag text-primary me-2"></i>Report Student</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            <div class="modal-header border-0" style="background: linear-gradient(135deg, #ef4444, #dc2626); color: white; border-radius: 16px 16px 0 0;">
+                <h5 class="modal-title fw-bold"><i class="fas fa-flag me-2"></i>Report Student</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <form method="post" action="{% url 'teacher_dashboard' %}" id="reportForm">
                 {% csrf_token %}
                 <input type="hidden" name="action" value="report_student">
                 <input type="hidden" name="student_id" id="reportStudentId" value="0">
-                <div class="modal-body">
-                    <p class="mb-3">Reporting: <strong id="reportStudentName"></strong></p>
-                    {% include 'includes/custom_case.html' %}
+                <div class="modal-body p-4">
+                    <p class="mb-3">Reporting: <strong id="reportStudentName" style="color: #2563eb;"></strong></p>
+                    {% include 'includes/custom_case.html' with categories=categories %}
                 </div>
                 <div class="modal-footer border-0">
                     <button type="button" class="btn-modern btn-modern-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn-modern btn-modern-primary" id="submitReportBtn"><i class="fas fa-paper-plane"></i> Submit</button>
+                    <button type="submit" class="btn-modern" style="background: linear-gradient(135deg, #ef4444, #dc2626); color: white;" id="submitReportBtn">
+                        <i class="fas fa-paper-plane"></i> Submit Report
+                    </button>
                 </div>
             </form>
         </div>
@@ -139,24 +165,78 @@
 </div>
 
 <script>
+// Enhanced Search with AI, Profile, and Report buttons
+document.getElementById('searchStudent')?.addEventListener('keyup', function() {
+    var query = this.value.trim();
+    var resultsDiv = document.getElementById('searchResults');
+    
+    if (query.length < 2) {
+        resultsDiv.innerHTML = '';
+        return;
+    }
+    
+    resultsDiv.innerHTML = '<div class="text-center py-3"><div class="spinner-border spinner-border-sm text-primary" role="status"></div> Searching...</div>';
+    
+    fetch('/api/search-students/?q=' + encodeURIComponent(query))
+        .then(response => response.json())
+        .then(data => {
+            if (data.students && data.students.length > 0) {
+                var html = '<h6 class="mb-2 fw-bold">Results (' + data.students.length + ' found):</h6>';
+                data.students.forEach(function(s) {
+                    var riskColor = s.risk_score >= 60 ? 'danger' : s.risk_score >= 30 ? 'warning' : 'success';
+                    var riskBadge = s.risk_level || 'GOOD';
+                    
+                    html += `
+                        <div class="card p-3 mb-2 search-result-card" style="border-left: 4px solid var(--bs-${riskColor});">
+                            <div class="d-flex justify-content-between align-items-center flex-wrap">
+                                <div>
+                                    <strong>${s.name}</strong>
+                                    <br>
+                                    <small class="text-muted">
+                                        ${s.admission_number} | ${s.stream} | 
+                                        <span class="badge bg-${riskColor}">${riskBadge}</span>
+                                        Risk: ${s.risk_score}% | Reports: ${s.total_reports || 0}
+                                    </small>
+                                </div>
+                                <div class="d-flex gap-1 mt-2 mt-md-0">
+                                    <button class="btn btn-sm btn-outline-primary" onclick="viewStudentProfile(${s.id})" title="View Profile">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    <button class="btn btn-sm" style="background: linear-gradient(135deg, #7c3aed, #2563eb); color: white;" onclick="viewStudentAI(${s.id})" title="AI Analysis">
+                                        <i class="fas fa-robot"></i> AI
+                                    </button>
+                                    <button class="btn btn-sm btn-danger" onclick="openReportModal(${s.id}, '${s.name}')" title="Report">
+                                        <i class="fas fa-flag"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+                resultsDiv.innerHTML = html;
+            } else {
+                resultsDiv.innerHTML = '<div class="alert alert-info">No students found. Try a different search.</div>';
+            }
+        })
+        .catch(function(err) {
+            console.error('Search error:', err);
+            resultsDiv.innerHTML = '<div class="alert alert-danger">Error searching. Please try again.</div>';
+        });
+});
+
+function viewStudentProfile(id) {
+    window.location.href = '/student/' + id + '/';
+}
+
+function viewStudentAI(id) {
+    window.location.href = '/student/' + id + '/?ai=true';
+}
+
 function openReportModal(id, name) {
     document.getElementById('reportStudentId').value = id;
     document.getElementById('reportStudentName').textContent = name;
-    new bootstrap.Modal(document.getElementById('reportModal')).show();
+    var modal = new bootstrap.Modal(document.getElementById('reportModal'));
+    modal.show();
 }
-
-document.getElementById('searchStudent')?.addEventListener('keyup', function() {
-    var query = this.value.trim();
-    if (query.length < 2) { document.getElementById('searchResults').innerHTML = ''; return; }
-    fetch('/api/search-students/?q=' + encodeURIComponent(query))
-        .then(r => r.json())
-        .then(data => {
-            var html = data.students.length ? '<h6>Results:</h6>' : '<div class="alert alert-info">No students found</div>';
-            data.students.forEach(function(s) {
-                html += '<div class="card p-2 mb-2"><div class="d-flex justify-content-between"><div><strong>'+s.name+'</strong><br><small>'+s.admission_number+' | '+s.stream+' | Risk: '+s.risk_score+'%</small></div><div><button class="btn-modern btn-modern-primary btn-modern-sm" onclick="openReportModal('+s.id+', \''+s.name+'\')"><i class="fas fa-flag"></i></button></div></div></div>';
-            });
-            document.getElementById('searchResults').innerHTML = html;
-        });
-});
 </script>
 {% endblock %}

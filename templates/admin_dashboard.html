@@ -1,8 +1,58 @@
-﻿{% extends 'base.html' %}
+{% extends 'base.html' %}
+{% load static %}
 
-{% block title %}Admin Dashboard{% endblock %}
+{% block title %}Admin Dashboard - Charles Lwanga High School{% endblock %}
+
+{% block extra_css %}
+<style>
+    select.form-control-modern,
+    select.form-control-modern option,
+    select[name="stream"],
+    select[name="stream"] option,
+    select[name="form"],
+    select[name="form"] option,
+    .form-control-modern option {
+        color: #000000 !important;
+        background-color: #ffffff !important;
+    }
+    
+    .form-control-modern {
+        color: #000000 !important;
+    }
+    
+    select option {
+        color: #000000 !important;
+        background-color: #ffffff !important;
+        padding: 8px 12px;
+    }
+    
+    select option:hover {
+        background-color: #e8f0fe !important;
+    }
+    
+    .text-white option,
+    .text-light option {
+        color: #000000 !important;
+    }
+</style>
+{% endblock %}
 
 {% block content %}
+<!-- AI Insights Banner -->
+<div class="alert-modern alert alert-info mb-4" data-aos="fade-up" style="background: linear-gradient(135deg, #7c3aed, #2563eb); color: white; border: none;">
+    <div class="d-flex justify-content-between align-items-center flex-wrap">
+        <div>
+            <i class="fas fa-robot fa-2x me-3"></i>
+            <strong>AI-Powered Discipline Management</strong>
+            <span class="ms-2 badge bg-light text-dark">Active</span>
+            <p class="mb-0 mt-1 small opacity-75">Get real-time AI recommendations based on Kenyan Education Act 2013</p>
+        </div>
+        <a href="{% url 'ai_dashboard' %}" class="btn btn-light btn-sm mt-2 mt-md-0">
+            <i class="fas fa-robot"></i> Open AI Dashboard
+        </a>
+    </div>
+</div>
+
 <!-- Pending Approvals Alert -->
 {% if pending_approvals > 0 %}
 <div class="alert-modern alert alert-warning mb-4" data-aos="fade-up">
@@ -21,12 +71,14 @@
         <div class="stat-icon primary"><i class="fas fa-users"></i></div>
         <div class="stat-value">{{ total_students }}</div>
         <div class="stat-label">Total Students</div>
+        <div class="stat-change up"><i class="fas fa-arrow-up"></i> Enrolled</div>
     </div>
     <div class="stat-card">
         <div class="stat-bg-icon"><i class="fas fa-exclamation-triangle"></i></div>
         <div class="stat-icon danger"><i class="fas fa-exclamation-triangle"></i></div>
         <div class="stat-value">{{ critical_students }}</div>
         <div class="stat-label">Critical Cases</div>
+        <div class="stat-change down"><i class="fas fa-arrow-up"></i> Need Intervention</div>
     </div>
     <div class="stat-card">
         <div class="stat-bg-icon"><i class="fas fa-flag"></i></div>
@@ -40,10 +92,11 @@
         <div class="stat-icon info"><i class="fas fa-user-clock"></i></div>
         <div class="stat-value">{{ online_count }}</div>
         <div class="stat-label">Online Teachers</div>
+        <div class="stat-change up"><i class="fas fa-circle" style="color: #10b981; font-size: 8px;"></i> Active</div>
     </div>
 </div>
 
-<!-- Management Actions -->
+<!-- Quick Actions -->
 <div class="card-modern mb-4" data-aos="fade-up">
     <div class="card-header-modern">
         <span class="header-icon"><i class="fas fa-cog"></i></span>
@@ -57,9 +110,15 @@
             </a>
             <a href="{% url 'admin_reset_requests' %}" class="btn-modern btn-modern-warning">
                 <i class="fas fa-key"></i> Password Resets
-                <span class="badge bg-light text-dark ms-1" id="resetCount">0</span>
+                <span class="badge bg-light text-dark ms-1" id="resetCount">{{ pending_resets|default:0 }}</span>
             </a>
-            <a href="{% url 'admin_profile' %}" class="btn-modern btn-modern-secondary">
+            <a href="{% url 'school_setup' %}" class="btn-modern" style="background: linear-gradient(135deg, #059669, #10b981); color: white;">
+                <i class="fas fa-school"></i> School Setup
+            </a>
+            <a href="{% url 'ai_dashboard' %}" class="btn-modern" style="background: linear-gradient(135deg, #7c3aed, #2563eb); color: white;">
+                <i class="fas fa-robot"></i> AI Analysis
+            </a>
+            <a href="{% url 'user_profile_settings' %}" class="btn-modern btn-modern-secondary">
                 <i class="fas fa-user-cog"></i> My Profile
             </a>
         </div>
@@ -77,25 +136,31 @@
             {% csrf_token %}
             <input type="hidden" name="action" value="add_student">
             <div class="row g-3">
-                <div class="col-md-3"><input type="text" name="admission_number" class="form-control-modern" placeholder="Admission Number" required></div>
-                <div class="col-md-3"><input type="text" name="name" class="form-control-modern" placeholder="Full Name" required></div>
+                <div class="col-md-3">
+                    <input type="text" name="admission_number" class="form-control-modern" placeholder="Admission Number" required>
+                </div>
+                <div class="col-md-3">
+                    <input type="text" name="name" class="form-control-modern" placeholder="Full Name" required>
+                </div>
                 <div class="col-md-2">
                     <select name="stream" class="form-control-modern" required>
-                        <option value="">Stream</option>
-                        {% for stream_key, stream_name in streams %}
-                        <option value="{{ stream_key }}">{{ stream_name }}</option>
+                        <option value="">-- Select Stream --</option>
+                        {% for stream in streams %}
+                        <option value="{{ stream.id }}">{{ stream.name }}</option>
                         {% endfor %}
                     </select>
                 </div>
                 <div class="col-md-2">
                     <select name="form" class="form-control-modern" required>
-                        <option value="">Form</option>
+                        <option value="">-- Select Form --</option>
                         {% for form_key, form_name in forms %}
                         <option value="{{ form_key }}">{{ form_name }}</option>
                         {% endfor %}
                     </select>
                 </div>
-                <div class="col-md-2"><button type="submit" class="btn-modern btn-modern-primary w-100"><i class="fas fa-plus"></i> Add</button></div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn-modern btn-modern-primary w-100"><i class="fas fa-plus"></i> Add</button>
+                </div>
             </div>
         </form>
     </div>
@@ -106,15 +171,18 @@
     <div class="card-header-modern">
         <span class="header-icon"><i class="fas fa-search"></i></span>
         Students
+        <span class="badge bg-light text-dark ms-2">{{ students.paginator.count }}</span>
     </div>
     <div class="card-body p-3">
         <form method="get" class="row g-2 mb-3">
-            <div class="col-md-3"><input type="text" name="search" class="form-control-modern" placeholder="Search..." value="{{ search_query }}"></div>
+            <div class="col-md-3">
+                <input type="text" name="search" class="form-control-modern" placeholder="Search..." value="{{ search_query }}">
+            </div>
             <div class="col-md-2">
                 <select name="stream" class="form-control-modern">
                     <option value="">All Streams</option>
-                    {% for stream_key, stream_name in streams %}
-                    <option value="{{ stream_key }}" {% if stream_filter == stream_key %}selected{% endif %}>{{ stream_name }}</option>
+                    {% for stream in streams %}
+                    <option value="{{ stream.name }}" {% if stream_filter == stream.name %}selected{% endif %}>{{ stream.name }}</option>
                     {% endfor %}
                 </select>
             </div>
@@ -134,7 +202,9 @@
                     <option value="good" {% if risk_filter == 'good' %}selected{% endif %}>Good</option>
                 </select>
             </div>
-            <div class="col-md-3"><button type="submit" class="btn-modern btn-modern-primary w-100"><i class="fas fa-filter"></i> Filter</button></div>
+            <div class="col-md-3">
+                <button type="submit" class="btn-modern btn-modern-primary w-100"><i class="fas fa-filter"></i> Filter</button>
+            </div>
         </form>
         
         <div class="table-responsive">
@@ -154,66 +224,107 @@
                 <tbody>
                     {% for student in students %}
                     <tr>
-                        <td>{{ student.admission_number }}</td>
+                        <td><strong>{{ student.admission_number }}</strong></td>
                         <td>{{ student.name }}</td>
-                        <td>{{ student.stream.get_name_display }}</td>
+                        <td><span class="badge-modern badge-info">{{ student.stream.name }}</span></td>
                         <td>{{ student.form }}</td>
-                        <td><span class="badge-modern {% if student.total_reports >= 20 %}badge-critical{% else %}badge-info{% endif %}">{{ student.total_reports }}</span></td>
+                        <td>
+                            <span class="badge-modern {% if student.total_reports >= 20 %}badge-critical{% elif student.total_reports >= 10 %}badge-warning{% else %}badge-info{% endif %}">
+                                {{ student.total_reports }}
+                            </span>
+                        </td>
                         <td>
                             <div class="d-flex align-items-center gap-2">
-                                <div class="progress-modern"><div class="progress-bar-modern" style="width: {{ student.risk_score }}%; background: {% if student.risk_score >= 60 %}linear-gradient(135deg, #ef4444, #dc2626){% elif student.risk_score >= 30 %}linear-gradient(135deg, #f59e0b, #d97706){% else %}linear-gradient(135deg, #10b981, #059669){% endif %}"></div></div>
+                                <div class="progress-modern" style="width: 80px;">
+                                    <div class="progress-bar-modern" style="width: {{ student.risk_score }}%; background: {% if student.risk_score >= 60 %}linear-gradient(135deg, #ef4444, #dc2626){% elif student.risk_score >= 30 %}linear-gradient(135deg, #f59e0b, #d97706){% else %}linear-gradient(135deg, #10b981, #059669){% endif %};"></div>
+                                </div>
                                 <span class="fw-bold" style="font-size:0.813rem;">{{ student.risk_score }}%</span>
                             </div>
                         </td>
                         <td>
-                            {% if student.is_critical %}<span class="badge-modern badge-critical">Critical</span>
-                            {% elif student.risk_score >= 30 %}<span class="badge-modern badge-warning">Warning</span>
-                            {% else %}<span class="badge-modern badge-success">Good</span>{% endif %}
+                            {% if student.is_critical %}
+                            <span class="badge-modern badge-critical"><i class="fas fa-exclamation-circle"></i> Critical</span>
+                            {% elif student.risk_score >= 30 %}
+                            <span class="badge-modern badge-warning"><i class="fas fa-exclamation-triangle"></i> Warning</span>
+                            {% else %}
+                            <span class="badge-modern badge-success"><i class="fas fa-check-circle"></i> Good</span>
+                            {% endif %}
                         </td>
-                        <td><a href="{% url 'student_profile' student.id %}" class="btn-modern btn-modern-primary btn-modern-sm"><i class="fas fa-eye"></i></a></td>
+                        <td>
+                            <div class="d-flex gap-1">
+                                <a href="{% url 'student_profile' student.id %}" class="btn-modern btn-modern-primary btn-modern-sm" title="View Profile">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                <a href="{% url 'student_profile' student.id %}?ai=true" class="btn-modern btn-modern-sm" style="background: linear-gradient(135deg, #7c3aed, #2563eb); color: white;" title="AI Analysis">
+                                    <i class="fas fa-robot"></i>
+                                </a>
+                                <button class="btn-modern btn-modern-danger btn-modern-sm" onclick="openReportModal({{ student.id }}, '{{ student.name }}')" title="Report">
+                                    <i class="fas fa-flag"></i>
+                                </button>
+                            </div>
+                        </td>
                     </tr>
                     {% empty %}
-                    <tr><td colspan="8" class="text-center py-4 text-muted">No students found</td></tr>
+                    <tr>
+                        <td colspan="8" class="text-center py-4 text-muted">
+                            <i class="fas fa-inbox fa-2x d-block mb-2"></i>
+                            No students found. Start by adding your first student!
+                        </td>
+                    </tr>
                     {% endfor %}
                 </tbody>
             </table>
         </div>
         
         <!-- Pagination -->
-        {% if students.has_other_pages %}
-        <nav aria-label="Page navigation">
-            <ul class="pagination justify-content-center">
-                {% if students.has_previous %}
-                <li class="page-item">
-                    <a class="page-link" href="?page={{ students.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if stream_filter %}&stream={{ stream_filter }}{% endif %}{% if form_filter %}&form={{ form_filter }}{% endif %}{% if risk_filter %}&risk={{ risk_filter }}{% endif %}">&laquo;</a>
-                </li>
-                {% else %}
-                <li class="page-item disabled"><span class="page-link">&laquo;</span></li>
-                {% endif %}
-
-                {% for num in students.paginator.page_range %}
-                    {% if students.number == num %}
-                    <li class="page-item active"><span class="page-link">{{ num }}</span></li>
-                    {% elif num > students.number|add:'-3' and num < students.number|add:'3' %}
-                    <li class="page-item">
-                        <a class="page-link" href="?page={{ num }}{% if search_query %}&search={{ search_query }}{% endif %}{% if stream_filter %}&stream={{ stream_filter }}{% endif %}{% if form_filter %}&form={{ form_filter }}{% endif %}{% if risk_filter %}&risk={{ risk_filter }}{% endif %}">{{ num }}</a>
-                    </li>
-                    {% endif %}
-                {% endfor %}
-
-                {% if students.has_next %}
-                <li class="page-item">
-                    <a class="page-link" href="?page={{ students.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if stream_filter %}&stream={{ stream_filter }}{% endif %}{% if form_filter %}&form={{ form_filter }}{% endif %}{% if risk_filter %}&risk={{ risk_filter }}{% endif %}">&raquo;</a>
-                </li>
-                {% else %}
-                <li class="page-item disabled"><span class="page-link">&raquo;</span></li>
-                {% endif %}
-            </ul>
-            <div class="text-center text-muted">
-                <small>Page {{ students.number }} of {{ students.paginator.num_pages }} ({{ students.paginator.count }} total)</small>
-            </div>
-        </nav>
-        {% endif %}
+        {% include 'includes/pagination.html' with page_obj=students %}
     </div>
 </div>
+
+<!-- Report Modal -->
+<div class="modal fade" id="reportModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4">
+            <div class="modal-header border-0" style="background: linear-gradient(135deg, #ef4444, #dc2626); color: white; border-radius: 16px 16px 0 0;">
+                <h5 class="modal-title fw-bold"><i class="fas fa-flag me-2"></i>Report Student</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="post" action="{% url 'admin_dashboard' %}" id="reportForm">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="report_student">
+                <input type="hidden" name="student_id" id="reportStudentId" value="0">
+                <div class="modal-body p-4">
+                    <p class="mb-3">Reporting: <strong id="reportStudentName" style="color: #2563eb;"></strong></p>
+                    {% include 'includes/custom_case.html' with categories=categories %}
+                </div>
+                <div class="modal-footer border-0">
+                    <button type="button" class="btn-modern btn-modern-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn-modern" style="background: linear-gradient(135deg, #ef4444, #dc2626); color: white;" id="submitReportBtn">
+                        <i class="fas fa-paper-plane"></i> Submit Report
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+function openReportModal(id, name) {
+    document.getElementById('reportStudentId').value = id;
+    document.getElementById('reportStudentName').textContent = name;
+    new bootstrap.Modal(document.getElementById('reportModal')).show();
+}
+
+// Auto-refresh stats every 30 seconds
+setInterval(function() {
+    fetch('/api/admin-notifications/')
+        .then(r => r.json())
+        .then(data => {
+            if (data.total !== undefined) {
+                const badge = document.querySelector('.notification-badge');
+                if (badge) badge.textContent = data.total || 0;
+            }
+        });
+}, 30000);
+</script>
 {% endblock %}
