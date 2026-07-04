@@ -1,6 +1,4 @@
-﻿
-    
-<div class="mb-3">
+﻿<div class="mb-3">
     <label class="form-label-modern">Report Type</label>
     <div class="d-flex gap-3">
         <div class="form-check">
@@ -19,12 +17,15 @@
     <div class="mb-3">
         <label class="form-label-modern">Offense Category</label>
         <select name="category" class="form-control-modern" id="categorySelect">
-            <option value="">Select a category...</option>
+            <option value="">-- Select a category --</option>
             {% for category in categories %}
-            <option value="{{ category.id }}">{{ category.name }} </option>
+            <option value="{{ category.id }}">{{ category.name }}</option>
             {% endfor %}
             <option value="custom">-- Custom Case --</option>
         </select>
+        {% if not categories %}
+        <small class="text-danger">No categories found. Please run: python manage.py seed_categories</small>
+        {% endif %}
     </div>
 </div>
 
@@ -41,11 +42,11 @@
 <div class="mb-3">
     <label class="form-label-modern">Severity Rating</label>
     <select name="rating" class="form-control-modern">
-        <option value="VERY_MINOR">Very Minor</option>
-        <option value="MINOR">Minor</option>
-        <option value="MODERATE" selected>Moderate</option>
-        <option value="SERIOUS">Serious</option>
-        <option value="VERY_SERIOUS">Very Serious</option>
+        <option value="VERY_MINOR">Very Minor (5 pts)</option>
+        <option value="MINOR">Minor (10 pts)</option>
+        <option value="MODERATE" selected>Moderate (20 pts)</option>
+        <option value="SERIOUS">Serious (30 pts)</option>
+        <option value="VERY_SERIOUS">Very Serious (40 pts)</option>
     </select>
 </div>
 
@@ -57,11 +58,19 @@
 
 <script>
 function toggleCustomCase(isCustom) {
-    document.getElementById('standardCategoryDiv').style.display = isCustom ? 'none' : 'block';
-    document.getElementById('customCaseDiv').style.display = isCustom ? 'block' : 'none';
-    document.getElementById('customCaseInput').required = isCustom;
-    document.getElementById('categorySelect').required = !isCustom;
-    if (isCustom) document.getElementById('categorySelect').value = 'custom';
+    var standardDiv = document.getElementById('standardCategoryDiv');
+    var customDiv = document.getElementById('customCaseDiv');
+    var customInput = document.getElementById('customCaseInput');
+    var categorySelect = document.getElementById('categorySelect');
+    
+    if (standardDiv) standardDiv.style.display = isCustom ? 'none' : 'block';
+    if (customDiv) customDiv.style.display = isCustom ? 'block' : 'none';
+    if (customInput) customInput.required = isCustom;
+    if (categorySelect) categorySelect.required = !isCustom;
+    
+    if (isCustom && categorySelect) {
+        categorySelect.value = 'custom';
+    }
 }
 
 document.getElementById('categorySelect')?.addEventListener('change', function() {
@@ -71,10 +80,4 @@ document.getElementById('categorySelect')?.addEventListener('change', function()
     }
 });
 </script>
-
-
-
-
-
-
 

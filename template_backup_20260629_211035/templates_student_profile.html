@@ -1,0 +1,837 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ student.name }} - Profile{% endblock %}
+
+{% block extra_css %}
+<style>
+    .ai-insights-panel {
+        transition: all 0.3s ease;
+    }
+    
+    .ai-insights-panel .card-body {
+        max-height: 400px;
+        overflow-y: auto;
+    }
+    
+    .ai-insights-panel .card-body::-webkit-scrollbar {
+        width: 4px;
+    }
+    .ai-insights-panel .card-body::-webkit-scrollbar-track {
+        background: #f1f5f9;
+        border-radius: 10px;
+    }
+    .ai-insights-panel .card-body::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 10px;
+    }
+    
+    .ai-action-item {
+        padding: 0.5rem 0.75rem;
+        border-left: 3px solid;
+        border-radius: 4px;
+        margin-bottom: 0.5rem;
+        transition: all 0.3s ease;
+    }
+    
+    .ai-action-item:hover {
+        transform: translateX(4px);
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
+    
+    .ai-action-item.critical { border-left-color: #dc2626; background: #fef2f2; }
+    .ai-action-item.warning { border-left-color: #f59e0b; background: #fffbeb; }
+    .ai-action-item.success { border-left-color: #10b981; background: #ecfdf5; }
+    .ai-action-item.info { border-left-color: #2563eb; background: #eff6ff; }
+    
+    .ai-action-item .step-number {
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        background: #2563eb;
+        color: white;
+        border-radius: 50%;
+        text-align: center;
+        line-height: 20px;
+        font-size: 10px;
+        font-weight: 700;
+        margin-right: 0.5rem;
+    }
+    
+    .teacher-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.25rem 0.75rem;
+        border-radius: 999px;
+        background: #f1f5f9;
+        color: #2563eb;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        font-weight: 500;
+        font-size: 0.875rem;
+        cursor: pointer;
+        border: none;
+    }
+    
+    .teacher-link:hover {
+        background: #eff6ff;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(37, 99, 235, 0.15);
+        color: #1d4ed8;
+        text-decoration: none;
+    }
+    
+    .teacher-link .teacher-avatar {
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid white;
+    }
+    
+    .teacher-link .teacher-avatar-placeholder {
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #2563eb, #7c3aed);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 0.7rem;
+        font-weight: 700;
+        border: 2px solid white;
+        flex-shrink: 0;
+    }
+    
+    /* Teacher Profile Modal Styles */
+    .teacher-profile-modal .modal-content {
+        border: none;
+        border-radius: 20px;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    }
+    
+    .teacher-profile-modal .modal-header {
+        background: linear-gradient(135deg, #2563eb, #7c3aed);
+        color: white;
+        border-radius: 20px 20px 0 0;
+        padding: 1.25rem 1.5rem;
+    }
+    
+    .teacher-profile-modal .modal-body {
+        padding: 1.5rem;
+        max-height: 500px;
+        overflow-y: auto;
+    }
+    
+    .teacher-profile-modal .teacher-info-card {
+        background: #f8fafc;
+        border-radius: 12px;
+        padding: 0.75rem 1rem;
+        border: 1px solid #e2e8f0;
+        transition: all 0.2s ease;
+    }
+    
+    .teacher-profile-modal .teacher-info-card:hover {
+        background: #f1f5f9;
+        border-color: #cbd5e1;
+    }
+    
+    .teacher-avatar-large {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 4px solid white;
+        box-shadow: 0 4px 20px rgba(37, 99, 235, 0.15);
+    }
+    
+    .teacher-avatar-placeholder-large {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #2563eb, #7c3aed);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto;
+        border: 4px solid white;
+        box-shadow: 0 4px 20px rgba(37, 99, 235, 0.15);
+    }
+    
+    .teacher-avatar-placeholder-large i {
+        font-size: 3.5rem;
+        color: white;
+    }
+
+    /* Student Profile Picture */
+    .student-avatar {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 3px solid white;
+    }
+    
+    .student-avatar-placeholder {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #2563eb, #7c3aed);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto;
+        border: 3px solid white;
+    }
+    
+    .student-avatar-placeholder i {
+        font-size: 3.5rem;
+        color: white;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+    <div class="col-lg-4" data-aos="fade-right">
+        <!-- AI Insights Panel -->
+        <div class="card-modern ai-insights-panel mt-4" id="aiInsightsPanel" style="display: none;">
+            <div class="card-header-modern" style="background: linear-gradient(135deg, #7c3aed, #2563eb);">
+                <span class="header-icon"><i class="fas fa-robot"></i></span>
+                AI Analysis
+                <span class="badge bg-light text-dark ms-2">Real-time</span>
+                <span class="badge bg-warning ms-1" id="aiStatusBadge">Ready</span>
+                <button type="button" class="btn-close btn-close-white ms-auto" onclick="document.getElementById('aiInsightsPanel').style.display='none';"></button>
+            </div>
+            <div class="card-body p-4" id="aiInsightsContent">
+                <div class="text-center py-3">
+                    <i class="fas fa-robot fa-3x text-primary mb-2"></i>
+                    <p class="text-muted">Click "AI Insights" to analyze this student</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Profile Card -->
+        <div class="card-modern">
+            <div class="card-header-modern text-center">
+                <div class="mb-3">
+                    {% if student.profile_picture %}
+                        <img src="{{ student.profile_picture.url }}" 
+                             alt="{{ student.name }}" 
+                             class="student-avatar"
+                             onerror="this.style.display='none'; this.parentElement.querySelector('.student-avatar-fallback').style.display='flex';">
+                        <div class="student-avatar-fallback" style="display: none; width: 120px; height: 120px; border-radius: 50%; background: linear-gradient(135deg, #2563eb, #7c3aed); display: flex; align-items: center; justify-content: center; margin: 0 auto; border: 3px solid white;">
+                            <i class="fas fa-user-graduate fa-3x" style="color: white;"></i>
+                        </div>
+                    {% else %}
+                        <div class="student-avatar-placeholder">
+                            <i class="fas fa-user-graduate fa-3x" style="color: white;"></i>
+                        </div>
+                    {% endif %}
+                </div>
+                <h4 class="mb-0">{{ student.name }}</h4>
+                <small class="text-light">{{ student.admission_number }}</small>
+                <div class="mt-2 d-flex gap-2 justify-content-center flex-wrap">
+                    {% if user.is_superuser or user.teacher_profile.assigned_stream == student.stream %}
+                    <a href="{% url 'edit_student' student.id %}" class="btn btn-sm btn-light"><i class="fas fa-edit"></i> Edit</a>
+                    {% endif %}
+                    <button class="btn btn-sm" id="aiInsightsBtn" style="background: linear-gradient(135deg, #7c3aed, #2563eb); color: white; border: none; padding: 6px 16px;">
+                        <i class="fas fa-robot"></i> AI Insights
+                        <span class="spinner-border spinner-border-sm ms-1" id="aiSpinner" style="display: none; width: 14px; height: 14px;" role="status"></span>
+                    </button>
+                </div>
+            </div>
+            <div class="card-body p-4">
+                <div class="mb-3"><label class="text-muted">Stream</label><p class="mb-0 fw-bold">{{ student.stream.name }}</p></div>
+                <div class="mb-3"><label class="text-muted">Form</label><p class="mb-0 fw-bold">{{ student.form }}</p></div>
+                <div class="mb-3"><label class="text-muted">Year</label><p class="mb-0 fw-bold">{{ student.year }}</p></div>
+                <div class="mb-3"><label class="text-muted">Total Reports</label><p class="mb-0 fw-bold">{{ total_reports }}</p></div>
+                <div class="mb-3">
+                    <label class="text-muted">Risk Score</label>
+                    <div class="progress-modern mb-2">
+                        <div class="progress-bar-modern" style="width: {{ student.risk_score }}%; background: {% if student.risk_score >= 60 %}linear-gradient(135deg, #ef4444, #dc2626){% elif student.risk_score >= 30 %}linear-gradient(135deg, #f59e0b, #d97706){% else %}linear-gradient(135deg, #10b981, #059669){% endif %};"></div>
+                    </div>
+                    <h3 class="{% if student.is_critical %}text-danger{% else %}text-success{% endif %}">{{ student.risk_score }}%</h3>
+                </div>
+                {% if student.intervention_count %}
+                <div class="mb-3">
+                    <label class="text-muted">Interventions</label>
+                    <p class="mb-0 fw-bold">{{ student.intervention_count }}</p>
+                </div>
+                {% endif %}
+                {% if student.optional_notes %}
+                <div class="alert alert-info"><i class="fas fa-sticky-note"></i> {{ student.optional_notes }}</div>
+                {% endif %}
+                <div class="text-center">
+                    <span class="badge-modern {% if student.is_critical %}badge-critical{% elif student.risk_score >= 30 %}badge-warning{% else %}badge-success{% endif %}" style="font-size:1rem; padding:0.5rem 1.5rem;">
+                        {{ student.risk_level }}
+                    </span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Category Breakdown -->
+        <div class="card-modern mt-4" data-aos="fade-right">
+            <div class="card-header-modern">
+                <span class="header-icon"><i class="fas fa-chart-pie"></i></span>
+                Offense Categories
+            </div>
+            <div class="card-body p-4">
+                {% if category_breakdown %}
+                <canvas id="categoryChart" height="200"></canvas>
+                <div class="mt-3">
+                    {% for cat in category_breakdown %}
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span>{{ cat.category__name }}</span>
+                        <span class="badge-modern badge-info">{{ cat.count }}x</span>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-muted text-center">No categories to display</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-8" data-aos="fade-left">
+        <!-- Timeline -->
+        <div class="card-modern mb-4">
+            <div class="card-header-modern">
+                <span class="header-icon"><i class="fas fa-chart-line"></i></span>
+                Risk Timeline
+            </div>
+            <div class="card-body p-4">
+                {% if timeline %}<canvas id="timelineChart" height="150"></canvas>{% else %}<p class="text-muted text-center">No data</p>{% endif %}
+            </div>
+        </div>
+        
+        <!-- Reports -->
+        <div class="card-modern">
+            <div class="card-header-modern">
+                <span class="header-icon"><i class="fas fa-history"></i></span>
+                Report History <span class="badge bg-light text-dark ms-2">{{ total_reports }}</span>
+            </div>
+            <div class="card-body p-0">
+                {% if reports %}
+                <div class="table-responsive">
+                    <table class="table-modern">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Category</th>
+                                <th>Reported By</th>
+                                <th>Points</th>
+                                <th>Rating</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for report in reports %}
+                            <tr>
+                                <td>{{ report.reported_at|date:"Y-m-d H:i" }}</td>
+                                <td><span class="badge-modern badge-critical">{{ report.category.name }}</span></td>
+                                <td>
+                                    <button class="teacher-link" 
+                                            data-user-id="{{ report.reported_by.id }}"
+                                            title="View {{ report.reported_by.get_full_name|default:report.reported_by.username }}'s Profile">
+                                        {% if report.reported_by.teacher_profile.profile_picture %}
+                                        <img src="{{ report.reported_by.teacher_profile.profile_picture.url }}" 
+                                             alt="{{ report.reported_by.username }}" 
+                                             class="teacher-avatar"
+                                             onerror="this.style.display='none'; this.parentElement.querySelector('.teacher-avatar-fallback').style.display='flex';">
+                                        <span class="teacher-avatar-fallback" style="display: none;">
+                                            {{ report.reported_by.get_full_name|default:report.reported_by.username|slice:":1"|upper }}
+                                        </span>
+                                        {% else %}
+                                        <span class="teacher-avatar-placeholder">
+                                            {{ report.reported_by.get_full_name|default:report.reported_by.username|slice:":1"|upper }}
+                                        </span>
+                                        {% endif %}
+                                        {{ report.reported_by.get_full_name|default:report.reported_by.username }}
+                                        <i class="fas fa-external-link-alt" style="font-size: 0.6rem; opacity: 0.5;"></i>
+                                    </button>
+                                </td>
+                                <td class="text-danger fw-bold">+{{ report.points }}</td>
+                                <td>
+                                    <span class="badge-modern {% if report.rating == 'VERY_SERIOUS' %}badge-critical{% elif report.rating == 'SERIOUS' %}badge-warning{% else %}badge-info{% endif %}">
+                                        {{ report.get_rating_display }}
+                                    </span>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-4 text-muted">
+                    <i class="fas fa-inbox fa-2x mb-2 d-block"></i>
+                    No reports found for this student.
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Teacher Profile Quick View Modal -->
+<div class="modal fade teacher-profile-modal" id="teacherProfileModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold">
+                    <i class="fas fa-user-tie me-2"></i>
+                    <span id="teacherModalName">Teacher Profile</span>
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="teacherModalContent">
+                <div class="text-center py-5">
+                    <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="text-muted mt-3">Loading teacher profile...</p>
+                </div>
+            </div>
+            <div class="modal-footer border-0">
+                <button type="button" class="btn-modern btn-modern-secondary" data-bs-dismiss="modal">Close</button>
+                <a href="#" id="teacherFullProfileLink" class="btn-modern btn-modern-primary">
+                    <i class="fas fa-external-link-alt"></i> View Full Profile
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+// ============================================================
+// AI INSIGHTS
+// ============================================================
+
+console.log('🚀 Student Profile Script Started');
+var STUDENT_ID = {{ student.id }};
+
+function loadAI() {
+    console.log('🎯 loadAI called for student:', STUDENT_ID);
+    
+    var panel = document.getElementById('aiInsightsPanel');
+    var content = document.getElementById('aiInsightsContent');
+    var spinner = document.getElementById('aiSpinner');
+    var btn = document.getElementById('aiInsightsBtn');
+    var statusBadge = document.getElementById('aiStatusBadge');
+    
+    if (spinner) spinner.style.display = 'inline-block';
+    if (btn) btn.disabled = true;
+    if (statusBadge) {
+        statusBadge.textContent = 'Loading...';
+        statusBadge.className = 'badge bg-warning ms-1';
+    }
+    if (panel) {
+        panel.style.display = 'block';
+        panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+    if (content) {
+        content.innerHTML = `
+            <div class="text-center py-3">
+                <i class="fas fa-spinner fa-spin fa-2x text-primary mb-2"></i>
+                <p class="text-muted">Loading AI analysis...</p>
+            </div>
+        `;
+    }
+    
+    fetch('/ai/api/student/' + STUDENT_ID + '/recommendations/', {
+        credentials: 'include',
+        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+    })
+    .then(function(response) {
+        if (!response.ok) throw new Error('HTTP ' + response.status);
+        return response.json();
+    })
+    .then(function(data) {
+        console.log('✅ AI Data received:', data);
+        if (data.error) throw new Error(data.error);
+        
+        if (statusBadge) {
+            statusBadge.textContent = 'Loaded';
+            statusBadge.className = 'badge bg-success ms-1';
+        }
+        renderAIInsights(content, data);
+    })
+    .catch(function(error) {
+        console.error('❌ Error:', error);
+        content.innerHTML = `
+            <div class="alert alert-danger">
+                <i class="fas fa-exclamation-circle me-2"></i>
+                ${error.message || 'Failed to load AI insights'}
+            </div>
+        `;
+        if (statusBadge) {
+            statusBadge.textContent = 'Error';
+            statusBadge.className = 'badge bg-danger ms-1';
+        }
+    })
+    .finally(function() {
+        if (spinner) spinner.style.display = 'none';
+        if (btn) btn.disabled = false;
+    });
+}
+
+function renderAIInsights(container, data) {
+    var student = data.student || {};
+    var profile = data.profile || {};
+    var recommendations = data.recommendations || [];
+    var total_reports = data.total_reports || 0;
+    
+    var html = '';
+    var riskScore = profile.risk_score || 0;
+    var riskLevel = profile.risk_level || 'GOOD';
+    var riskColor = riskLevel === 'CRITICAL' ? 'danger' :
+                   riskLevel === 'WARNING' ? 'warning' : 'success';
+    
+    html += `
+        <div class="mb-3">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="fw-bold">📊 Risk Analysis</span>
+                <span class="badge bg-${riskColor}">${riskLevel}</span>
+            </div>
+            <div class="progress-modern mb-1">
+                <div class="progress-bar-modern" style="width: ${riskScore}%; background: ${riskScore >= 60 ? 'linear-gradient(135deg, #ef4444, #dc2626)' : riskScore >= 30 ? 'linear-gradient(135deg, #f59e0b, #d97706)' : 'linear-gradient(135deg, #10b981, #059669)'};"></div>
+            </div>
+            <div class="d-flex justify-content-between">
+                <small class="text-muted">Score: ${riskScore}%</small>
+                <small class="text-muted">Reports: ${total_reports}</small>
+            </div>
+        </div>
+    `;
+    
+    if (recommendations && recommendations.length > 0) {
+        html += '<div class="mb-3"><strong>📋 Action Plan</strong>';
+        recommendations.forEach(function(rec) {
+            var recClass = rec.type === 'critical' ? 'critical' :
+                          rec.type === 'warning' ? 'warning' :
+                          rec.type === 'pattern' ? 'info' : 'success';
+            var icon = rec.type === 'critical' ? 'fa-exclamation-triangle' :
+                      rec.type === 'warning' ? 'fa-exclamation-circle' :
+                      rec.type === 'pattern' ? 'fa-chart-bar' : 'fa-check-circle';
+            
+            html += `
+                <div class="ai-action-item ${recClass} mt-2">
+                    <div class="d-flex align-items-start">
+                        <span style="min-width: 24px;"><i class="fas ${icon} me-1"></i></span>
+                        <div>
+                            <div class="fw-bold">${rec.title}</div>
+                            <div class="small text-muted">${rec.description}</div>
+                            ${rec.steps ? `
+                                <div class="mt-1 small">
+                                    ${rec.steps.map(function(step, idx) {
+                                        return `<div><span class="step-number">${idx + 1}</span>${step}</div>`;
+                                    }).join('')}
+                                </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+        html += '</div>';
+    }
+    
+    html += `
+        <div class="alert alert-light border border-primary small mt-3">
+            <i class="fas fa-gavel text-primary me-2"></i>
+            <strong>Kenyan Education Act 2013</strong>
+            <div class="mt-1">All discipline actions must comply with the Kenya Basic Education Act 2013. Positive discipline approaches should be used.</div>
+        </div>
+    `;
+    
+    container.innerHTML = html;
+}
+
+// ============================================================
+// TEACHER PROFILE QUICK VIEW
+// ============================================================
+
+function viewTeacherProfile(userId) {
+    console.log('👤 Viewing teacher profile for user ID:', userId);
+    
+    if (!userId) {
+        console.error('❌ No user ID provided');
+        return;
+    }
+    
+    var modal = new bootstrap.Modal(document.getElementById('teacherProfileModal'));
+    var content = document.getElementById('teacherModalContent');
+    var nameEl = document.getElementById('teacherModalName');
+    var fullProfileLink = document.getElementById('teacherFullProfileLink');
+    
+    // Show loading state
+    content.innerHTML = `
+        <div class="text-center py-5">
+            <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="text-muted mt-3">Loading teacher profile...</p>
+        </div>
+    `;
+    modal.show();
+    
+    // Fetch teacher profile data
+    var apiUrl = '/api/teacher-profile/' + userId + '/';
+    console.log('🌐 Fetching:', apiUrl);
+    
+    fetch(apiUrl, {
+        credentials: 'include',
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then(function(response) {
+        console.log('📡 Response status:', response.status);
+        if (!response.ok) {
+            throw new Error('HTTP ' + response.status + ': ' + response.statusText);
+        }
+        return response.json();
+    })
+    .then(function(data) {
+        console.log('✅ Teacher data received:', data);
+        
+        if (data.error) {
+            throw new Error(data.error);
+        }
+        
+        // Update modal title and links
+        nameEl.textContent = data.full_name || data.username;
+        fullProfileLink.href = '/profile/' + userId + '/';
+        
+        // Build profile HTML
+        var html = `
+            <div class="row g-4">
+                <div class="col-md-4 text-center">
+                    ${data.profile_picture ? `
+                        <img src="${data.profile_picture}" alt="${data.full_name}" 
+                             class="teacher-avatar-large"
+                             onerror="this.style.display='none'; this.parentElement.querySelector('.teacher-avatar-large-fallback').style.display='flex';">
+                        <div class="teacher-avatar-large-fallback" style="display: none; width: 120px; height: 120px; border-radius: 50%; background: linear-gradient(135deg, #2563eb, #7c3aed); display: flex; align-items: center; justify-content: center; margin: 0 auto; border: 4px solid white; box-shadow: 0 4px 20px rgba(37, 99, 235, 0.15);">
+                            <i class="fas fa-user-tie fa-3x" style="color: white;"></i>
+                        </div>
+                    ` : `
+                        <div class="teacher-avatar-placeholder-large">
+                            <i class="fas fa-user-tie"></i>
+                        </div>
+                    `}
+                    <h5 class="mt-3 fw-bold">${data.full_name}</h5>
+                    <p class="text-muted small">@${data.username}</p>
+                    <div class="d-flex justify-content-center gap-2 flex-wrap">
+                        ${data.is_online ? '<span class="badge bg-success"><i class="fas fa-circle me-1" style="font-size: 8px;"></i> Online</span>' : '<span class="badge bg-secondary"><i class="fas fa-circle me-1" style="font-size: 8px;"></i> Offline</span>'}
+                        ${data.is_superuser ? '<span class="badge bg-danger"><i class="fas fa-crown me-1"></i> Admin</span>' : ''}
+                        ${data.is_approved ? '<span class="badge bg-success">Approved</span>' : '<span class="badge bg-warning">Pending</span>'}
+                        ${data.is_suspended ? '<span class="badge bg-danger">Suspended</span>' : ''}
+                    </div>
+                </div>
+                <div class="col-md-8">
+                    <div class="row g-2">
+                        <div class="col-sm-6">
+                            <div class="teacher-info-card">
+                                <small class="text-muted d-block">Email</small>
+                                <strong>${data.email || 'N/A'}</strong>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="teacher-info-card">
+                                <small class="text-muted d-block">Role</small>
+                                <strong>${data.role || 'Teacher'}</strong>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="teacher-info-card">
+                                <small class="text-muted d-block">Assigned Stream</small>
+                                <strong>${data.assigned_stream || 'Not Assigned'}</strong>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="teacher-info-card">
+                                <small class="text-muted d-block">Assigned Form</small>
+                                <strong>${data.assigned_form || 'None'}</strong>
+                            </div>
+                        </div>
+                        ${data.phone ? `
+                        <div class="col-12">
+                            <div class="teacher-info-card">
+                                <small class="text-muted d-block">Phone</small>
+                                <strong>${data.phone}</strong>
+                            </div>
+                        </div>
+                        ` : ''}
+                        ${data.last_activity ? `
+                        <div class="col-12">
+                            <div class="teacher-info-card">
+                                <small class="text-muted d-block">Last Activity</small>
+                                <strong>${data.last_activity}</strong>
+                            </div>
+                        </div>
+                        ` : ''}
+                        ${data.is_suspended && data.suspension_reason ? `
+                        <div class="col-12">
+                            <div class="teacher-info-card" style="border-color: #dc2626; background: #fef2f2;">
+                                <small class="text-muted d-block">⚠️ Suspension Reason</small>
+                                <strong class="text-danger">${data.suspension_reason}</strong>
+                            </div>
+                        </div>
+                        ` : ''}
+                    </div>
+                </div>
+            </div>
+        `;
+        content.innerHTML = html;
+        
+    })
+    .catch(function(error) {
+        console.error('❌ Error loading teacher:', error);
+        content.innerHTML = `
+            <div class="alert alert-danger">
+                <i class="fas fa-exclamation-circle me-2"></i>
+                Error loading teacher profile: ${error.message}
+                <br><small class="text-muted">Please try again or contact support.</small>
+            </div>
+        `;
+    });
+}
+
+// ============================================================
+// INITIALIZATION
+// ============================================================
+
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('📄 DOM loaded');
+    
+    // AI Insights Button
+    var btn = document.getElementById('aiInsightsBtn');
+    if (btn) {
+        btn.onclick = function(e) {
+            e.preventDefault();
+            loadAI();
+        };
+    }
+    
+    // Auto-load if URL has ?ai=true
+    var urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('ai') === 'true') {
+        setTimeout(loadAI, 500);
+    }
+    
+    // Make teacher links clickable to show profile modal
+    document.querySelectorAll('.teacher-link').forEach(function(link) {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            var userId = this.getAttribute('data-user-id');
+            if (userId) {
+                viewTeacherProfile(userId);
+            } else {
+                console.error('❌ No user-id found on teacher link');
+            }
+        });
+    });
+    
+    // Initialize charts
+    initCharts();
+});
+
+function initCharts() {
+    // Category Chart
+    var categoryCtx = document.getElementById('categoryChart');
+    if (categoryCtx) {
+        var categories = [];
+        var counts = [];
+        var colors = ['#2563eb', '#7c3aed', '#10b981', '#f59e0b', '#ef4444'];
+        
+        {% if category_breakdown %}
+            {% for cat in category_breakdown %}
+                categories.push('{{ cat.category__name|escapejs }}');
+                counts.push({{ cat.count }});
+            {% endfor %}
+        {% endif %}
+        
+        if (categories.length > 0) {
+            new Chart(categoryCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: categories,
+                    datasets: [{
+                        data: counts,
+                        backgroundColor: colors.slice(0, categories.length),
+                        borderWidth: 2,
+                        borderColor: '#fff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                font: { size: 11 },
+                                boxWidth: 12,
+                                padding: 10
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    }
+    
+    // Timeline Chart
+    var timelineCtx = document.getElementById('timelineChart');
+    if (timelineCtx) {
+        var dates = [];
+        var scores = [];
+        
+        {% if timeline %}
+            {% for point in timeline %}
+                dates.push('{{ point.date|date:"M d" }}');
+                scores.push({{ point.score }});
+            {% endfor %}
+        {% endif %}
+        
+        if (dates.length > 1) {
+            new Chart(timelineCtx, {
+                type: 'line',
+                data: {
+                    labels: dates,
+                    datasets: [{
+                        label: 'Risk Score',
+                        data: scores,
+                        borderColor: '#2563eb',
+                        backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 4,
+                        pointBackgroundColor: '#2563eb'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            grid: { color: 'rgba(0,0,0,0.05)' }
+                        },
+                        x: {
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
+        }
+    }
+}
+</script>
+{% endblock %}

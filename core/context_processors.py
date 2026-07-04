@@ -1,10 +1,17 @@
 ﻿from django.contrib.auth.models import User
-from .models import TeacherProfile, PasswordReset, Notification, Student, DisciplineReport
+from .models import TeacherProfile, PasswordReset, Notification, Student, DisciplineReport, School
 from django.db.models import Count
 from django.utils import timezone
 
 def user_management_context(request):
-    """Add all notification counts to templates"""
+    """Add all notification counts and school info to templates"""
+    
+    # Get school info
+    school = School.objects.first()
+    school_name = school.name if school else "Disciplinary System"
+    school_motto = school.motto if school and school.motto else "Excellence Through Discipline"
+    school_short_name = school.short_name if school else "DMS"
+    
     context = {
         'notification_count': 0,
         'unread_notifications': [],
@@ -13,6 +20,10 @@ def user_management_context(request):
         'admin_notification_count': 0,
         'critical_students': 0,
         'reports_today': 0,
+        'school_name': school_name,
+        'school_motto': school_motto,
+        'school_short_name': school_short_name,
+        'school': school,
     }
     
     if request.user.is_authenticated:
@@ -29,7 +40,7 @@ def user_management_context(request):
                     teacher_profile__is_approved=False,
                     teacher_profile__is_suspended=False,
                     groups__name='ClassTeacher'
-                ).exclude(id=request.user.id).count()  # Exclude current user
+                ).exclude(id=request.user.id).count()
                 context['pending_approvals'] = pending_approvals
                 
                 # Count pending resets
@@ -56,3 +67,4 @@ def user_management_context(request):
                 pass
     
     return context
+

@@ -4,94 +4,600 @@
 
 {% block extra_css %}
 <style>
-    .profile-pic-container { position: relative; display: inline-block; }
-    .profile-pic-container img { width: 150px; height: 150px; border-radius: 50%; object-fit: cover; border: 3px solid #2563eb; }
-    .profile-pic-placeholder { width: 150px; height: 150px; border-radius: 50%; background: linear-gradient(135deg, #2563eb, #7c3aed); display: flex; align-items: center; justify-content: center; margin: 0 auto; border: 3px solid #2563eb; }
-    .profile-pic-placeholder i { font-size: 4rem; color: white; }
-    .form-section { border-bottom: 1px solid #e2e8f0; padding-bottom: 1.5rem; margin-bottom: 1.5rem; }
-    .form-section:last-child { border-bottom: none; margin-bottom: 0; }
+    .profile-container {
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+    
+    .profile-card {
+        background: white;
+        border-radius: 20px;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+    
+    .profile-card:hover {
+        box-shadow: 0 8px 40px rgba(0,0,0,0.08);
+    }
+    
+    /* ===== LEFT PANEL - PROFILE INFO ===== */
+    .profile-left {
+        background: linear-gradient(180deg, #f8fafc, #ffffff);
+        padding: 2rem 1.5rem;
+        border-right: 1px solid #e2e8f0;
+        height: 100%;
+        min-height: 500px;
+    }
+    
+    .profile-avatar-container {
+        text-align: center;
+        margin-bottom: 1.5rem;
+    }
+    
+    .profile-avatar {
+        width: 140px;
+        height: 140px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 4px solid #2563eb;
+        box-shadow: 0 8px 30px rgba(37, 99, 235, 0.2);
+        background: #f1f5f9;
+        transition: all 0.3s ease;
+    }
+    
+    .profile-avatar:hover {
+        transform: scale(1.02);
+        box-shadow: 0 12px 40px rgba(37, 99, 235, 0.3);
+    }
+    
+    .profile-avatar-placeholder {
+        width: 140px;
+        height: 140px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #2563eb, #7c3aed);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto;
+        border: 4px solid #2563eb;
+        box-shadow: 0 8px 30px rgba(37, 99, 235, 0.2);
+        transition: all 0.3s ease;
+    }
+    
+    .profile-avatar-placeholder:hover {
+        transform: scale(1.02);
+        box-shadow: 0 12px 40px rgba(37, 99, 235, 0.3);
+    }
+    
+    .profile-avatar-placeholder i {
+        font-size: 4rem;
+        color: white;
+    }
+    
+    .profile-name {
+        text-align: center;
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #0f172a;
+        margin-top: 0.5rem;
+        margin-bottom: 0.25rem;
+    }
+    
+    .profile-username {
+        text-align: center;
+        color: #64748b;
+        font-size: 0.9rem;
+    }
+    
+    .profile-role-badge {
+        text-align: center;
+        margin: 0.75rem 0;
+    }
+    
+    .profile-role-badge .badge {
+        padding: 0.4rem 1.25rem;
+        border-radius: 999px;
+        font-weight: 600;
+        font-size: 0.75rem;
+    }
+    
+    .badge-admin { background: #fef2f2; color: #dc2626; }
+    
+    .profile-info-list {
+        margin-top: 1.5rem;
+    }
+    
+    .profile-info-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.75rem 0;
+        border-bottom: 1px solid #f1f5f9;
+    }
+    
+    .profile-info-item:last-child {
+        border-bottom: none;
+    }
+    
+    .profile-info-item .label {
+        font-size: 0.8rem;
+        color: #94a3b8;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .profile-info-item .label i {
+        width: 18px;
+        color: #2563eb;
+    }
+    
+    .profile-info-item .value {
+        font-weight: 600;
+        color: #0f172a;
+        font-size: 0.9rem;
+        text-align: right;
+    }
+    
+    .profile-info-item .value .status-online { color: #059669; }
+    .profile-info-item .value .status-offline { color: #94a3b8; }
+    
+    /* ===== RIGHT PANEL - SETTINGS ===== */
+    .profile-right {
+        padding: 2rem 1.5rem;
+        height: 100%;
+        min-height: 500px;
+        overflow-y: auto;
+        max-height: 700px;
+    }
+    
+    .profile-right::-webkit-scrollbar {
+        width: 4px;
+    }
+    .profile-right::-webkit-scrollbar-track {
+        background: #f1f5f9;
+        border-radius: 10px;
+    }
+    .profile-right::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 10px;
+    }
+    
+    .settings-section {
+        margin-bottom: 1.5rem;
+    }
+    
+    .settings-section:last-child {
+        margin-bottom: 0;
+    }
+    
+    .settings-section-title {
+        font-size: 0.85rem;
+        font-weight: 700;
+        color: #0f172a;
+        margin-bottom: 0.75rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid #f1f5f9;
+    }
+    
+    .settings-section-title .icon {
+        width: 28px;
+        height: 28px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.8rem;
+    }
+    
+    .settings-section-title .icon.primary { background: #eff6ff; color: #2563eb; }
+    .settings-section-title .icon.warning { background: #fffbeb; color: #d97706; }
+    .settings-section-title .icon.success { background: #ecfdf5; color: #059669; }
+    
+    .settings-form {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .settings-form .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.5rem;
+    }
+    
+    .settings-form .form-row .full-width {
+        grid-column: 1 / -1;
+    }
+    
+    .btn-profile {
+        padding: 0.5rem 1.25rem;
+        border-radius: 10px;
+        font-weight: 600;
+        font-size: 0.8rem;
+        transition: all 0.3s ease;
+        border: none;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        min-width: 120px;
+    }
+    
+    .btn-profile-primary {
+        background: linear-gradient(135deg, #2563eb, #7c3aed);
+        color: white;
+    }
+    
+    .btn-profile-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(37, 99, 235, 0.35);
+        color: white;
+    }
+    
+    .btn-profile-warning {
+        background: linear-gradient(135deg, #d97706, #f59e0b);
+        color: white;
+    }
+    
+    .btn-profile-warning:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(217, 119, 6, 0.35);
+        color: white;
+    }
+    
+    .btn-profile-secondary {
+        background: #f1f5f9;
+        color: #475569;
+    }
+    
+    .btn-profile-secondary:hover {
+        background: #e2e8f0;
+        transform: translateY(-2px);
+        color: #0f172a;
+    }
+    
+    .btn-profile-block {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .form-control-modern {
+        width: 100%;
+        padding: 0.5rem 0.8rem;
+        border: 2px solid #e2e8f0;
+        border-radius: 8px;
+        font-size: 0.85rem;
+        transition: all 0.3s ease;
+        background: white;
+        color: #0f172a;
+    }
+    
+    .form-control-modern:focus {
+        border-color: #2563eb;
+        outline: none;
+        box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+    }
+    
+    .form-control-modern::placeholder {
+        color: #94a3b8;
+    }
+    
+    .form-label-modern {
+        font-weight: 600;
+        font-size: 0.75rem;
+        color: #475569;
+        margin-bottom: 0.2rem;
+        display: block;
+    }
+    
+    .form-file-input {
+        padding: 0.4rem;
+        border: 2px dashed #e2e8f0;
+        border-radius: 8px;
+        background: #f8fafc;
+        width: 100%;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .form-file-input:hover {
+        border-color: #2563eb;
+        background: #eff6ff;
+    }
+    
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 992px) {
+        .profile-left {
+            border-right: none;
+            border-bottom: 1px solid #e2e8f0;
+            min-height: auto;
+        }
+        .profile-right {
+            min-height: auto;
+            max-height: none;
+        }
+        .settings-form .form-row {
+            grid-template-columns: 1fr;
+        }
+    }
+    
+    @media (max-width: 768px) {
+        .profile-avatar {
+            width: 100px;
+            height: 100px;
+        }
+        .profile-avatar-placeholder {
+            width: 100px;
+            height: 100px;
+        }
+        .profile-avatar-placeholder i {
+            font-size: 2.5rem;
+        }
+        .profile-name {
+            font-size: 1.2rem;
+        }
+        .profile-left {
+            padding: 1.5rem;
+        }
+        .profile-right {
+            padding: 1.5rem;
+        }
+        .btn-profile {
+            min-width: 100%;
+        }
+        .settings-form .form-row {
+            grid-template-columns: 1fr;
+        }
+    }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-lg-8" data-aos="fade-up">
-        <div class="card-modern">
-            <div class="card-body p-4">
-                <div class="text-center mb-4">
-                    <div style="width: 64px; height: 64px; background: linear-gradient(135deg, #2563eb, #7c3aed); border-radius: 16px; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem;">
-                        <i class="fas fa-user-shield fa-2x text-white"></i>
-                    </div>
-                    <h2 class="fw-bold">Admin Profile</h2>
-                    <p class="text-muted">Manage your account credentials</p>
-                    <div class="alert alert-info"><i class="fas fa-info-circle me-2"></i><strong>{{ user.username }}</strong>{% if user.email %} | {{ user.email }}{% endif %}</div>
-                </div>
-
-                <!-- Profile Picture -->
-                <div class="form-section">
-                    <h5><i class="fas fa-camera text-primary me-2"></i>Profile Picture</h5>
-                    <div class="row align-items-center g-3">
-                        <div class="col-md-3 text-center">
-                            <div class="profile-pic-container">
-                                {% if user.teacher_profile.profile_picture %}
-                                <img src="{{ user.teacher_profile.profile_picture.url }}" alt="Profile">
-                                {% else %}
-                                <div class="profile-pic-placeholder"><i class="fas fa-user"></i></div>
-                                {% endif %}
+<div class="profile-container">
+    <div class="profile-card">
+        <div class="row g-0">
+            
+            <!-- ===== LEFT PANEL - Profile Information ===== -->
+            <div class="col-lg-4 col-md-12">
+                <div class="profile-left">
+                    
+                    <!-- Profile Avatar -->
+                    <div class="profile-avatar-container">
+                        {% if user.teacher_profile.profile_picture %}
+                            <img src="{{ user.teacher_profile.profile_picture.url }}" 
+                                 alt="{{ user.get_full_name|default:user.username }}" 
+                                 class="profile-avatar"
+                                 onerror="this.style.display='none'; this.parentElement.querySelector('.profile-avatar-fallback').style.display='flex';">
+                            <div class="profile-avatar-fallback" style="display: none; width: 140px; height: 140px; border-radius: 50%; background: linear-gradient(135deg, #2563eb, #7c3aed); display: flex; align-items: center; justify-content: center; margin: 0 auto; border: 4px solid #2563eb; box-shadow: 0 8px 30px rgba(37, 99, 235, 0.2);">
+                                <i class="fas fa-user fa-4x" style="color: white;"></i>
                             </div>
+                        {% else %}
+                            <div class="profile-avatar-placeholder">
+                                <i class="fas fa-user"></i>
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Name & Role -->
+                    <div class="profile-name">{{ user.get_full_name|default:user.username }}</div>
+                    <div class="profile-username">@{{ user.username }}</div>
+                    
+                    <div class="profile-role-badge">
+                        <span class="badge badge-admin">
+                            <i class="fas fa-crown"></i> Administrator
+                        </span>
+                    </div>
+                    
+                    <!-- Profile Information -->
+                    <div class="profile-info-list">
+                        <div class="profile-info-item">
+                            <span class="label"><i class="fas fa-envelope"></i> Email</span>
+                            <span class="value">{{ user.email|default:"Not set" }}</span>
                         </div>
-                        <div class="col-md-9">
-                            <form method="post" enctype="multipart/form-data" action="{% url 'upload_profile_picture' %}">
-                                {% csrf_token %}
-                                <div class="mb-3"><label class="form-label-modern">Upload New Picture</label><input type="file" name="profile_picture" class="form-control-modern" accept="image/*"></div>
-                                <button type="submit" class="btn-modern btn-modern-primary"><i class="fas fa-upload"></i> Upload</button>
-                            </form>
+                        <div class="profile-info-item">
+                            <span class="label"><i class="fas fa-user-tag"></i> Username</span>
+                            <span class="value">{{ user.username }}</span>
+                        </div>
+                        <div class="profile-info-item">
+                            <span class="label"><i class="fas fa-user-graduate"></i> Full Name</span>
+                            <span class="value">{{ user.get_full_name|default:"Not set" }}</span>
+                        </div>
+                        <div class="profile-info-item">
+                            <span class="label"><i class="fas fa-phone"></i> Phone</span>
+                            <span class="value">{{ user.teacher_profile.phone_number|default:"Not set" }}</span>
+                        </div>
+                        <div class="profile-info-item">
+                            <span class="label"><i class="fas fa-school"></i> Stream</span>
+                            <span class="value">{{ user.teacher_profile.assigned_stream.name|default:"Not Assigned" }}</span>
+                        </div>
+                        <div class="profile-info-item">
+                            <span class="label"><i class="fas fa-circle"></i> Status</span>
+                            <span class="value">
+                                {% if user.teacher_profile.is_online %}
+                                    <span class="status-online">🟢 Online</span>
+                                {% else %}
+                                    <span class="status-offline">⚪ Offline</span>
+                                {% endif %}
+                            </span>
+                        </div>
+                        <div class="profile-info-item">
+                            <span class="label"><i class="fas fa-clock"></i> Last Active</span>
+                            <span class="value">{{ user.teacher_profile.last_activity|date:"M d, Y H:i"|default:"N/A" }}</span>
                         </div>
                     </div>
+                    
+                    <!-- Back Button -->
+                    <div class="mt-3">
+                        <a href="{% url 'admin_dashboard' %}" class="btn-profile btn-profile-secondary btn-profile-block">
+                            <i class="fas fa-arrow-left"></i> Back to Dashboard
+                        </a>
+                    </div>
                 </div>
-
-                <!-- Change Password -->
-                <div class="form-section">
-                    <h5><i class="fas fa-key text-warning me-2"></i>Change Password</h5>
-                    <form method="post">
-                        {% csrf_token %}<input type="hidden" name="action" value="change_password">
-                        <div class="row g-2">
-                            <div class="col-12"><input type="password" name="current_password" class="form-control-modern" placeholder="Current Password" required></div>
-                            <div class="col-md-6"><input type="password" name="new_password" class="form-control-modern" placeholder="New Password (min 8 chars)" required></div>
-                            <div class="col-md-6"><input type="password" name="confirm_password" class="form-control-modern" placeholder="Confirm Password" required></div>
-                            <div class="col-12"><button type="submit" class="btn-modern btn-modern-warning"><i class="fas fa-save"></i> Change Password</button></div>
-                        </div>
-                    </form>
-                </div>
-
-                <!-- Change Username -->
-                <div class="form-section">
-                    <h5><i class="fas fa-user-tag text-primary me-2"></i>Change Username</h5>
-                    <form method="post">
-                        {% csrf_token %}<input type="hidden" name="action" value="change_username">
-                        <div class="row g-2">
-                            <div class="col-md-8"><input type="text" name="new_username" class="form-control-modern" value="{{ user.username }}" required></div>
-                            <div class="col-md-4"><input type="password" name="confirm_password" class="form-control-modern" placeholder="Password" required></div>
-                            <div class="col-12"><button type="submit" class="btn-modern btn-modern-primary"><i class="fas fa-save"></i> Change Username</button></div>
-                        </div>
-                    </form>
-                </div>
-
-                <!-- Change Email -->
-                <div class="form-section">
-                    <h5><i class="fas fa-envelope text-primary me-2"></i>Change Email</h5>
-                    <form method="post">
-                        {% csrf_token %}<input type="hidden" name="action" value="change_email">
-                        <div class="row g-2">
-                            <div class="col-md-8"><input type="email" name="new_email" class="form-control-modern" value="{{ user.email|default:'' }}" required></div>
-                            <div class="col-md-4"><input type="password" name="confirm_password" class="form-control-modern" placeholder="Password" required></div>
-                            <div class="col-12"><button type="submit" class="btn-modern btn-modern-primary"><i class="fas fa-save"></i> Change Email</button></div>
-                        </div>
-                    </form>
-                </div>
-
-                <div class="text-center mt-3"><a href="{% url 'admin_dashboard' %}" class="btn-modern btn-modern-secondary"><i class="fas fa-arrow-left"></i> Back to Dashboard</a></div>
             </div>
+            
+            <!-- ===== RIGHT PANEL - Settings ===== -->
+            <div class="col-lg-8 col-md-12">
+                <div class="profile-right">
+                    
+                    <!-- Profile Picture Upload -->
+                    <div class="settings-section">
+                        <div class="settings-section-title">
+                            <span class="icon success"><i class="fas fa-camera"></i></span>
+                            Profile Picture
+                        </div>
+                        <form method="post" enctype="multipart/form-data" action="{% url 'upload_profile_picture' %}">
+                            {% csrf_token %}
+                            <div class="settings-form">
+                                <div class="form-row">
+                                    <div class="full-width">
+                                        <input type="file" name="profile_picture" class="form-file-input" accept="image/*">
+                                    </div>
+                                    <div class="full-width">
+                                        <button type="submit" class="btn-profile btn-profile-primary btn-profile-block">
+                                            <i class="fas fa-upload"></i> Upload Picture
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    
+                    <!-- Update Name -->
+                    <div class="settings-section">
+                        <div class="settings-section-title">
+                            <span class="icon primary"><i class="fas fa-user-edit"></i></span>
+                            Update Full Name
+                        </div>
+                        <form method="post">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="change_full_name">
+                            <div class="settings-form">
+                                <div class="form-row">
+                                    <div>
+                                        <label class="form-label-modern">First Name</label>
+                                        <input type="text" name="first_name" class="form-control-modern" value="{{ user.first_name }}" placeholder="First Name">
+                                    </div>
+                                    <div>
+                                        <label class="form-label-modern">Last Name</label>
+                                        <input type="text" name="last_name" class="form-control-modern" value="{{ user.last_name }}" placeholder="Last Name">
+                                    </div>
+                                    <div class="full-width">
+                                        <label class="form-label-modern">Confirm Password</label>
+                                        <input type="password" name="confirm_password" class="form-control-modern" placeholder="Enter password to confirm" required>
+                                    </div>
+                                    <div class="full-width">
+                                        <button type="submit" class="btn-profile btn-profile-primary btn-profile-block">
+                                            <i class="fas fa-save"></i> Update Name
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    
+                    <!-- Change Username -->
+                    <div class="settings-section">
+                        <div class="settings-section-title">
+                            <span class="icon primary"><i class="fas fa-user-tag"></i></span>
+                            Change Username
+                        </div>
+                        <form method="post">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="change_username">
+                            <div class="settings-form">
+                                <div class="form-row">
+                                    <div class="full-width">
+                                        <label class="form-label-modern">New Username</label>
+                                        <input type="text" name="new_username" class="form-control-modern" value="{{ user.username }}" required>
+                                    </div>
+                                    <div class="full-width">
+                                        <label class="form-label-modern">Confirm Password</label>
+                                        <input type="password" name="confirm_password" class="form-control-modern" placeholder="Enter password to confirm" required>
+                                    </div>
+                                    <div class="full-width">
+                                        <button type="submit" class="btn-profile btn-profile-primary btn-profile-block">
+                                            <i class="fas fa-save"></i> Change Username
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    
+                    <!-- Change Email -->
+                    <div class="settings-section">
+                        <div class="settings-section-title">
+                            <span class="icon primary"><i class="fas fa-envelope"></i></span>
+                            Change Email
+                        </div>
+                        <form method="post">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="change_email">
+                            <div class="settings-form">
+                                <div class="form-row">
+                                    <div class="full-width">
+                                        <label class="form-label-modern">New Email</label>
+                                        <input type="email" name="new_email" class="form-control-modern" value="{{ user.email|default:'' }}" required>
+                                    </div>
+                                    <div class="full-width">
+                                        <label class="form-label-modern">Confirm Password</label>
+                                        <input type="password" name="confirm_password" class="form-control-modern" placeholder="Enter password to confirm" required>
+                                    </div>
+                                    <div class="full-width">
+                                        <button type="submit" class="btn-profile btn-profile-primary btn-profile-block">
+                                            <i class="fas fa-save"></i> Change Email
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    
+                    <!-- Change Password -->
+                    <div class="settings-section">
+                        <div class="settings-section-title">
+                            <span class="icon warning"><i class="fas fa-key"></i></span>
+                            Change Password
+                        </div>
+                        <form method="post">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="change_password">
+                            <div class="settings-form">
+                                <div class="form-row">
+                                    <div class="full-width">
+                                        <label class="form-label-modern">Current Password</label>
+                                        <input type="password" name="current_password" class="form-control-modern" placeholder="Enter current password" required>
+                                    </div>
+                                    <div>
+                                        <label class="form-label-modern">New Password</label>
+                                        <input type="password" name="new_password" class="form-control-modern" placeholder="Min 8 characters" required>
+                                    </div>
+                                    <div>
+                                        <label class="form-label-modern">Confirm Password</label>
+                                        <input type="password" name="confirm_password" class="form-control-modern" placeholder="Confirm new password" required>
+                                    </div>
+                                    <div class="full-width">
+                                        <button type="submit" class="btn-profile btn-profile-warning btn-profile-block">
+                                            <i class="fas fa-save"></i> Change Password
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    
+                </div>
+            </div>
+            
         </div>
     </div>
 </div>

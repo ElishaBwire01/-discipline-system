@@ -1,0 +1,1701 @@
+﻿{% extends "base.html" %}
+{% load static %}
+
+{% block title %}AI Discipline Intelligence{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* ============================================
+       SMART AI DASHBOARD - MODERN UI
+       ============================================ */
+    
+    :root {
+        --ai-primary: #7c3aed;
+        --ai-secondary: #2563eb;
+        --ai-gradient: linear-gradient(135deg, #7c3aed, #2563eb);
+        --ai-gradient-hover: linear-gradient(135deg, #6d28d9, #1d4ed8);
+        --ai-card-radius: 20px;
+        --ai-transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .ai-dashboard-header {
+        background: var(--ai-gradient);
+        border-radius: var(--ai-card-radius);
+        padding: 2.5rem 2rem;
+        color: white;
+        position: relative;
+        overflow: hidden;
+        margin-bottom: 2rem;
+    }
+    
+    .ai-dashboard-header::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -20%;
+        width: 500px;
+        height: 500px;
+        background: rgba(255,255,255,0.05);
+        border-radius: 50%;
+        animation: float 8s ease-in-out infinite;
+    }
+    
+    .ai-dashboard-header::after {
+        content: '';
+        position: absolute;
+        bottom: -30%;
+        left: -10%;
+        width: 400px;
+        height: 400px;
+        background: rgba(255,255,255,0.03);
+        border-radius: 50%;
+        animation: float 10s ease-in-out infinite reverse;
+    }
+    
+    @keyframes float {
+        0%, 100% { transform: translate(0, 0) scale(1); }
+        50% { transform: translate(20px, -20px) scale(1.1); }
+    }
+    
+    .ai-dashboard-header .header-content {
+        position: relative;
+        z-index: 1;
+    }
+    
+    .ai-dashboard-header h1 {
+        font-size: 2.5rem;
+        font-weight: 800;
+        margin-bottom: 0.5rem;
+        letter-spacing: -0.02em;
+    }
+    
+    .ai-dashboard-header h1 .highlight {
+        background: rgba(255,255,255,0.2);
+        padding: 0.1rem 1rem;
+        border-radius: 999px;
+        font-size: 0.7rem;
+        font-weight: 500;
+        margin-left: 0.75rem;
+        vertical-align: middle;
+        backdrop-filter: blur(10px);
+    }
+    
+    .ai-dashboard-header p {
+        opacity: 0.9;
+        font-size: 1.1rem;
+        margin-bottom: 0;
+    }
+    
+    .ai-status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: rgba(255,255,255,0.15);
+        backdrop-filter: blur(10px);
+        padding: 0.5rem 1.25rem;
+        border-radius: 999px;
+        font-size: 0.875rem;
+        font-weight: 500;
+        border: 1px solid rgba(255,255,255,0.2);
+        transition: var(--ai-transition);
+    }
+    
+    .ai-status-badge:hover {
+        background: rgba(255,255,255,0.25);
+        transform: scale(1.02);
+    }
+    
+    .ai-status-badge .dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        display: inline-block;
+        animation: pulse-dot 2s ease-in-out infinite;
+    }
+    
+    .ai-status-badge .dot.online { background: #34d399; }
+    .ai-status-badge .dot.analyzing { background: #fbbf24; animation-duration: 0.8s; }
+    
+    @keyframes pulse-dot {
+        0%, 100% { opacity: 1; transform: scale(1); }
+        50% { opacity: 0.5; transform: scale(0.8); }
+    }
+
+    .ai-stat-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1.25rem;
+        margin-bottom: 2rem;
+    }
+    
+    .ai-stat-card {
+        background: white;
+        border-radius: var(--ai-card-radius);
+        padding: 1.5rem;
+        border: 1px solid rgba(124, 58, 237, 0.08);
+        transition: var(--ai-transition);
+        position: relative;
+        overflow: hidden;
+        cursor: default;
+    }
+    
+    .ai-stat-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: var(--ai-gradient);
+        opacity: 0;
+        transition: var(--ai-transition);
+    }
+    
+    .ai-stat-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 20px 60px rgba(124, 58, 237, 0.12);
+        border-color: rgba(124, 58, 237, 0.2);
+    }
+    
+    .ai-stat-card:hover::before {
+        opacity: 1;
+    }
+    
+    .ai-stat-card .stat-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 0.75rem;
+    }
+    
+    .ai-stat-card .stat-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
+        flex-shrink: 0;
+    }
+    
+    .ai-stat-card .stat-icon.purple { background: #f3e8ff; color: #7c3aed; }
+    .ai-stat-card .stat-icon.blue { background: #dbeafe; color: #2563eb; }
+    .ai-stat-card .stat-icon.green { background: #d1fae5; color: #059669; }
+    .ai-stat-card .stat-icon.orange { background: #fef3c7; color: #d97706; }
+    .ai-stat-card .stat-icon.red { background: #fee2e2; color: #dc2626; }
+    
+    .ai-stat-card .stat-trend {
+        font-size: 0.7rem;
+        font-weight: 600;
+        padding: 0.125rem 0.5rem;
+        border-radius: 20px;
+        background: #f1f5f9;
+        color: #64748b;
+    }
+    
+    .ai-stat-card .stat-trend.up { background: #d1fae5; color: #059669; }
+    .ai-stat-card .stat-trend.down { background: #fee2e2; color: #dc2626; }
+    
+    .ai-stat-card .stat-value {
+        font-size: 2.25rem;
+        font-weight: 800;
+        color: #0f172a;
+        line-height: 1.2;
+        transition: var(--ai-transition);
+    }
+    
+    .ai-stat-card .stat-label {
+        font-size: 0.875rem;
+        color: #64748b;
+        font-weight: 500;
+    }
+    
+    .ai-stat-card .stat-change {
+        font-size: 0.75rem;
+        font-weight: 600;
+        margin-top: 0.25rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+    }
+    
+    .ai-stat-card .stat-change.positive { color: #059669; }
+    .ai-stat-card .stat-change.negative { color: #dc2626; }
+
+    .ai-tabs {
+        display: flex;
+        gap: 0.5rem;
+        margin-bottom: 1.5rem;
+        flex-wrap: wrap;
+    }
+    
+    .ai-tab-btn {
+        padding: 0.75rem 1.5rem;
+        border: 2px solid #e2e8f0;
+        border-radius: 12px;
+        background: white;
+        color: #64748b;
+        font-weight: 600;
+        cursor: pointer;
+        transition: var(--ai-transition);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .ai-tab-btn:hover {
+        border-color: #7c3aed;
+        color: #7c3aed;
+        transform: translateY(-2px);
+    }
+    
+    .ai-tab-btn.active {
+        background: var(--ai-gradient);
+        color: white;
+        border-color: transparent;
+    }
+    
+    .ai-tab-content {
+        display: none;
+        animation: slideUp 0.5s ease-out;
+    }
+    
+    .ai-tab-content.active {
+        display: block;
+    }
+
+    .ai-card {
+        background: white;
+        border-radius: var(--ai-card-radius);
+        border: 1px solid rgba(124, 58, 237, 0.08);
+        box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+        transition: var(--ai-transition);
+        overflow: hidden;
+        margin-bottom: 1.5rem;
+    }
+    
+    .ai-card:hover {
+        box-shadow: 0 10px 40px rgba(124, 58, 237, 0.08);
+    }
+    
+    .ai-card-header {
+        padding: 1.25rem 1.5rem;
+        background: var(--ai-gradient);
+        color: white;
+        border: none;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+    
+    .ai-card-header .header-icon {
+        width: 36px;
+        height: 36px;
+        background: rgba(255,255,255,0.2);
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.875rem;
+    }
+    
+    .ai-card-body {
+        padding: 1.5rem;
+        max-height: 400px;
+        overflow-y: auto;
+    }
+
+    .ai-recommendation {
+        border-left: 4px solid;
+        border-radius: 12px;
+        padding: 1rem 1.25rem;
+        margin-bottom: 0.75rem;
+        transition: var(--ai-transition);
+        background: #f8fafc;
+        cursor: pointer;
+    }
+    
+    .ai-recommendation:hover {
+        transform: translateX(4px);
+        box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+    }
+    
+    .ai-recommendation.critical { border-left-color: #dc2626; background: #fef2f2; }
+    .ai-recommendation.serious { border-left-color: #d97706; background: #fffbeb; }
+    .ai-recommendation.moderate { border-left-color: #2563eb; background: #eff6ff; }
+    .ai-recommendation.minor { border-left-color: #10b981; background: #ecfdf5; }
+    
+    .ai-recommendation .rec-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 0.5rem;
+    }
+    
+    .ai-recommendation .rec-priority {
+        font-size: 0.65rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        padding: 0.125rem 0.5rem;
+        border-radius: 4px;
+    }
+    
+    .ai-recommendation .rec-priority.high { background: #dc2626; color: white; }
+    .ai-recommendation .rec-priority.medium { background: #d97706; color: white; }
+    .ai-recommendation .rec-priority.low { background: #2563eb; color: white; }
+    
+    .ai-recommendation .rec-title {
+        font-weight: 600;
+        color: #0f172a;
+        margin-bottom: 0.25rem;
+    }
+    
+    .ai-recommendation .rec-details {
+        font-size: 0.875rem;
+        color: #64748b;
+        margin-bottom: 0.5rem;
+    }
+    
+    .ai-recommendation .rec-steps {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    
+    .ai-recommendation .rec-steps li {
+        font-size: 0.813rem;
+        color: #475569;
+        padding: 0.25rem 0;
+        padding-left: 1.25rem;
+        position: relative;
+    }
+    
+    .ai-recommendation .rec-steps li::before {
+        content: '›';
+        position: absolute;
+        left: 0;
+        color: #7c3aed;
+        font-weight: 700;
+    }
+
+    .ai-search-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .ai-search-container {
+        background: white;
+        border-radius: var(--ai-card-radius);
+        padding: 1.5rem;
+        border: 1px solid rgba(124, 58, 237, 0.08);
+        transition: var(--ai-transition);
+    }
+    
+    .ai-search-container:hover {
+        border-color: rgba(124, 58, 237, 0.2);
+        box-shadow: 0 8px 30px rgba(124, 58, 237, 0.06);
+    }
+    
+    .ai-search-container .search-title {
+        font-weight: 600;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: #0f172a;
+    }
+    
+    .ai-search-container .search-title .title-icon {
+        width: 32px;
+        height: 32px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.875rem;
+    }
+    
+    .ai-search-container .search-title .title-icon.purple { background: #f3e8ff; color: #7c3aed; }
+    .ai-search-container .search-title .title-icon.blue { background: #dbeafe; color: #2563eb; }
+    
+    .ai-search-container .input-group {
+        display: flex;
+        gap: 0.5rem;
+    }
+    
+    .ai-search-container .input-group .form-control {
+        flex: 1;
+        border: 2px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 0.75rem 1rem;
+        font-size: 0.9375rem;
+        transition: var(--ai-transition);
+        background: #f8fafc;
+    }
+    
+    .ai-search-container .input-group .form-control:focus {
+        border-color: #7c3aed;
+        background: white;
+        box-shadow: 0 0 0 4px rgba(124, 58, 237, 0.1);
+        outline: none;
+    }
+    
+    .btn-ai-search {
+        background: var(--ai-gradient);
+        color: white;
+        border: none;
+        padding: 0.75rem 1.5rem;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 0.875rem;
+        transition: var(--ai-transition);
+        cursor: pointer;
+        white-space: nowrap;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .btn-ai-search:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(124, 58, 237, 0.35);
+        color: white;
+    }
+    
+    .btn-ai-search:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none;
+    }
+
+    .ai-result-card {
+        animation: slideUp 0.5s ease-out;
+        margin-top: 1rem;
+    }
+    
+    @keyframes slideUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .ai-result-card .card {
+        border-radius: 14px;
+        border: 1px solid rgba(124, 58, 237, 0.1);
+        overflow: hidden;
+    }
+
+    .ai-guidelines {
+        background: linear-gradient(135deg, #faf5ff, #f0f9ff);
+        border-radius: var(--ai-card-radius);
+        padding: 1.5rem;
+        border: 1px solid rgba(124, 58, 237, 0.1);
+        margin-top: 1.5rem;
+    }
+    
+    .ai-guidelines .guideline-title {
+        font-weight: 700;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: #0f172a;
+    }
+    
+    .ai-guidelines .guideline-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.75rem;
+    }
+    
+    .ai-guidelines .guideline-item {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.75rem 1rem;
+        background: white;
+        border-radius: 12px;
+        transition: var(--ai-transition);
+        cursor: pointer;
+        border: 1px solid transparent;
+    }
+    
+    .ai-guidelines .guideline-item:hover {
+        border-color: rgba(124, 58, 237, 0.2);
+        transform: translateX(4px);
+        box-shadow: 0 4px 15px rgba(124, 58, 237, 0.06);
+    }
+    
+    .ai-guidelines .guideline-item .g-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        background: rgba(124, 58, 237, 0.1);
+        color: #7c3aed;
+    }
+
+    @media (max-width: 1200px) {
+        .ai-stat-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+    
+    @media (max-width: 992px) {
+        .ai-search-grid {
+            grid-template-columns: 1fr;
+        }
+        .ai-guidelines .guideline-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+    
+    @media (max-width: 768px) {
+        .ai-dashboard-header {
+            padding: 1.5rem;
+        }
+        .ai-dashboard-header h1 {
+            font-size: 1.75rem;
+        }
+        .ai-stat-grid {
+            grid-template-columns: 1fr 1fr;
+            gap: 0.75rem;
+        }
+        .ai-stat-card {
+            padding: 1rem;
+        }
+        .ai-stat-card .stat-value {
+            font-size: 1.5rem;
+        }
+        .ai-tabs {
+            flex-direction: column;
+        }
+        .ai-tab-btn {
+            justify-content: center;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Dashboard Header -->
+    <div class="ai-dashboard-header">
+        <div class="header-content d-flex flex-wrap align-items-center justify-content-between">
+            <div>
+                <h1>
+                    <i class="fas fa-brain me-2"></i>AI Discipline Intelligence
+                    <span class="highlight">v3.0</span>
+                </h1>
+                <p><i class="fas fa-gavel me-2"></i>Powered by Kenyan Education Act 2013 · Advanced AI Analytics</p>
+            </div>
+            <div class="d-flex gap-3 mt-3 mt-md-0 flex-wrap">
+                <span class="ai-status-badge">
+                    <span class="dot online" id="statusDot"></span>
+                    <span id="statusText">System Online</span>
+                </span>
+                <span class="ai-status-badge">
+                    <i class="fas fa-sync-alt fa-fw" id="refreshIcon" style="cursor: pointer;" onclick="refreshData()"></i>
+                    <span id="lastUpdate">Just now</span>
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats Grid -->
+    <div class="ai-stat-grid" id="statsGrid">
+        <div class="ai-stat-card">
+            <div class="stat-top">
+                <div class="stat-icon purple"><i class="fas fa-users"></i></div>
+                <span class="stat-trend">Active</span>
+            </div>
+            <div class="stat-value" id="totalStudents">-</div>
+            <div class="stat-label">Total Students</div>
+            <div class="stat-change positive"><i class="fas fa-arrow-up"></i> Enrolled</div>
+        </div>
+        <div class="ai-stat-card">
+            <div class="stat-top">
+                <div class="stat-icon red"><i class="fas fa-exclamation-triangle"></i></div>
+                <span class="stat-trend down">Alert</span>
+            </div>
+            <div class="stat-value" id="criticalCount">-</div>
+            <div class="stat-label">Critical Risk</div>
+            <div class="stat-change negative"><i class="fas fa-arrow-up"></i> Needs Intervention</div>
+        </div>
+        <div class="ai-stat-card">
+            <div class="stat-top">
+                <div class="stat-icon blue"><i class="fas fa-flag"></i></div>
+                <span class="stat-trend">Total</span>
+            </div>
+            <div class="stat-value" id="totalReports">-</div>
+            <div class="stat-label">Total Reports</div>
+            <div class="stat-change positive"><i class="fas fa-arrow-up"></i> All-time</div>
+        </div>
+        <div class="ai-stat-card">
+            <div class="stat-top">
+                <div class="stat-icon orange"><i class="fas fa-chart-line"></i></div>
+                <span class="stat-trend">Current</span>
+            </div>
+            <div class="stat-value" id="avgRisk">-</div>
+            <div class="stat-label">Average Risk</div>
+            <div class="stat-change">Overall</div>
+        </div>
+    </div>
+
+    <!-- AI Tabs -->
+    <div class="ai-tabs">
+        <button class="ai-tab-btn active" onclick="switchTab('recommendations')">
+            <i class="fas fa-lightbulb"></i> Recommendations
+        </button>
+        <button class="ai-tab-btn" onclick="switchTab('predictive')">
+            <i class="fas fa-robot"></i> Predictive Analysis
+        </button>
+        <button class="ai-tab-btn" onclick="switchTab('patterns')">
+            <i class="fas fa-chart-pie"></i> Behavior Patterns
+        </button>
+        <button class="ai-tab-btn" onclick="switchTab('effectiveness')">
+            <i class="fas fa-check-circle"></i> Intervention Effectiveness
+        </button>
+    </div>
+
+    <!-- Tab 1: Recommendations -->
+    <div id="tab-recommendations" class="ai-tab-content active">
+        <!-- Global Recommendations -->
+        <div class="ai-card">
+            <div class="ai-card-header">
+                <span class="header-icon"><i class="fas fa-globe-africa"></i></span>
+                Global Recommendations
+                <span class="badge bg-light text-dark ms-2" id="recCount">0</span>
+                <span class="ms-auto badge bg-light text-dark" style="background: rgba(255,255,255,0.2) !important; color: white !important;">
+                    <i class="fas fa-bolt me-1"></i> Live
+                </span>
+            </div>
+            <div class="ai-card-body" id="globalRecommendations">
+                <div class="text-center py-4">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="text-muted mt-2">Analyzing school-wide data...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Search & Analysis -->
+        <div class="ai-search-grid">
+            <!-- Student Search -->
+            <div class="ai-search-container">
+                <div class="search-title">
+                    <span class="title-icon purple"><i class="fas fa-search"></i></span>
+                    Student AI Analysis
+                    <span class="badge bg-primary ms-auto" id="studentSearchStatus">Ready</span>
+                </div>
+                <div class="input-group">
+                    <input type="text" class="form-control" id="studentSearch" 
+                           placeholder="Search by name or admission number..." 
+                           autocomplete="off">
+                    <button class="btn-ai-search" id="searchStudentBtn">
+                        <i class="fas fa-robot"></i> Analyze
+                    </button>
+                </div>
+                <div id="studentAnalysisResult" class="mt-3"></div>
+            </div>
+
+            <!-- Class Analysis -->
+            <div class="ai-search-container">
+                <div class="search-title">
+                    <span class="title-icon blue"><i class="fas fa-users"></i></span>
+                    Class Analysis
+                    <span class="badge bg-primary ms-auto" id="classSearchStatus">Ready</span>
+                </div>
+                <div class="input-group">
+                    <select class="form-control" id="streamSelect">
+                        <option value="">Select Stream...</option>
+                        {% for stream in streams %}
+                        <option value="{{ stream.id }}">{{ stream.name }}</option>
+                        {% endfor %}
+                    </select>
+                    <button class="btn-ai-search" id="analyzeClassBtn">
+                        <i class="fas fa-chart-bar"></i> Analyze
+                    </button>
+                </div>
+                <div id="classAnalysisResult" class="mt-3"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tab 2: Predictive Analysis -->
+    <div id="tab-predictive" class="ai-tab-content">
+        <div class="ai-card">
+            <div class="ai-card-header">
+                <span class="header-icon"><i class="fas fa-robot"></i></span>
+                Predictive Risk Analysis
+                <span class="ms-auto badge bg-light text-dark" style="background: rgba(255,255,255,0.2) !important; color: white !important;">
+                    <i class="fas fa-clock me-1"></i> AI Powered
+                </span>
+            </div>
+            <div class="ai-card-body" id="predictiveAnalysis">
+                <div class="text-center py-4">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="text-muted mt-2">Analyzing predictive patterns...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tab 3: Behavior Patterns -->
+    <div id="tab-patterns" class="ai-tab-content">
+        <div class="ai-card">
+            <div class="ai-card-header">
+                <span class="header-icon"><i class="fas fa-chart-pie"></i></span>
+                Behavior Pattern Analysis
+                <span class="ms-auto badge bg-light text-dark" style="background: rgba(255,255,255,0.2) !important; color: white !important;">
+                    <i class="fas fa-chart-line me-1"></i> Insights
+                </span>
+            </div>
+            <div class="ai-card-body" id="behaviorPatterns">
+                <div class="text-center py-4">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="text-muted mt-2">Analyzing behavior patterns...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tab 4: Intervention Effectiveness -->
+    <div id="tab-effectiveness" class="ai-tab-content">
+        <div class="ai-card">
+            <div class="ai-card-header">
+                <span class="header-icon"><i class="fas fa-check-circle"></i></span>
+                Intervention Effectiveness
+                <span class="ms-auto badge bg-light text-dark" style="background: rgba(255,255,255,0.2) !important; color: white !important;">
+                    <i class="fas fa-chart-bar me-1"></i> Results
+                </span>
+            </div>
+            <div class="ai-card-body" id="interventionEffectiveness">
+                <div class="text-center py-4">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="text-muted mt-2">Measuring intervention effectiveness...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Kenyan Education Guidelines -->
+    <div class="ai-guidelines">
+        <div class="guideline-title">
+            <i class="fas fa-gavel text-primary"></i>
+            Kenyan Education Guidelines
+            <span class="badge bg-primary ms-2">Reference</span>
+        </div>
+        <div class="guideline-grid">
+            <div class="guideline-item" onclick="showGuideline('Basic Education Act 2013')">
+                <div class="g-icon"><i class="fas fa-book"></i></div>
+                <div class="g-content">
+                    <div class="g-title">Basic Education Act 2013</div>
+                    <div class="g-desc">Every child's right to education</div>
+                </div>
+            </div>
+            <div class="guideline-item" onclick="showGuideline('Positive Discipline')">
+                <div class="g-icon"><i class="fas fa-handshake"></i></div>
+                <div class="g-content">
+                    <div class="g-title">Positive Discipline</div>
+                    <div class="g-desc">Non-violent, restorative approaches</div>
+                </div>
+            </div>
+            <div class="guideline-item" onclick="showGuideline('Escalation Protocol')">
+                <div class="g-icon"><i class="fas fa-arrow-up"></i></div>
+                <div class="g-content">
+                    <div class="g-title">Escalation Protocol</div>
+                    <div class="g-desc">Warning → Suspension → Committee → Expulsion</div>
+                </div>
+            </div>
+            <div class="guideline-item" onclick="showGuideline('Child Protection')">
+                <div class="g-icon"><i class="fas fa-shield-alt"></i></div>
+                <div class="g-content">
+                    <div class="g-title">Child Protection</div>
+                    <div class="g-desc">Children's Act 2001 compliance</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// ============================================================
+// AI DASHBOARD v3 - FULL FUNCTIONALITY
+// ============================================================
+
+// State
+var dashboardState = {
+    lastUpdate: null,
+    isLoading: false,
+    statsLoaded: false
+};
+
+// Tab switching
+function switchTab(tabName) {
+    // Update buttons
+    document.querySelectorAll('.ai-tab-btn').forEach(function(btn) {
+        btn.classList.remove('active');
+    });
+    event.target.closest('.ai-tab-btn').classList.add('active');
+    
+    // Update content
+    document.querySelectorAll('.ai-tab-content').forEach(function(content) {
+        content.classList.remove('active');
+    });
+    document.getElementById('tab-' + tabName).classList.add('active');
+    
+    // Load data for the selected tab
+    if (tabName === 'predictive') {
+        loadPredictiveAnalysis();
+    } else if (tabName === 'patterns') {
+        loadBehaviorPatterns();
+    } else if (tabName === 'effectiveness') {
+        loadInterventionEffectiveness();
+    }
+}
+
+// Load stats and global recommendations
+function loadStats() {
+    if (dashboardState.isLoading) return;
+    dashboardState.isLoading = true;
+    
+    fetch('/ai/api/global/recommendations/', {
+        credentials: 'include',
+        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+    })
+    .then(function(response) {
+        if (!response.ok) throw new Error('HTTP ' + response.status);
+        return response.json();
+    })
+    .then(function(data) {
+        if (data.global_stats) {
+            animateValue('totalStudents', data.global_stats.total_students || 0);
+            animateValue('criticalCount', data.global_stats.critical_count || 0);
+            animateValue('totalReports', data.global_stats.total_reports || 0);
+            animateValue('avgRisk', (data.global_stats.avg_risk || 0).toFixed(1) + '%');
+            dashboardState.statsLoaded = true;
+        }
+        
+        renderRecommendations(data);
+        updateTimestamp();
+    })
+    .catch(function(error) {
+        console.error('Stats error:', error);
+        document.getElementById('globalRecommendations').innerHTML = 
+            '<div class="alert alert-warning">Could not load recommendations</div>';
+    })
+    .finally(function() {
+        dashboardState.isLoading = false;
+    });
+}
+
+function renderRecommendations(data) {
+    var container = document.getElementById('globalRecommendations');
+    var countBadge = document.getElementById('recCount');
+    
+    if (data.recommendations && data.recommendations.length > 0) {
+        countBadge.textContent = data.recommendations.length;
+        var html = '';
+        data.recommendations.forEach(function(rec) {
+            var priorityClass = rec.priority === 'HIGH' ? 'critical' : 
+                               rec.priority === 'MEDIUM' ? 'serious' : 'moderate';
+            var priorityBadge = rec.priority === 'HIGH' ? 'high' : 
+                               rec.priority === 'MEDIUM' ? 'medium' : 'low';
+            
+            html += '<div class="ai-recommendation ' + priorityClass + '">';
+            html += '<div class="rec-header">';
+            html += '<div class="rec-title">' + rec.action + '</div>';
+            html += '<span class="rec-priority ' + priorityBadge + '">' + rec.priority + '</span>';
+            html += '</div>';
+            html += '<div class="rec-details">' + rec.details + '</div>';
+            if (rec.steps) {
+                html += '<ul class="rec-steps">';
+                rec.steps.forEach(function(step) {
+                    html += '<li>' + step + '</li>';
+                });
+                html += '</ul>';
+            }
+            html += '</div>';
+        });
+        container.innerHTML = html;
+    } else {
+        countBadge.textContent = '0';
+        container.innerHTML = `
+            <div class="text-center py-4">
+                <i class="fas fa-check-circle text-success fa-3x mb-3"></i>
+                <p class="text-muted mb-0">No urgent recommendations. Continue monitoring.</p>
+            </div>
+        `;
+    }
+}
+
+// Load Predictive Analysis
+function loadPredictiveAnalysis() {
+    var container = document.getElementById('predictiveAnalysis');
+    container.innerHTML = `
+        <div class="text-center py-3">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="text-muted mt-2">Analyzing predictive patterns...</p>
+        </div>
+    `;
+    
+    fetch('/ai/api/predictive-analysis/', {
+        credentials: 'include',
+        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+    })
+    .then(function(response) { return response.json(); })
+    .then(function(data) {
+        if (data.status === 'success') {
+            renderPredictiveAnalysis(data.data, container);
+        } else {
+            container.innerHTML = `<div class="alert alert-danger">${data.message}</div>`;
+        }
+    })
+    .catch(function(error) {
+        container.innerHTML = `<div class="alert alert-danger">Error loading predictive analysis</div>`;
+    });
+}
+
+function renderPredictiveAnalysis(data, container) {
+    var html = '';
+    
+    // Summary stats
+    var summary = data.summary;
+    html += `
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="card bg-light">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">${summary.total_analyzed}</h5>
+                        <p class="card-text text-muted small">Students Analyzed</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-danger text-white">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">${summary.high_risk_count}</h5>
+                        <p class="card-text small">High Risk Predictions</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-warning">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">${summary.medium_risk_count}</h5>
+                        <p class="card-text small">Medium Risk Predictions</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-success text-white">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">${summary.low_risk_count}</h5>
+                        <p class="card-text small">Low Risk Predictions</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <p class="text-muted small">Last Updated: ${new Date(summary.timestamp).toLocaleString()}</p>
+        <hr>
+    `;
+    
+    // Predictions table
+    html += '<div class="table-responsive"><table class="table table-hover">';
+    html += `
+        <thead>
+            <tr>
+                <th>Student</th>
+                <th>Stream</th>
+                <th>Current Risk</th>
+                <th>Predicted Risk</th>
+                <th>Level</th>
+                <th>Trend</th>
+                <th>Urgency</th>
+            </tr>
+        </thead>
+        <tbody>
+    `;
+    
+    data.predictions.slice(0, 20).forEach(function(p) {
+        var riskColor = p.predicted_level === 'CRITICAL' ? 'danger' : 
+                       p.predicted_level === 'WARNING' ? 'warning' : 'success';
+        var urgencyColor = p.urgency === 'HIGH' ? 'danger' : 
+                          p.urgency === 'MEDIUM' ? 'warning' : 'success';
+        var trendIcon = p.severity_trend === 'WORSENING' ? 'fa-arrow-up text-danger' : 
+                       p.severity_trend === 'IMPROVING' ? 'fa-arrow-down text-success' : 'fa-minus text-secondary';
+        
+        html += `
+            <tr>
+                <td><a href="/student/${p.student_id}/">${p.name}</a></td>
+                <td>${p.stream}</td>
+                <td>${p.current_risk}%</td>
+                <td><strong>${p.predicted_risk}%</strong></td>
+                <td><span class="badge bg-${riskColor}">${p.predicted_level}</span></td>
+                <td><i class="fas ${trendIcon}"></i> ${p.severity_trend}</td>
+                <td><span class="badge bg-${urgencyColor}">${p.urgency}</span></td>
+            </tr>
+        `;
+    });
+    
+    html += '</tbody></table></div>';
+    container.innerHTML = html;
+}
+
+// Load Behavior Patterns
+function loadBehaviorPatterns() {
+    var container = document.getElementById('behaviorPatterns');
+    container.innerHTML = `
+        <div class="text-center py-3">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="text-muted mt-2">Analyzing behavior patterns...</p>
+        </div>
+    `;
+    
+    fetch('/ai/api/behavior-patterns/?days=90', {
+        credentials: 'include',
+        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+    })
+    .then(function(response) { return response.json(); })
+    .then(function(data) {
+        if (data.status === 'success') {
+            renderBehaviorPatterns(data.data, container);
+        } else {
+            container.innerHTML = `<div class="alert alert-danger">${data.message}</div>`;
+        }
+    })
+    .catch(function(error) {
+        container.innerHTML = `<div class="alert alert-danger">Error loading behavior patterns</div>`;
+    });
+}
+
+function renderBehaviorPatterns(data, container) {
+    var html = `
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <div class="card bg-light">
+                    <div class="card-body">
+                        <h6><i class="fas fa-calendar-alt me-2"></i>Analysis Period</h6>
+                        <p class="mb-0">Last ${data.period_days} days</p>
+                        <p class="text-muted small">Total Reports: ${data.total_reports}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card bg-light">
+                    <div class="card-body">
+                        <h6><i class="fas fa-lightbulb me-2"></i>Insights</h6>
+                        <p class="mb-0">${data.insights ? data.insights.length : 0} insights detected</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // Insights
+    if (data.insights && data.insights.length > 0) {
+        html += '<h6 class="mt-3"><i class="fas fa-lightbulb text-warning me-2"></i>Key Insights</h6>';
+        data.insights.forEach(function(insight) {
+            var icon = insight.type === 'category_dominance' ? 'fa-chart-bar' :
+                      insight.type === 'peak_day' ? 'fa-calendar-day' :
+                      insight.type === 'frequent_offenders' ? 'fa-user-graduate' :
+                      insight.type === 'risk_trend' ? 'fa-chart-line' : 'fa-info-circle';
+            var color = insight.type === 'category_dominance' ? 'primary' :
+                       insight.type === 'risk_trend' && insight.title.includes('Worsening') ? 'danger' : 'info';
+            
+            html += `
+                <div class="alert alert-${color} alert-sm">
+                    <i class="fas ${icon} me-2"></i>
+                    <strong>${insight.title}</strong>
+                    <p class="mb-0 small">${insight.description}</p>
+                    <p class="mb-0 text-muted small"><i class="fas fa-arrow-right me-1"></i>${insight.recommendation}</p>
+                </div>
+            `;
+        });
+    }
+    
+    // Category Patterns
+    if (data.category_patterns && data.category_patterns.length > 0) {
+        html += '<h6 class="mt-3"><i class="fas fa-tag me-2"></i>Top Categories</h6>';
+        html += '<div class="row">';
+        data.category_patterns.forEach(function(cat) {
+            html += `
+                <div class="col-md-4 col-sm-6 mb-2">
+                    <div class="d-flex justify-content-between align-items-center p-2 border rounded">
+                        <span>${cat.category__name}</span>
+                        <span class="badge bg-primary">${cat.count}</span>
+                    </div>
+                </div>
+            `;
+        });
+        html += '</div>';
+    }
+    
+    // Weekday Patterns
+    if (data.weekday_patterns && data.weekday_patterns.length > 0) {
+        html += '<h6 class="mt-3"><i class="fas fa-calendar-week me-2"></i>Weekday Distribution</h6>';
+        html += '<div class="row">';
+        data.weekday_patterns.forEach(function(day) {
+            html += `
+                <div class="col-md-3 col-sm-4 mb-2">
+                    <div class="d-flex justify-content-between align-items-center p-2 border rounded">
+                        <span>${day.day}</span>
+                        <span class="badge bg-info">${day.percentage}%</span>
+                    </div>
+                </div>
+            `;
+        });
+        html += '</div>';
+    }
+    
+    // Top Students
+    if (data.top_students && data.top_students.length > 0) {
+        html += '<h6 class="mt-3"><i class="fas fa-user-graduate me-2"></i>Frequent Offenders</h6>';
+        html += '<div class="table-responsive"><table class="table table-sm">';
+        html += '<thead><tr><th>Student</th><th>Stream</th><th>Reports</th></tr></thead><tbody>';
+        data.top_students.forEach(function(s) {
+            html += `<tr><td>${s.name}</td><td>${s.stream}</td><td>${s.report_count}</td></tr>`;
+        });
+        html += '</tbody></table></div>';
+    }
+    
+    container.innerHTML = html;
+}
+
+// Load Intervention Effectiveness
+function loadInterventionEffectiveness() {
+    var container = document.getElementById('interventionEffectiveness');
+    container.innerHTML = `
+        <div class="text-center py-3">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="text-muted mt-2">Measuring intervention effectiveness...</p>
+        </div>
+    `;
+    
+    fetch('/ai/api/intervention-effectiveness/', {
+        credentials: 'include',
+        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+    })
+    .then(function(response) { return response.json(); })
+    .then(function(data) {
+        if (data.status === 'success') {
+            renderInterventionEffectiveness(data.data, container);
+        } else {
+            container.innerHTML = `<div class="alert alert-danger">${data.message}</div>`;
+        }
+    })
+    .catch(function(error) {
+        container.innerHTML = `<div class="alert alert-danger">Error loading intervention effectiveness</div>`;
+    });
+}
+
+function renderInterventionEffectiveness(data, container) {
+    if (!data.effectiveness_data || data.effectiveness_data.length === 0) {
+        container.innerHTML = `
+            <div class="text-center py-4">
+                <i class="fas fa-info-circle fa-3x text-muted mb-3"></i>
+                <p>No students with interventions recorded yet.</p>
+                <p class="text-muted small">Start recording interventions to measure effectiveness.</p>
+            </div>
+        `;
+        return;
+    }
+    
+    var summary = data.summary;
+    var html = `
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="card bg-light">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">${summary.total_analyzed}</h5>
+                        <p class="card-text text-muted small">Students Analyzed</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-success text-white">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">${summary.improved_count}</h5>
+                        <p class="card-text small">Improved</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-danger text-white">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">${summary.worsened_count}</h5>
+                        <p class="card-text small">Worsened</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-primary text-white">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">${summary.effectiveness_rate}%</h5>
+                        <p class="card-text small">Effectiveness Rate</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // Recommendations
+    if (data.recommendations && data.recommendations.length > 0) {
+        html += '<h6 class="mt-3"><i class="fas fa-lightbulb text-warning me-2"></i>Recommendations</h6>';
+        data.recommendations.forEach(function(rec) {
+            var color = rec.type === 'success' ? 'success' :
+                       rec.type === 'warning' ? 'warning' :
+                       rec.type === 'urgent' ? 'danger' : 'info';
+            html += `
+                <div class="alert alert-${color} alert-sm">
+                    <strong>${rec.title}</strong>
+                    <p class="mb-0 small">${rec.description}</p>
+                    <p class="mb-0 text-muted small"><i class="fas fa-arrow-right me-1"></i>${rec.action}</p>
+                </div>
+            `;
+        });
+    }
+    
+    // Effectiveness data table
+    html += '<h6 class="mt-3"><i class="fas fa-table me-2"></i>Student Details</h6>';
+    html += '<div class="table-responsive"><table class="table table-hover table-sm">';
+    html += `
+        <thead>
+            <tr>
+                <th>Student</th>
+                <th>Stream</th>
+                <th>Interventions</th>
+                <th>Before Risk</th>
+                <th>After Risk</th>
+                <th>Change</th>
+                <th>Status</th>
+                <th>Effectiveness</th>
+            </tr>
+        </thead>
+        <tbody>
+    `;
+    
+    data.effectiveness_data.forEach(function(s) {
+        var statusColor = s.status === 'IMPROVED' ? 'success' :
+                         s.status === 'SLIGHTLY_IMPROVED' ? 'info' :
+                         s.status === 'STABLE' ? 'secondary' :
+                         s.status === 'SLIGHTLY_WORSENED' ? 'warning' : 'danger';
+        var effectColor = s.effectiveness === 'High' ? 'success' :
+                         s.effectiveness === 'Medium' ? 'info' :
+                         s.effectiveness === 'Moderate' ? 'primary' : 'warning';
+        var changeColor = s.risk_change < 0 ? 'text-success' : 
+                         s.risk_change > 0 ? 'text-danger' : 'text-secondary';
+        
+        html += `
+            <tr>
+                <td><a href="/student/${s.student_id}/">${s.name}</a></td>
+                <td>${s.stream}</td>
+                <td>${s.intervention_count}</td>
+                <td>${s.before_avg_risk}</td>
+                <td>${s.after_avg_risk}</td>
+                <td class="${changeColor}">${s.risk_change > 0 ? '+' : ''}${s.risk_change}</td>
+                <td><span class="badge bg-${statusColor}">${s.status.replace('_', ' ')}</span></td>
+                <td><span class="badge bg-${effectColor}">${s.effectiveness}</span></td>
+            </tr>
+        `;
+    });
+    
+    html += '</tbody></table></div>';
+    container.innerHTML = html;
+}
+
+// Other functions...
+function animateValue(id, value) {
+    var el = document.getElementById(id);
+    if (!el) return;
+    
+    var current = parseFloat(el.textContent.replace(/[^0-9.]/g, '')) || 0;
+    var target = parseFloat(value) || 0;
+    var duration = 800;
+    var startTime = null;
+    
+    function update(currentTime) {
+        if (!startTime) startTime = currentTime;
+        var progress = Math.min((currentTime - startTime) / duration, 1);
+        var eased = 1 - Math.pow(1 - progress, 3);
+        var currentValue = current + (target - current) * eased;
+        
+        if (typeof target === 'string' && target.includes('%')) {
+            el.textContent = currentValue.toFixed(1) + '%';
+        } else {
+            el.textContent = Math.round(currentValue);
+        }
+        
+        if (progress < 1) {
+            requestAnimationFrame(update);
+        } else {
+            el.textContent = typeof target === 'string' && target.includes('%') ? 
+                target : Math.round(target);
+        }
+    }
+    requestAnimationFrame(update);
+}
+
+function updateTimestamp() {
+    var now = new Date();
+    var el = document.getElementById('lastUpdate');
+    if (el) {
+        el.textContent = now.toLocaleTimeString();
+    }
+}
+
+function refreshData() {
+    var icon = document.getElementById('refreshIcon');
+    if (icon) icon.classList.add('fa-spin');
+    loadStats();
+    setTimeout(function() {
+        if (icon) icon.classList.remove('fa-spin');
+    }, 1000);
+}
+
+// Student search
+document.getElementById('searchStudentBtn').addEventListener('click', function() {
+    var query = document.getElementById('studentSearch').value.trim();
+    var container = document.getElementById('studentAnalysisResult');
+    var status = document.getElementById('studentSearchStatus');
+    var btn = this;
+    
+    if (!query) {
+        container.innerHTML = `<div class="alert alert-warning">Please enter a student name or admission number</div>`;
+        return;
+    }
+    
+    container.innerHTML = `
+        <div class="text-center py-3">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="text-muted mt-2">Searching for ${query}...</p>
+        </div>
+    `;
+    btn.disabled = true;
+    status.textContent = 'Searching...';
+    status.className = 'badge bg-warning ms-auto';
+    
+    fetch('/api/search-students/?q=' + encodeURIComponent(query), {
+        credentials: 'include',
+        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+    })
+    .then(function(response) { return response.json(); })
+    .then(function(data) {
+        if (data.students && data.students.length > 0) {
+            var student = data.students[0];
+            return fetch('/ai/api/student/' + student.id + '/recommendations/', {
+                credentials: 'include',
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            })
+            .then(function(r) { return r.json(); })
+            .then(function(studentData) {
+                displayStudentResult(container, studentData);
+                status.textContent = 'Found';
+                status.className = 'badge bg-success ms-auto';
+            });
+        } else {
+            container.innerHTML = `
+                <div class="alert alert-warning">
+                    <i class="fas fa-user-slash"></i> Student "${query}" not found.
+                </div>
+            `;
+            status.textContent = 'Not Found';
+            status.className = 'badge bg-danger ms-auto';
+        }
+    })
+    .catch(function(err) {
+        container.innerHTML = `<div class="alert alert-danger">Error: ${err.message}</div>`;
+        status.textContent = 'Error';
+        status.className = 'badge bg-danger ms-auto';
+    })
+    .finally(function() {
+        btn.disabled = false;
+    });
+});
+
+function displayStudentResult(container, studentData) {
+    if (studentData.error) {
+        container.innerHTML = `<div class="alert alert-danger">${studentData.error}</div>`;
+        return;
+    }
+    
+    var s = studentData.student;
+    if (!s) {
+        container.innerHTML = `<div class="alert alert-warning">No student data found</div>`;
+        return;
+    }
+    
+    var riskColor = s.risk_level === 'CRITICAL' ? 'danger' : 
+                   s.risk_level === 'WARNING' ? 'warning' : 'success';
+    
+    var html = `
+        <div class="ai-result-card">
+            <div class="card border-${riskColor}">
+                <div class="card-header bg-${riskColor} bg-opacity-10 d-flex justify-content-between align-items-center">
+                    <div>
+                        <strong>👤 ${s.name}</strong>
+                        <br><small class="text-muted">${s.admission_number} · ${s.stream} · Form ${s.form}</small>
+                    </div>
+                    <span class="badge bg-${riskColor}">${s.risk_level}</span>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Risk Score: <strong>${s.risk_score}%</strong></span>
+                        <span>Reports: <strong>${s.total_reports}</strong></span>
+                        <span>Interventions: <strong>${s.intervention_count || 0}</strong></span>
+                    </div>
+                    <div class="progress mb-3" style="height:8px;">
+                        <div class="progress-bar" style="width:${s.risk_score}%; background: ${s.risk_score >= 60 ? '#dc2626' : s.risk_score >= 30 ? '#d97706' : '#059669'};"></div>
+                    </div>
+                    
+                    ${studentData.recommendations && studentData.recommendations.length > 0 ? `
+                        <div class="mt-2">
+                            <small><strong><i class="fas fa-robot text-primary"></i> AI Recommendations:</strong></small>
+                            ${studentData.recommendations.map(function(rec) {
+                                return `
+                                    <div class="alert alert-${rec.type === 'critical' ? 'danger' : rec.type === 'warning' ? 'warning' : rec.type === 'pattern' ? 'info' : 'success'} alert-sm mt-1" style="padding:0.4rem;font-size:0.8rem;">
+                                        <strong>${rec.title}</strong>
+                                        <div style="font-size:0.75rem;white-space:pre-line;">${rec.description}</div>
+                                        ${rec.steps ? `<div class="mt-1"><small>${rec.steps.map(function(step) { return '• ' + step; }).join('<br>')}</small></div>` : ''}
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
+                    ` : `
+                        <div class="alert alert-success alert-sm mt-2">
+                            <i class="fas fa-check-circle"></i> No issues detected.
+                        </div>
+                    `}
+                    
+                    <a href="/student/${s.id}/?ai=true" class="btn btn-sm btn-primary w-100 mt-2">
+                        <i class="fas fa-external-link-alt"></i> View Full Profile
+                    </a>
+                </div>
+            </div>
+        </div>
+    `;
+    container.innerHTML = html;
+}
+
+// Class analysis
+document.getElementById('analyzeClassBtn').addEventListener('click', function() {
+    var streamId = document.getElementById('streamSelect').value;
+    var container = document.getElementById('classAnalysisResult');
+    var status = document.getElementById('classSearchStatus');
+    var btn = this;
+    
+    if (!streamId) {
+        container.innerHTML = `<div class="alert alert-warning">Please select a stream</div>`;
+        return;
+    }
+    
+    container.innerHTML = `
+        <div class="text-center py-3">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="text-muted mt-2">Analyzing class...</p>
+        </div>
+    `;
+    btn.disabled = true;
+    status.textContent = 'Analyzing...';
+    status.className = 'badge bg-warning ms-auto';
+    
+    fetch('/ai/api/class/' + streamId + '/recommendations/', {
+        credentials: 'include',
+        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+    })
+    .then(function(response) { return response.json(); })
+    .then(function(data) {
+        if (data.error) {
+            container.innerHTML = `<div class="alert alert-danger">${data.error}</div>`;
+            return;
+        }
+        
+        var stats = data.statistics || {};
+        var html = `
+            <div class="ai-result-card">
+                <div class="card">
+                    <div class="card-header bg-primary bg-opacity-10 d-flex justify-content-between align-items-center">
+                        <strong>📊 ${data.stream} Analysis</strong>
+                        <span class="badge bg-primary">${stats.total_students || 0} students</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="row text-center mb-3">
+                            <div class="col-3"><small class="text-muted">Total</small><br><strong>${stats.total_students || 0}</strong></div>
+                            <div class="col-3"><small class="text-danger">Critical</small><br><strong class="text-danger">${stats.critical_count || 0}</strong></div>
+                            <div class="col-3"><small class="text-warning">Warning</small><br><strong class="text-warning">${stats.warning_count || 0}</strong></div>
+                            <div class="col-3"><small class="text-success">Good</small><br><strong class="text-success">${stats.good_count || 0}</strong></div>
+                        </div>
+                        <div class="text-center mb-3">
+                            <small>Average Risk: <strong>${(stats.average_risk || 0).toFixed(1)}%</strong></small>
+                            ${stats.students_with_interventions ? `<br><small>Students with interventions: <strong>${stats.students_with_interventions}</strong></small>` : ''}
+                        </div>
+                        
+                        ${data.recommendations && data.recommendations.length > 0 ? `
+                            <div class="mt-2">
+                                <small><strong>💡 Recommendations:</strong></small>
+                                ${data.recommendations.map(function(rec) {
+                                    var color = rec.type === 'URGENT' ? 'danger' : 
+                                               rec.type === 'WARNING' ? 'warning' : 
+                                               rec.type === 'SUCCESS' ? 'success' : 'info';
+                                    return `
+                                        <div class="alert alert-${color} alert-sm mt-1" style="padding:0.4rem;font-size:0.8rem;">
+                                            <strong>${rec.action}</strong>
+                                            <div class="small">${rec.details}</div>
+                                            ${rec.steps ? `<div class="mt-1"><small>${rec.steps.map(function(step) { return '• ' + step; }).join('<br>')}</small></div>` : ''}
+                                        </div>
+                                    `;
+                                }).join('')}
+                            </div>
+                        ` : ''}
+                        
+                        ${data.top_offenders && data.top_offenders.length > 0 ? `
+                            <div class="mt-2">
+                                <small><strong>👤 Top offenders:</strong></small>
+                                <div class="d-flex flex-wrap gap-1 mt-1">
+                                    ${data.top_offenders.map(function(o) {
+                                        return `<span class="badge bg-warning text-dark">${o.name} (${o.reports} reports)</span>`;
+                                    }).join('')}
+                                </div>
+                            </div>
+                        ` : ''}
+                    </div>
+                </div>
+            </div>
+        `;
+        container.innerHTML = html;
+        status.textContent = 'Loaded';
+        status.className = 'badge bg-success ms-auto';
+    })
+    .catch(function(err) {
+        container.innerHTML = `<div class="alert alert-danger">Error: ${err.message}</div>`;
+        status.textContent = 'Error';
+        status.className = 'badge bg-danger ms-auto';
+    })
+    .finally(function() {
+        btn.disabled = false;
+    });
+});
+
+// Guideline toast
+function showGuideline(title) {
+    var guidelines = {
+        'Basic Education Act 2013': 'Section 30: Every child has the right to basic education. Section 36: School discipline must respect the child\'s dignity. Section 37: Corporal punishment is strictly prohibited.',
+        'Positive Discipline': 'Use of counseling and guidance instead of punishment. Non-violent approaches to discipline. Restorative justice practices. Community service as alternative to suspension.',
+        'Escalation Protocol': 'Step 1: Verbal warning & Counseling → Step 2: Written warning & Parent meeting → Step 3: Suspension (1-10 days) & Behavior plan → Step 4: Disciplinary committee review → Step 5: Expulsion (refer to County Education Director)',
+        'Child Protection': 'Children\'s Act 2001 compliance. Every child has the right to protection from abuse, neglect, and exploitation. Schools must have child protection policies in place.'
+    };
+    
+    var content = guidelines[title] || 'Refer to the official Kenyan education guidelines for more information.';
+    showToast(content, 'info', 5000);
+}
+
+function showToast(message, type, duration) {
+    type = type || 'info';
+    duration = duration || 3000;
+    
+    var colors = {
+        info: 'bg-primary',
+        warning: 'bg-warning',
+        success: 'bg-success',
+        danger: 'bg-danger'
+    };
+    
+    var icons = {
+        info: 'fa-info-circle',
+        warning: 'fa-exclamation-triangle',
+        success: 'fa-check-circle',
+        danger: 'fa-exclamation-circle'
+    };
+    
+    var toast = document.createElement('div');
+    toast.className = 'toast align-items-center text-white ' + colors[type] + ' border-0 position-fixed bottom-0 end-0 m-3';
+    toast.role = 'alert';
+    toast.style.zIndex = '9999';
+    toast.innerHTML = `
+        <div class="d-flex">
+            <div class="toast-body">
+                <i class="fas ' + icons[type] + ' me-2"></i>
+                ${message}
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+        </div>
+    `;
+    document.body.appendChild(toast);
+    
+    var bsToast = new bootstrap.Toast(toast, { delay: duration });
+    bsToast.show();
+    setTimeout(function() { toast.remove(); }, duration + 500);
+}
+
+// Enter key support
+document.getElementById('studentSearch').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+        document.getElementById('searchStudentBtn').click();
+    }
+});
+
+// Auto-refresh
+setInterval(function() {
+    if (!dashboardState.isLoading) {
+        refreshData();
+    }
+}, 30000);
+
+// Status dot animation
+setInterval(function() {
+    var dot = document.getElementById('statusDot');
+    if (dot) {
+        dot.classList.remove('online');
+        dot.classList.add('analyzing');
+        document.getElementById('statusText').textContent = 'Analyzing...';
+        setTimeout(function() {
+            dot.classList.remove('analyzing');
+            dot.classList.add('online');
+            document.getElementById('statusText').textContent = 'System Online';
+        }, 1000);
+    }
+}, 60000);
+
+// Initial load
+document.addEventListener('DOMContentLoaded', function() {
+    loadStats();
+    
+    // Check for student parameter in URL
+    var urlParams = new URLSearchParams(window.location.search);
+    var studentId = urlParams.get('student');
+    if (studentId) {
+        document.getElementById('studentSearch').value = studentId;
+        setTimeout(function() {
+            document.getElementById('searchStudentBtn').click();
+        }, 500);
+    }
+});
+
+console.log('🚀 AI Dashboard v3 loaded with advanced AI features!');
+</script>
+{% endblock %}

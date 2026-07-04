@@ -19,12 +19,12 @@
                     {% csrf_token %}
                     <div class="mb-3 text-start">
                         <label class="form-label-modern">Select Stream</label>
-                        <select name="stream" class="form-control-modern" required>
-                            <option value="">-- Choose your stream --</option>
-                            {% for stream in streams %}
-                            <option value="{{ stream.id }}">{{ stream.get_name_display }}</option>
-                            {% endfor %}
-                        </select>
+                                            <select name="stream" class="form-control-modern" required>
+                        <option value="">-- Choose your stream --</option>
+                        {% for stream in streams %}
+                        <option value="{{ stream.id }}">{{ stream.name }}</option>
+                        {% endfor %}
+                    </select>
                     </div>
                     <div class="mb-3 text-start">
                         <label class="form-label-modern">Select Form</label>
@@ -44,3 +44,7 @@
     </div>
 </div>
 {% endblock %}
+
+
+
+

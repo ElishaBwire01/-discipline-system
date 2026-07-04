@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Image Test{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2 class="mb-4">Profile Image Test</h2>
+    
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Student Profile Picture Test</h5>
+                </div>
+                <div class="card-body text-center">
+                    {% if student %}
+                        <h6>Student: {{ student.name }}</h6>
+                        {% if student.profile_picture %}
+                            <img src="{{ student.profile_picture.url }}" 
+                                 alt="Student" 
+                                 style="width: 150px; height: 150px; border-radius: 50%; object-fit: cover; border: 3px solid #2563eb;"
+                                 onerror="this.alt='Image not found'; this.style.border='3px solid red';">
+                            <p class="mt-2"><code>{{ student.profile_picture.url }}</code></p>
+                            <p class="text-success">? Image URL generated</p>
+                        {% else %}
+                            <p class="text-muted">No profile picture</p>
+                        {% endif %}
+                    {% else %}
+                        <p class="text-muted">No student selected</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Teacher Profile Picture Test</h5>
+                </div>
+                <div class="card-body text-center">
+                    {% if teacher %}
+                        <h6>Teacher: {{ teacher.user.get_full_name }}</h6>
+                        {% if teacher.profile_picture %}
+                            <img src="{{ teacher.profile_picture.url }}" 
+                                 alt="Teacher" 
+                                 style="width: 150px; height: 150px; border-radius: 50%; object-fit: cover; border: 3px solid #7c3aed;"
+                                 onerror="this.alt='Image not found'; this.style.border='3px solid red';">
+                            <p class="mt-2"><code>{{ teacher.profile_picture.url }}</code></p>
+                            <p class="text-success">? Image URL generated</p>
+                        {% else %}
+                            <p class="text-muted">No profile picture</p>
+                        {% endif %}
+                    {% else %}
+                        <p class="text-muted">No teacher selected</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="mt-4">
+        <a href="/admin-dashboard/" class="btn btn-primary">Back to Dashboard</a>
+    </div>
+</div>
+{% endblock %}

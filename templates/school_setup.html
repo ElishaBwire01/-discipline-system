@@ -1,0 +1,332 @@
+﻿{% extends 'base.html' %}
+
+{% block title %}School Setup{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="alert alert-info alert-modern mb-4">
+            <i class="fas fa-info-circle"></i>
+            <strong>School Setup</strong> - Configure your school details, grades, streams, and academic terms.
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- ============================================ -->
+    <!-- SCHOOL DETAILS -->
+    <!-- ============================================ -->
+    <div class="col-md-6" data-aos="fade-up">
+        <div class="card-modern">
+            <div class="card-header-modern">
+                <span class="header-icon"><i class="fas fa-school"></i></span>
+                School Details
+            </div>
+            <div class="card-body p-4">
+                <form method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="save_school">
+                    
+                    <div class="mb-3">
+                        <label class="form-label-modern">School Name *</label>
+                        <input type="text" name="name" class="form-control-modern" value="{{ school.name }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label-modern">Short Name</label>
+                        <input type="text" name="short_name" class="form-control-modern" value="{{ school.short_name }}">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label-modern">Motto</label>
+                        <input type="text" name="motto" class="form-control-modern" value="{{ school.motto }}">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label-modern">Address</label>
+                        <textarea name="address" class="form-control-modern" rows="2">{{ school.address }}</textarea>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label-modern">Phone</label>
+                            <input type="text" name="phone" class="form-control-modern" value="{{ school.phone }}">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label-modern">Email</label>
+                            <input type="email" name="email" class="form-control-modern" value="{{ school.email }}">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label-modern">Website</label>
+                        <input type="url" name="website" class="form-control-modern" value="{{ school.website }}">
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label-modern">Current Year</label>
+                            <input type="number" name="current_year" class="form-control-modern" value="{{ school.current_year }}">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label-modern">Terms per Year</label>
+                            <select name="terms_per_year" class="form-control-modern">
+                                <option value="1">1 Term</option>
+                                <option value="2">2 Terms</option>
+                                <option value="3" {% if school.terms_per_year == 3 %}selected{% endif %}>3 Terms</option>
+                                <option value="4">4 Terms</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="allow_teacher_registration" id="allowTeacherReg" {% if school.allow_teacher_registration %}checked{% endif %}>
+                                <label class="form-check-label" for="allowTeacherReg">Allow Teacher Registration</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="require_teacher_approval" id="requireApproval" {% if school.require_teacher_approval %}checked{% endif %}>
+                                <label class="form-check-label" for="requireApproval">Require Teacher Approval</label>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn-modern btn-modern-primary w-100">
+                        <i class="fas fa-save"></i> Save School Details
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- GRADES / FORMS -->
+    <!-- ============================================ -->
+    <div class="col-md-6" data-aos="fade-up" data-aos-delay="100">
+        <div class="card-modern">
+            <div class="card-header-modern">
+                <span class="header-icon"><i class="fas fa-graduation-cap"></i></span>
+                Grades / Forms
+                <span class="badge bg-light text-dark ms-2">{{ grades|length }}</span>
+            </div>
+            <div class="card-body p-4">
+                <form method="post" class="row g-2">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="add_grade">
+                    <div class="col-md-6">
+                        <input type="text" name="grade_name" class="form-control-modern" placeholder="Form 1" required>
+                    </div>
+                    <div class="col-md-4">
+                        <input type="text" name="grade_code" class="form-control-modern" placeholder="F1" required>
+                    </div>
+                    <div class="col-md-2">
+                        <button type="submit" class="btn-modern btn-modern-primary w-100"><i class="fas fa-plus"></i></button>
+                    </div>
+                </form>
+                
+                <div class="mt-3">
+                    {% for grade in grades %}
+                    <div class="d-flex justify-content-between align-items-center p-2 mb-2" style="background: #f8f9fa; border-radius: 8px;">
+                        <div>
+                            <strong>{{ grade.name }}</strong>
+                            <span class="badge bg-secondary ms-2">{{ grade.code }}</span>
+                            <span class="badge bg-info ms-1">Order: {{ grade.order }}</span>
+                        </div>
+                        <form method="post" onsubmit="return confirm('Delete {{ grade.name }}?')">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="delete_grade">
+                            <input type="hidden" name="grade_id" value="{{ grade.id }}">
+                            <button type="submit" class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></button>
+                        </form>
+                    </div>
+                    {% empty %}
+                    <p class="text-muted text-center">No grades added yet</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================ -->
+<!-- SECOND ROW - STREAMS AND TERMS -->
+<!-- ============================================ -->
+<div class="row mt-4">
+    <!-- ============================================ -->
+    <!-- STREAMS / CLASSES -->
+    <!-- ============================================ -->
+    <div class="col-md-6" data-aos="fade-up" data-aos-delay="200">
+        <div class="card-modern">
+            <div class="card-header-modern">
+                <span class="header-icon"><i class="fas fa-people-group"></i></span>
+                Streams / Classes
+                <span class="badge bg-light text-dark ms-2">{{ streams|length }}</span>
+            </div>
+            <div class="card-body p-4">
+                <form method="post" class="row g-2">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="add_stream">
+                    <div class="col-md-6">
+                        <input type="text" name="stream_name" class="form-control-modern" placeholder="Stream Name" required>
+                    </div>
+                    <div class="col-md-4">
+                        <input type="text" name="stream_code" class="form-control-modern" placeholder="Code" required>
+                    </div>
+                    <div class="col-md-2">
+                        <button type="submit" class="btn-modern btn-modern-primary w-100"><i class="fas fa-plus"></i></button>
+                    </div>
+                </form>
+                
+                <div class="mt-3">
+                    {% for stream in streams %}
+                    <div class="d-flex justify-content-between align-items-center p-2 mb-2" style="background: #f8f9fa; border-radius: 8px;">
+                        <div>
+                            <strong>{{ stream.name }}</strong>
+                            <span class="badge bg-secondary ms-2">{{ stream.code }}</span>
+                            <span class="badge bg-success ms-1">Active</span>
+                        </div>
+                        <form method="post" onsubmit="return confirm('Delete {{ stream.name }}? This will delete all students in this stream.')">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="delete_stream">
+                            <input type="hidden" name="stream_id" value="{{ stream.id }}">
+                            <button type="submit" class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></button>
+                        </form>
+                    </div>
+                    {% empty %}
+                    <p class="text-muted text-center">No streams added yet</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- ACADEMIC TERMS -->
+    <!-- ============================================ -->
+    <div class="col-md-6" data-aos="fade-up" data-aos-delay="300">
+        <div class="card-modern">
+            <div class="card-header-modern">
+                <span class="header-icon"><i class="fas fa-calendar-alt"></i></span>
+                Academic Terms
+                <span class="badge bg-light text-dark ms-2">{{ terms|length }}</span>
+            </div>
+            <div class="card-body p-4">
+                <form method="post" class="row g-2">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="add_term">
+                    <div class="col-md-3">
+                        <input type="text" name="term_name" class="form-control-modern" placeholder="Term 1" required>
+                    </div>
+                    <div class="col-md-2">
+                        <input type="number" name="term_number" class="form-control-modern" placeholder="1" required>
+                    </div>
+                    <div class="col-md-2">
+                        <input type="number" name="term_year" class="form-control-modern" placeholder="2026" value="2026" required>
+                    </div>
+                    <div class="col-md-2">
+                        <input type="date" name="start_date" class="form-control-modern" required>
+                    </div>
+                    <div class="col-md-2">
+                        <input type="date" name="end_date" class="form-control-modern" required>
+                    </div>
+                    <div class="col-md-1">
+                        <button type="submit" class="btn-modern btn-modern-primary w-100"><i class="fas fa-plus"></i></button>
+                    </div>
+                    <div class="col-12">
+                        <textarea name="notes" class="form-control-modern" rows="2" placeholder="Notes about this term (e.g., Games Term, Exam Term, etc.)"></textarea>
+                    </div>
+                </form>
+                
+                <div class="mt-3">
+                    {% for term in terms %}
+                    <div class="d-flex justify-content-between align-items-start p-2 mb-2" style="background: {% if term.is_current %}#e8f5e9{% else %}#f8f9fa{% endif %}; border-radius: 8px; border-left: 4px solid {% if term.is_current %}#059669{% else %}#2563eb{% endif %};">
+                        <div class="flex-grow-1">
+                            <div class="d-flex align-items-center gap-2 flex-wrap">
+                                <strong>{{ term.name }}</strong>
+                                <span class="badge bg-secondary">#{{ term.term_number }}</span>
+                                <span class="badge bg-secondary">{{ term.year }}</span>
+                                {% if term.is_current %}
+                                <span class="badge bg-success"><i class="fas fa-check-circle"></i> Current</span>
+                                {% endif %}
+                                <span class="badge bg-info"><i class="far fa-clock"></i> {{ term.get_duration_display }}</span>
+                            </div>
+                            <div class="small text-muted mt-1">
+                                <i class="far fa-calendar-alt"></i>
+                                {{ term.start_date|date:"M d, Y" }} - {{ term.end_date|date:"M d, Y" }}
+                                {% if term.notes %}
+                                <br><i class="fas fa-sticky-note"></i> <span class="text-dark">{{ term.notes }}</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <form method="post" onsubmit="return confirm('Delete {{ term.name }}?')" class="ms-2">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="delete_term">
+                            <input type="hidden" name="term_id" value="{{ term.id }}">
+                            <button type="submit" class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></button>
+                        </form>
+                    </div>
+                    {% empty %}
+                    <p class="text-muted text-center">No terms added yet</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================ -->
+<!-- BULK UPLOAD -->
+<!-- ============================================ -->
+<div class="row mt-4">
+    <div class="col-md-12">
+        <div class="card-modern" data-aos="fade-up" data-aos-delay="400">
+            <div class="card-header-modern">
+                <span class="header-icon"><i class="fas fa-upload"></i></span>
+                Bulk Upload Students
+            </div>
+            <div class="card-body p-4">
+                <form method="post" action="{% url 'bulk_upload_students' %}" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="row g-3 align-items-end">
+                        <div class="col-md-8">
+                            <label class="form-label-modern">Upload Excel File (.xlsx, .xls)</label>
+                            <input type="file" name="excel_file" class="form-control-modern" accept=".xlsx,.xls">
+                            <small class="text-muted">
+                                <i class="fas fa-info-circle"></i>
+                                Required columns: <strong>name</strong>, <strong>admission_number</strong>, <strong>grade</strong>, <strong>stream</strong>
+                            </small>
+                        </div>
+                        <div class="col-md-4">
+                            <button type="submit" class="btn-modern btn-modern-success w-100">
+                                <i class="fas fa-cloud-upload-alt"></i> Upload Students
+                            </button>
+                        </div>
+                    </div>
+                </form>
+                
+                <div class="mt-3">
+                    <button class="btn-modern btn-modern-secondary btn-modern-sm" onclick="downloadTemplate()">
+                        <i class="fas fa-download"></i> Download Excel Template
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function downloadTemplate() {
+    var data = [
+        ['name', 'admission_number', 'grade', 'stream', 'form', 'year', 'notes'],
+        ['John Doe', 'ADM001', 'Form 1', 'Mulumba', 'Form 1', '2026', 'Good student'],
+        ['Jane Smith', 'ADM002', 'Form 2', 'Kizza', 'Form 2', '2026', 'Needs attention'],
+    ];
+    
+    var csv = data.map(function(row) { return row.join(','); }).join('\n');
+    var blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+    var url = window.URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = 'student_upload_template.csv';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
+}
+</script>
+{% endblock %}

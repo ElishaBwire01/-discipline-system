@@ -20,8 +20,8 @@
         .error-box {
             background: rgba(255,255,255,0.95);
             border-radius: 24px;
-            padding: 3rem;
-            max-width: 480px;
+            padding: 2.5rem;
+            max-width: 600px;
             text-align: center;
             box-shadow: 0 25px 60px rgba(0,0,0,0.3);
         }
@@ -34,7 +34,7 @@
             font-size: 2.5rem; color: white;
         }
         .error-box h1 { font-size: 2rem; font-weight: 800; color: #0f172a; margin-bottom: 0.5rem; }
-        .error-box p { color: #64748b; margin-bottom: 1.5rem; }
+        .error-box .subtitle { color: #64748b; margin-bottom: 1.5rem; }
         .error-box .btn-home {
             display: inline-flex; align-items: center; gap: 0.5rem;
             padding: 0.75rem 2rem;
@@ -42,16 +42,216 @@
             color: white; border: none; border-radius: 12px;
             text-decoration: none; font-weight: 600;
             transition: all 0.3s;
+            cursor: pointer;
         }
         .error-box .btn-home:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(37,99,235,0.35); }
+        .error-box .btn-report {
+            display: inline-flex; align-items: center; gap: 0.5rem;
+            padding: 0.75rem 2rem;
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white; border: none; border-radius: 12px;
+            text-decoration: none; font-weight: 600;
+            transition: all 0.3s;
+            cursor: pointer;
+            margin-top: 0.5rem;
+        }
+        .error-box .btn-report:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(239,68,68,0.35); }
+        .error-box .btn-report:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+        .error-box .report-status {
+            margin-top: 1rem;
+            padding: 0.75rem;
+            border-radius: 12px;
+            font-size: 0.875rem;
+            display: none;
+        }
+        .error-box .report-status.success { display: block; background: #ecfdf5; color: #059669; }
+        .error-box .report-status.error { display: block; background: #fef2f2; color: #dc2626; }
+        .error-box .report-status.loading { display: block; background: #eff6ff; color: #2563eb; }
+        
+        .error-details {
+            text-align: left;
+            background: #1e293b;
+            color: #e2e8f0;
+            border-radius: 12px;
+            padding: 1rem;
+            margin: 1rem 0;
+            font-size: 0.75rem;
+            max-height: 300px;
+            overflow-y: auto;
+            display: none;
+            font-family: 'Courier New', monospace;
+            white-space: pre-wrap;
+            word-break: break-all;
+            line-height: 1.5;
+        }
+        .error-details.show { display: block; }
+        .btn-toggle-details {
+            background: none;
+            border: none;
+            color: #2563eb;
+            font-size: 0.813rem;
+            cursor: pointer;
+            text-decoration: underline;
+            margin-top: 0.5rem;
+        }
+        .error-preview {
+            background: #fef2f2;
+            border: 1px solid #fca5a5;
+            border-radius: 8px;
+            padding: 0.75rem;
+            margin: 0.75rem 0;
+            font-size: 0.813rem;
+            color: #991b1b;
+            text-align: left;
+        }
+        .error-preview strong { color: #dc2626; }
+        .buttons-row { display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap; }
     </style>
 </head>
 <body>
     <div class="error-box">
         <div class="error-icon"><i class="fas fa-exclamation-triangle"></i></div>
-        <h1>500</h1>
-        <p>Something went wrong on our end. Please try again later.</p>
-        <a href="/" class="btn-home"><i class="fas fa-home"></i> Go Home</a>
+        <h1>500 - Server Error</h1>
+        <p class="subtitle">Something went wrong on our end. Please try again later.</p>
+        
+        <div class="error-preview" id="errorPreview">
+            <strong><i class="fas fa-bug me-1"></i> Error:</strong>
+            <span id="errorPreviewText">Loading error details...</span>
+        </div>
+        
+        <div class="buttons-row">
+            <a href="/" class="btn-home"><i class="fas fa-home"></i> Go Home</a>
+            <button class="btn-report" id="reportErrorBtn">
+                <i class="fas fa-bug"></i> Report Error
+                <span class="spinner-border spinner-border-sm ms-1" id="reportSpinner" style="display: none; width: 14px; height: 14px;" role="status"></span>
+            </button>
+        </div>
+        
+        <div class="report-status" id="reportStatus"></div>
+        
+        <button class="btn-toggle-details" id="toggleDetails">Show Full Technical Details</button>
+        <div class="error-details" id="errorDetails">
+            <div id="errorContent">Loading error details...</div>
+        </div>
     </div>
+
+    <script>
+        // Collect error information
+        const errorInfo = {
+            url: window.location.href,
+            userAgent: navigator.userAgent,
+            timestamp: new Date().toISOString(),
+            referrer: document.referrer || 'Direct'
+        };
+
+        // Get error details from sessionStorage if available
+        let errorData = null;
+        try {
+            const savedError = sessionStorage.getItem('lastError');
+            if (savedError) {
+                errorData = JSON.parse(savedError);
+                document.getElementById('errorContent').textContent = JSON.stringify(errorData, null, 2);
+                document.getElementById('errorPreviewText').textContent = errorData.message || 'Unknown error';
+                
+                // Show error preview
+                const preview = document.getElementById('errorPreview');
+                preview.innerHTML = `
+                    <strong><i class="fas fa-bug me-1"></i> Error:</strong>
+                    <span style="color: #dc2626;">${errorData.message || 'Unknown error'}</span>
+                    <br><small style="color: #6b7280;">Type: ${errorData.type || 'Unknown'}</small>
+                `;
+            }
+        } catch(e) {
+            document.getElementById('errorPreviewText').textContent = 'No error details available';
+        }
+
+        // Toggle technical details
+        document.getElementById('toggleDetails').addEventListener('click', function() {
+            const details = document.getElementById('errorDetails');
+            details.classList.toggle('show');
+            this.textContent = details.classList.contains('show') ? 'Hide Technical Details' : 'Show Full Technical Details';
+        });
+
+        // Report error button
+        document.getElementById('reportErrorBtn').addEventListener('click', function() {
+            const btn = this;
+            const status = document.getElementById('reportStatus');
+            const spinner = document.getElementById('reportSpinner');
+            
+            btn.disabled = true;
+            spinner.style.display = 'inline-block';
+            status.className = 'report-status loading';
+            status.textContent = '📤 Sending error report...';
+            status.style.display = 'block';
+
+            // Prepare data to send
+            const reportData = {
+                error: errorData || { message: 'No error data available' },
+                url: errorInfo.url,
+                userAgent: errorInfo.userAgent,
+                timestamp: errorInfo.timestamp,
+                referrer: errorInfo.referrer,
+                pageContent: document.body.innerText.substring(0, 1000)
+            };
+
+            // Send to server via fetch
+            fetch('/api/report-error/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken') || ''
+                },
+                body: JSON.stringify(reportData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                spinner.style.display = 'none';
+                if (data.status === 'success') {
+                    status.className = 'report-status success';
+                    status.textContent = '✅ Error report sent! Check your terminal.';
+                    btn.innerHTML = '<i class="fas fa-check"></i> Reported';
+                } else {
+                    status.className = 'report-status error';
+                    status.textContent = '❌ Failed to send error report.';
+                    btn.disabled = false;
+                }
+            })
+            .catch(err => {
+                spinner.style.display = 'none';
+                status.className = 'report-status error';
+                status.textContent = '❌ Could not connect to server.';
+                btn.disabled = false;
+            });
+        });
+
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        // Save any JavaScript errors
+        window.addEventListener('error', function(e) {
+            try {
+                const errorData = {
+                    message: e.message,
+                    filename: e.filename,
+                    lineno: e.lineno,
+                    stack: e.error ? e.error.stack : 'No stack'
+                };
+                sessionStorage.setItem('lastError', JSON.stringify(errorData));
+            } catch(ex) {}
+        });
+    </script>
 </body>
 </html>
+
