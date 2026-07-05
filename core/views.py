@@ -2897,25 +2897,19 @@ def user_profile_settings(request):
                 messages.success(request, 'Name updated!')
             return redirect('user_profile_settings')
 
-        # ? ADD PROFILE PICTURE UPLOAD HANDLING
+        # ✅ FIXED: Profile picture upload (works with Supabase Storage)
         elif action == 'change_profile_picture':
             if request.FILES.get('profile_picture'):
                 try:
                     if not profile:
                         profile = TeacherProfile.objects.create(user=user)
                     
-                    # Delete old picture if exists
-                    if profile.profile_picture:
-                        old_path = profile.profile_picture.path
-                        if os.path.isfile(old_path):
-                            os.remove(old_path)
-                    
-                    # Save new picture
+                    # ✅ Just save the new picture - Supabase handles the old file
                     profile.profile_picture = request.FILES['profile_picture']
                     profile.save()
-                    messages.success(request, 'Profile picture updated successfully!')
+                    messages.success(request, '✅ Profile picture updated successfully!')
                 except Exception as e:
-                    messages.error(request, f'Error uploading picture: {e}')
+                    messages.error(request, f'❌ Error uploading picture: {e}')
             else:
                 messages.error(request, 'Please select an image to upload.')
             return redirect('user_profile_settings')
@@ -2930,11 +2924,14 @@ def user_profile_settings(request):
         'unread_notifications': unread_notifications,
     }
     return render(request, 'user_profile.html', context)
+
+
 @login_required
 def admin_profile(request):
     return redirect('user_profile_settings')
 
 
+# ✅ FIXED: Upload profile picture (works with Supabase Storage)
 @login_required
 def upload_profile_picture(request):
     if request.method == 'POST' and request.FILES.get('profile_picture'):
@@ -2943,18 +2940,14 @@ def upload_profile_picture(request):
             if not profile:
                 profile = TeacherProfile.objects.create(user=request.user)
 
-            if profile.profile_picture:
-                old_path = profile.profile_picture.path
-                if os.path.isfile(old_path):
-                    os.remove(old_path)
-
+            # ✅ Just save the new picture - Supabase handles everything
             profile.profile_picture = request.FILES['profile_picture']
-            profile.save(update_fields=['profile_picture'])
-            messages.success(request, '? Profile picture updated!')
+            profile.save()
+            messages.success(request, '✅ Profile picture updated successfully!')
         except Exception as e:
-            messages.error(request, f'? Error uploading picture: {e}')
+            messages.error(request, f'❌ Error uploading picture: {e}')
     else:
-        messages.error(request, '? No image file provided.')
+        messages.error(request, '❌ No image file provided.')
     return redirect('user_profile_settings')
 
 
@@ -2962,13 +2955,13 @@ def upload_profile_picture(request):
 def view_user_profile(request, user_id):
     is_teacher = request.user.groups.filter(name__in=['Teacher', 'ClassTeacher']).exists()
     if not (request.user.is_superuser or is_teacher or request.user.id == user_id):
-        messages.error(request, '? You do not have permission to view this profile.')
+        messages.error(request, '❌ You do not have permission to view this profile.')
         return redirect('user_profile_settings')
 
     try:
         viewed_user = User.objects.get(id=user_id)
     except User.DoesNotExist:
-        messages.error(request, '? User not found.')
+        messages.error(request, '❌ User not found.')
         return redirect('user_profile_settings')
 
     viewed_profile = get_teacher_profile(viewed_user)
@@ -2999,7 +2992,7 @@ def edit_student(request, student_id):
             is_allowed = True
 
     if not is_allowed:
-        messages.error(request, '? Permission denied.')
+        messages.error(request, '❌ Permission denied.')
         return redirect('student_profile', student_id=student_id)
 
     if request.method == 'POST':
@@ -3012,35 +3005,31 @@ def edit_student(request, student_id):
                 student.year = int(request.POST.get('year', timezone.now().year))
                 student.optional_notes = request.POST.get('optional_notes', '')
 
+                # ✅ FIXED: Student picture upload (works with Supabase Storage)
                 if request.FILES.get('profile_picture'):
-                    if student.profile_picture:
-                        old_path = student.profile_picture.path
-                        if os.path.isfile(old_path):
-                            os.remove(old_path)
                     student.profile_picture = request.FILES['profile_picture']
 
                 student.save()
-                messages.success(request, '? Student updated successfully!')
+                messages.success(request, '✅ Student updated successfully!')
             except Exception as e:
-                messages.error(request, f'? Error updating student: {e}')
+                messages.error(request, f'❌ Error updating student: {e}')
             return redirect('student_profile', student_id=student.id)
 
         elif action == 'delete_student':
             student_name = student.name
             if request.user.is_superuser:
                 student.delete()
-                messages.success(request, f'? Student {student_name} permanently deleted.')
+                messages.success(request, f'✅ Student {student_name} permanently deleted.')
             else:
                 student.is_active = False
                 student.save()
-                messages.success(request, f'? Student {student_name} deactivated.')
+                messages.success(request, f'✅ Student {student_name} deactivated.')
             return redirect('class_teacher_dashboard')
 
     return render(request, 'edit_student.html', {
         'student': student,
         'forms': _get_form_choices(),
     })
-
 
 # ============================================
 # ADMIN NOTIFICATIONS
