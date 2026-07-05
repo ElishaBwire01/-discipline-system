@@ -1,18 +1,15 @@
 {
   "version": 2,
-  "functions": {
-    "disciplinary_program/wsgi.py": {
-      "runtime": "python3.11"
+  "builds": [
+    {
+      "src": "disciplinary_program/wsgi.py",
+      "use": "@vercel/python"
     }
-  },
+  ],
   "routes": [
     {
       "src": "/(.*)",
       "dest": "disciplinary_program/wsgi.py"
     }
-  ],
-  "env": {
-    "DJANGO_SETTINGS_MODULE": "disciplinary_program.settings",
-    "DEBUG": "False"
-  }
+  ]
 }
