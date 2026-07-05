@@ -423,7 +423,7 @@ def admin_dashboard(request):
     categories = DisciplineCategory.objects.filter(is_active=True).order_by('order', 'name')
 
     context = {
-        'streams': Stream.objects.filter(is_active=True).order_by('name'),
+        'streams_list': Stream.objects.filter(is_active=True).order_by('name'),
         'students': students_page,
         'total_students': total_students,
         'critical_students': critical_count,
@@ -1098,9 +1098,9 @@ def student_recommendations(request, student_id):
 
 
 @login_required
-def class_recommendations(request, class_id):
+def class_recommendations(request, stream_id):
     try:
-        stream = get_object_or_404(Stream, id=class_id)
+        stream = get_object_or_404(Stream, id=stream_id)
         students = Student.objects.filter(stream=stream, is_active=True)
 
         if not students.exists():
@@ -1922,7 +1922,7 @@ def export_reports(request, format):
                     report.student.name,
                     report.student.admission_number,
                     report.category_name,
-                    report.get_rating_display(),
+                    report.get_rating_display() if hasattr(report, 'get_rating_display') else dict(DisciplineReport.RATING_CHOICES).get(report.rating, report.rating),
                     report.points,
                     report.reported_by.username,
                     report.comments[:100] + '...' if len(report.comments) > 100 else report.comments,
@@ -1945,7 +1945,7 @@ def export_reports(request, format):
                     report.student.name,
                     report.student.admission_number,
                     report.category_name,
-                    report.get_rating_display(),
+                    report.get_rating_display() if hasattr(report, 'get_rating_display') else dict(DisciplineReport.RATING_CHOICES).get(report.rating, report.rating),
                     report.points,
                     report.reported_by.username,
                     report.comments[:100] + '...' if len(report.comments) > 100 else report.comments,
@@ -1982,7 +1982,7 @@ def export_student_reports(request, student_id):
             writer.writerow([
                 report.reported_at.strftime('%Y-%m-%d %H:%M'),
                 report.category_name,
-                report.get_rating_display(),
+                report.get_rating_display() if hasattr(report, 'get_rating_display') else dict(DisciplineReport.RATING_CHOICES).get(report.rating, report.rating),
                 report.points,
                 report.reported_by.username,
                 report.comments,
@@ -2111,7 +2111,7 @@ def ai_chat_student_context(request):
             data['recent_reports'].append({
                 'date': report.reported_at.strftime('%Y-%m-%d %H:%M'),
                 'category': report.category.name,
-                'rating': report.get_rating_display(),
+                'rating': report.get_rating_display() if hasattr(report, 'get_rating_display') else dict(DisciplineReport.RATING_CHOICES).get(report.rating, report.rating),
                 'points': report.points
             })
         
@@ -3139,7 +3139,6 @@ def test_streams(request):
     """Renders test_streams.html with stream and grade data for template debugging."""
     unread_notifications = request.user.notifications.filter(is_read=False)
     context = {
-        'streams': Stream.objects.filter(is_active=True).order_by('name'),
         'streams': Stream.objects.filter(is_active=True).order_by('name'),
         'grades': GradeLevel.objects.filter(is_active=True).order_by('order', 'name'),
         'notification_count': unread_notifications.count(),
