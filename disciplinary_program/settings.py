@@ -57,7 +57,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'core.apps.CoreConfig',
-    'storages',  # For Supabase Storage
+    'storages',  # For Supabase Storage (kept for future use)
 ]
 
 # ============================================
@@ -119,13 +119,27 @@ else:
     }
 
 # ============================================
-# SUPABASE STORAGE FOR ALL FILES
+# STORAGE CONFIGURATION - LOCAL STORAGE
 # ============================================
 
-# Use Supabase Storage for media files
-DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+print("📁 Configuring local storage...")
+
+# ✅ Using local storage for stability
+DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
+
+# Media files configuration
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+os.makedirs(MEDIA_ROOT, exist_ok=True)
+
+print(f"📁 Local media directory: {MEDIA_ROOT}")
+
+# ============================================
+# SUPABASE STORAGE (KEPT FOR FUTURE USE)
+# ============================================
 
 # Supabase S3 Credentials (from environment variables)
+# These are kept for reference when re-enabling Supabase Storage
 AWS_ACCESS_KEY_ID = os.environ.get('SUPABASE_ACCESS_KEY_ID')
 AWS_SECRET_ACCESS_KEY = os.environ.get('SUPABASE_SECRET_ACCESS_KEY')
 AWS_STORAGE_BUCKET_NAME = os.environ.get('SUPABASE_BUCKET', 'media')
@@ -138,14 +152,16 @@ AWS_S3_OBJECT_PARAMETERS = {
 # Public URL for Supabase Storage
 AWS_S3_CUSTOM_DOMAIN = os.environ.get('SUPABASE_PUBLIC_URL')
 
-# Media URL - points to Supabase Storage
-if AWS_S3_ENDPOINT_URL and AWS_STORAGE_BUCKET_NAME:
-    MEDIA_URL = f"{AWS_S3_ENDPOINT_URL}/public/{AWS_STORAGE_BUCKET_NAME}/"
-else:
-    MEDIA_URL = '/media/'
-
-# No local media directory on Vercel (files go to Supabase)
-MEDIA_ROOT = None
+# ⚠️ To re-enable Supabase Storage, uncomment below:
+# STORAGES = {
+#     'default': {
+#         'BACKEND': 'storages.backends.s3boto3.S3Boto3Storage',
+#     },
+#     'staticfiles': {
+#         'BACKEND': 'whitenoise.storage.CompressedManifestStaticFilesStorage',
+#     },
+# }
+# DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 
 # ============================================
 # STATIC FILES (Handled by WhiteNoise)
@@ -227,3 +243,5 @@ SUPABASE_URL = os.environ.get('SUPABASE_URL')
 SUPABASE_PUBLISHABLE_KEY = os.environ.get('SUPABASE_PUBLISHABLE_KEY')
 SUPABASE_SECRET_KEY = os.environ.get('SUPABASE_SECRET_KEY')
 SUPABASE_PASSWORD = os.environ.get('SUPABASE_PASSWORD')
+
+print("✅ Settings loaded successfully!")
