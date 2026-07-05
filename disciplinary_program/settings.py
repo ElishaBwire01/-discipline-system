@@ -6,9 +6,14 @@ import os
 from pathlib import Path
 import dj_database_url
 from django.core.management.utils import get_random_secret_key
-import dotenv
 
-dotenv.load_dotenv()
+# ✅ FIX 1: Only load dotenv locally, not on Vercel
+try:
+    from dotenv import load_dotenv
+    if not os.environ.get("VERCEL"):
+        load_dotenv()
+except ImportError:
+    pass
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -125,12 +130,10 @@ else:
     }
 
 # ============================================
-# FORCE SUPABASE STORAGE - ✅ ADD THIS SECTION
+# ✅ FIX 2 & 4: MODERN STORAGE CONFIGURATION
 # ============================================
 
-print("📦 Configuring Supabase Storage...")
-
-# ✅ Force Django to use Supabase Storage
+# ✅ Single source of truth - STORAGES only (Django 4.2+)
 STORAGES = {
     'default': {
         'BACKEND': 'storages.backends.s3boto3.S3Boto3Storage',
@@ -140,15 +143,18 @@ STORAGES = {
     },
 }
 
-# For compatibility
-DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
-
-# Supabase S3 Credentials
+# ✅ FIX 7: Supabase S3 Credentials
 AWS_ACCESS_KEY_ID = os.environ.get('SUPABASE_ACCESS_KEY_ID')
 AWS_SECRET_ACCESS_KEY = os.environ.get('SUPABASE_SECRET_ACCESS_KEY')
 AWS_STORAGE_BUCKET_NAME = os.environ.get('SUPABASE_BUCKET', 'media')
 AWS_S3_ENDPOINT_URL = os.environ.get('SUPABASE_S3_ENDPOINT')
 AWS_S3_REGION_NAME = os.environ.get('SUPABASE_REGION', 'eu-north-1')
+
+# ✅ FIX 3: Removed DEFAULT_FILE_STORAGE (using STORAGES instead)
+
+# ✅ FIX 8: S3-compatible provider settings
+AWS_S3_SIGNATURE_VERSION = "s3v4"
+AWS_S3_ADDRESSING_STYLE = "path"
 AWS_S3_OBJECT_PARAMETERS = {
     'CacheControl': 'max-age=86400',
 }
@@ -162,21 +168,21 @@ if AWS_S3_ENDPOINT_URL and AWS_STORAGE_BUCKET_NAME:
 else:
     MEDIA_URL = '/media/'
 
-# No local media directory - all files go to Supabase
-MEDIA_ROOT = None
-
-print(f"📁 MEDIA_URL: {MEDIA_URL}")
-print(f"📁 Storage bucket: {AWS_STORAGE_BUCKET_NAME}")
-print(f"📁 S3 Endpoint: {AWS_S3_ENDPOINT_URL}")
+# ✅ FIX 5: Keep MEDIA_ROOT (some packages expect it)
+MEDIA_ROOT = BASE_DIR / 'media'
+# Create directory if it doesn't exist (local development only)
+if not IS_VERCEL:
+    os.makedirs(MEDIA_ROOT, exist_ok=True)
 
 # ============================================
 # STATIC FILES (Handled by WhiteNoise)
 # ============================================
 
 STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATICFILES_DIRS = [BASE_DIR / 'static']
+
+# ✅ FIX 4: Removed STATICFILES_STORAGE (using STORAGES instead)
 
 # ============================================
 # SESSION & CACHE (Use Database)
@@ -232,5 +238,3 @@ SUPABASE_URL = os.environ.get('SUPABASE_URL')
 SUPABASE_PUBLISHABLE_KEY = os.environ.get('SUPABASE_PUBLISHABLE_KEY')
 SUPABASE_SECRET_KEY = os.environ.get('SUPABASE_SECRET_KEY')
 SUPABASE_PASSWORD = os.environ.get('SUPABASE_PASSWORD')
-
-print("✅ Settings loaded successfully!")
