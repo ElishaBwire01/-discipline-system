@@ -1,0 +1,259 @@
+﻿/* ============================================
+   MOBILE RESPONSIVE CSS
+   ============================================ */
+
+/* Global Mobile Styles */
+@media (max-width: 768px) {
+    /* Cards */
+    .card-modern {
+        border-radius: 12px;
+        margin-bottom: 12px;
+    }
+    
+    .card-header-modern {
+        padding: 10px 15px;
+        font-size: 0.95rem;
+    }
+    
+    .card-body {
+        padding: 15px !important;
+    }
+    
+    /* Stats Cards */
+    .stat-card {
+        padding: 12px;
+        margin-bottom: 12px;
+    }
+    
+    .stat-value {
+        font-size: 1.5rem;
+    }
+    
+    .stat-icon {
+        width: 45px;
+        height: 45px;
+        font-size: 1.3rem;
+    }
+    
+    /* Tables */
+    .table-modern {
+        font-size: 0.8rem;
+    }
+    
+    .table-modern thead th {
+        padding: 8px 6px;
+        font-size: 0.75rem;
+    }
+    
+    .table-modern tbody td {
+        padding: 8px 6px;
+    }
+    
+    /* Buttons */
+    .btn-modern {
+        padding: 0.35rem 0.8rem;
+        font-size: 0.85rem;
+        width: 100%;
+        margin-bottom: 5px;
+    }
+    
+    /* Forms */
+    .input-group-modern input {
+        padding: 0.7rem 1rem 0.7rem 2.5rem;
+        font-size: 0.9rem;
+    }
+    
+    /* Navbar */
+    .navbar-modern {
+        padding: 0.5rem 0;
+    }
+    
+    .navbar-brand {
+        font-size: 1.1rem;
+    }
+    
+    /* Notification Dropdown */
+    .notification-dropdown {
+        min-width: 280px;
+        right: -80px;
+    }
+    
+    /* Profile Picture */
+    .profile-pic-container img,
+    .profile-pic-placeholder {
+        width: 100px;
+        height: 100px;
+    }
+    
+    /* Modals */
+    .modal-dialog {
+        margin: 10px;
+    }
+    
+    .modal-body {
+        padding: 15px;
+    }
+    
+    /* Login/Register Cards */
+    .login-card,
+    .register-card,
+    .reset-card,
+    .choose-card {
+        padding: 20px;
+        margin: 10px;
+    }
+    
+    /* Grid */
+    .row {
+        margin-left: -8px;
+        margin-right: -8px;
+    }
+    
+    .col-md-3, .col-md-4, .col-md-6, .col-md-8 {
+        padding-left: 8px;
+        padding-right: 8px;
+    }
+    
+    /* Search Box */
+    .search-box input {
+        padding: 0.7rem 2.5rem 0.7rem 1rem;
+        font-size: 0.9rem;
+    }
+    
+    /* Rating Buttons */
+    .btn-group .btn {
+        font-size: 0.7rem;
+        padding: 0.3rem 0.5rem;
+    }
+    
+    /* Alerts */
+    .alert-modern {
+        padding: 10px 15px;
+        font-size: 0.9rem;
+    }
+    
+    /* Student Profile */
+    .student-profile-header {
+        text-align: center;
+    }
+    
+    .student-profile-header img {
+        margin: 0 auto;
+        display: block;
+    }
+}
+
+/* Extra Small Devices (Phones) */
+@media (max-width: 480px) {
+    .stat-value {
+        font-size: 1.2rem;
+    }
+    
+    .table-modern {
+        font-size: 0.7rem;
+    }
+    
+    .table-modern thead th,
+    .table-modern tbody td {
+        padding: 5px 4px;
+    }
+    
+    .btn-modern {
+        font-size: 0.75rem;
+        padding: 0.25rem 0.6rem;
+    }
+    
+    .modal-body {
+        padding: 10px;
+    }
+    
+    .login-card {
+        padding: 15px;
+    }
+    
+    .login-title {
+        font-size: 1.3rem;
+    }
+    
+    .profile-pic-container img,
+    .profile-pic-placeholder {
+        width: 80px;
+        height: 80px;
+    }
+}
+
+/* Touch Friendly */
+.btn, .nav-link, .stat-card, .notification-item {
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* Profile Picture in Navbar */
+.navbar-profile-pic {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-right: 5px;
+}
+
+@media (max-width: 768px) {
+    .navbar-profile-pic {
+        width: 25px;
+        height: 25px;
+    }
+}
+
+/* Profile Picture in Tables */
+.table-profile-pic {
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-right: 5px;
+}
+
+@media (max-width: 768px) {
+    .table-profile-pic {
+        width: 20px;
+        height: 20px;
+    }
+}
+
+/* Student Profile Picture */
+.student-profile-pic {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #667eea;
+}
+
+@media (max-width: 768px) {
+    .student-profile-pic {
+        width: 100px;
+        height: 100px;
+    }
+}
+
+/* Placeholder for no image */
+.profile-placeholder {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 3rem;
+    margin: 0 auto;
+}
+
+@media (max-width: 768px) {
+    .profile-placeholder {
+        width: 100px;
+        height: 100px;
+        font-size: 2.5rem;
+    }
+}
