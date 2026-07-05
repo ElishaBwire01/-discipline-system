@@ -1,9 +1,10 @@
-"""
-Django settings for disciplinary_program project.
-"""
+# ============================================
+# SUPABASE - ALL DATA STORAGE
+# ============================================
 
 import os
 from pathlib import Path
+import dj_database_url
 from django.core.management.utils import get_random_secret_key
 import dotenv
 
@@ -11,8 +12,117 @@ dotenv.load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', get_random_secret_key())
-DEBUG = True
+# ============================================
+# SUPABASE POSTGRESQL DATABASE
+# ============================================
+
+DATABASE_URL = os.environ.get('DATABASE_URL')
+if DATABASE_URL:
+    DATABASES = {
+        'default': dj_database_url.config(
+            default=DATABASE_URL,
+            conn_max_age=600,
+            ssl_require=True
+        )
+    }
+else:
+    # Local development fallback
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
+
+# ============================================
+# SUPABASE STORAGE FOR ALL FILES
+# ============================================
+
+# Always use Supabase Storage for ALL files
+# No local file storage at all
+INSTALLED_APPS = [
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+    'core.apps.CoreConfig',
+    'storages',  # For Supabase Storage
+]
+
+# ============================================
+# SUPABASE STORAGE CONFIGURATION
+# ============================================
+
+# Use Supabase Storage for media files
+DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+
+# Supabase S3 Credentials (from environment variables)
+AWS_ACCESS_KEY_ID = os.environ.get('SUPABASE_ACCESS_KEY_ID')
+AWS_SECRET_ACCESS_KEY = os.environ.get('SUPABASE_SECRET_ACCESS_KEY')
+AWS_STORAGE_BUCKET_NAME = os.environ.get('SUPABASE_BUCKET', 'media')
+AWS_S3_ENDPOINT_URL = os.environ.get('SUPABASE_S3_ENDPOINT')
+AWS_S3_REGION_NAME = os.environ.get('SUPABASE_REGION', 'eu-north-1')
+AWS_S3_OBJECT_PARAMETERS = {
+    'CacheControl': 'max-age=86400',
+}
+
+# Public URL for Supabase Storage
+AWS_S3_CUSTOM_DOMAIN = os.environ.get('SUPABASE_PUBLIC_URL')
+
+# Media URL - points to Supabase Storage
+if AWS_S3_ENDPOINT_URL and AWS_STORAGE_BUCKET_NAME:
+    MEDIA_URL = f"{AWS_S3_ENDPOINT_URL}/public/{AWS_STORAGE_BUCKET_NAME}/"
+else:
+    MEDIA_URL = '/media/'
+
+# No local media directory on Vercel (files go to Supabase)
+MEDIA_ROOT = None
+
+# ============================================
+# STATIC FILES (Handled by WhiteNoise)
+# ============================================
+
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+# ============================================
+# MIDDLEWARE (Ensure WhiteNoise is included)
+# ============================================
+
+MIDDLEWARE = [
+    'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # For static files on Vercel
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.common.CommonMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+]
+
+# ============================================
+# VERCEL DETECTION
+# ============================================
+
+IS_VERCEL = os.environ.get('VERCEL', '0') == '1'
+IS_PRODUCTION = os.environ.get('DJANGO_ENV') == 'production'
+
+# Security settings for production
+if IS_VERCEL or IS_PRODUCTION:
+    SECURE_SSL_REDIRECT = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_BROWSER_XSS_FILTER = True
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+
+# ============================================
+# ALLOWED HOSTS
+# ============================================
+
 ALLOWED_HOSTS = [
     '.vercel.app',
     '.trycloudflare.com',
@@ -28,70 +138,28 @@ CSRF_TRUSTED_ORIGINS = [
     'http://localhost:8000',
 ]
 
-INSTALLED_APPS = [
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
-    'core.apps.CoreConfig',
-]
+# ============================================
+# SESSION & CACHE (Use Database)
+# ============================================
 
-MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
-]
+# Sessions stored in Supabase PostgreSQL
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 
-ROOT_URLCONF = 'disciplinary_program.urls'
-
-TEMPLATES = [
-    {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates'],
-        'APP_DIRS': True,
+# Cache using database
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
+        'LOCATION': 'django_cache_table',
+        'TIMEOUT': 300,
         'OPTIONS': {
-            'context_processors': [
-                'django.template.context_processors.debug',
-                'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
-                'core.context_processors.user_management_context',
-            ],
-        },
-    },
-]
-
-WSGI_APPLICATION = 'disciplinary_program.wsgi.application'
-
-# ============================================
-# DATABASE CONFIGURATION
-# ============================================
-import dj_database_url
-
-# Use PostgreSQL on Vercel, SQLite locally
-if os.environ.get('VERCEL'):
-    DATABASES = {
-        'default': dj_database_url.config(
-            default=os.environ.get('DATABASE_URL'),
-            conn_max_age=600,
-            ssl_require=False
-        )
-    }
-else:
-    # Local development - use SQLite
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
+            'MAX_ENTRIES': 1000
         }
     }
+}
+
+# ============================================
+# AUTHENTICATION
+# ============================================
 
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
@@ -105,87 +173,24 @@ USE_I18N = True
 USE_TZ = True
 
 # ============================================
-# STATIC & MEDIA FILES
+# LOGIN URLs
 # ============================================
-STATIC_URL = '/static/'
-STATIC_ROOT = BASE_DIR / 'staticfiles'
-STATICFILES_DIRS = [BASE_DIR / 'static']
 
-# ? MEDIA FILES CONFIGURATION - CRITICAL FOR PROFILE PICTURES
-MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
-
-# ============================================
-# LOGIN URLS
-# ============================================
 LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = '/dashboard/'
 LOGOUT_REDIRECT_URL = '/login/'
 
+# ============================================
+# DEFAULT AUTO FIELD
+# ============================================
+
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # ============================================
-# SUPABASE CONFIGURATION
+# SUPABASE CONFIGURATION (Additional)
 # ============================================
+
 SUPABASE_URL = os.environ.get('SUPABASE_URL')
 SUPABASE_PUBLISHABLE_KEY = os.environ.get('SUPABASE_PUBLISHABLE_KEY')
 SUPABASE_SECRET_KEY = os.environ.get('SUPABASE_SECRET_KEY')
-
-# ============================================
-# DATABASE CONFIGURATION - Supabase PostgreSQL
-# ============================================
-
-# Supabase PostgreSQL Configuration
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'postgres',
-        'USER': 'postgres',
-        'PASSWORD': os.environ.get('SUPABASE_PASSWORD', ''),
-        'HOST': 'murnebrvgejmxdxzxtfe.supabase.co',
-        'PORT': '5432',
-        'OPTIONS': {
-            'sslmode': 'require',
-        },
-    }
-}
-
-# Use DATABASE_URL if provided
-DATABASE_URL = os.environ.get('DATABASE_URL')
-if DATABASE_URL:
-    DATABASES['default'] = dj_database_url.config(
-        default=DATABASE_URL,
-        conn_max_age=600,
-        ssl_require=True
-    )
-# ============================================
-# SUPABASE CONFIGURATION
-# ============================================
-SUPABASE_URL = os.environ.get('SUPABASE_URL', 'https://murnebrvgejmxdxzxtfe.supabase.co')
-SUPABASE_PUBLISHABLE_KEY = os.environ.get('SUPABASE_PUBLISHABLE_KEY')
-SUPABASE_SECRET_KEY = os.environ.get('SUPABASE_SECRET_KEY')
-# ============================================
-# VERCEL & SUPABASE CONFIGURATION
-# ============================================
-
-# Detect Vercel environment
-IS_VERCEL = os.environ.get('VERCEL', '0') == '1'
-
-# Media files configuration
-if IS_VERCEL:
-    # Vercel has read-only filesystem - use temp directory
-    MEDIA_URL = '/media/'
-    MEDIA_ROOT = '/tmp/media'
-    os.makedirs(MEDIA_ROOT, exist_ok=True)
-    print(f"?? Vercel Media directory: {MEDIA_ROOT}")
-else:
-    # Local development
-    MEDIA_URL = '/media/'
-    MEDIA_ROOT = BASE_DIR / 'media'
-
-# Ensure WhiteNoise is in middleware
-if 'whitenoise.middleware.WhiteNoiseMiddleware' not in MIDDLEWARE:
-    MIDDLEWARE.insert(1, 'whitenoise.middleware.WhiteNoiseMiddleware')
-
-# Static files storage
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+SUPABASE_PASSWORD = os.environ.get('SUPABASE_PASSWORD')
