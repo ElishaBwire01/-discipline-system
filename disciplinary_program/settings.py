@@ -13,6 +13,90 @@ dotenv.load_dotenv()
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # ============================================
+# DJANGO CORE SETTINGS
+# ============================================
+
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', get_random_secret_key())
+DEBUG = os.environ.get('DEBUG', 'False') == 'True'
+
+# ============================================
+# URL & WSGI CONFIGURATION
+# ============================================
+
+ROOT_URLCONF = 'disciplinary_program.urls'
+WSGI_APPLICATION = 'disciplinary_program.wsgi.application'
+
+# ============================================
+# ALLOWED HOSTS
+# ============================================
+
+ALLOWED_HOSTS = [
+    '.vercel.app',
+    '.trycloudflare.com',
+    'localhost',
+    '127.0.0.1',
+    'murnebrvgejmxdxzxtfe.supabase.co',
+]
+
+CSRF_TRUSTED_ORIGINS = [
+    'https://*.vercel.app',
+    'https://*.trycloudflare.com',
+    'https://*.supabase.co',
+    'http://localhost:8000',
+]
+
+# ============================================
+# INSTALLED APPS
+# ============================================
+
+INSTALLED_APPS = [
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+    'core.apps.CoreConfig',
+    'storages',  # For Supabase Storage
+]
+
+# ============================================
+# MIDDLEWARE
+# ============================================
+
+MIDDLEWARE = [
+    'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # For static files on Vercel
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.common.CommonMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+]
+
+# ============================================
+# TEMPLATES
+# ============================================
+
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [BASE_DIR / 'templates'],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                'django.template.context_processors.debug',
+                'django.template.context_processors.request',
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
+                'core.context_processors.user_management_context',
+            ],
+        },
+    },
+]
+
+# ============================================
 # SUPABASE POSTGRESQL DATABASE
 # ============================================
 
@@ -36,23 +120,6 @@ else:
 
 # ============================================
 # SUPABASE STORAGE FOR ALL FILES
-# ============================================
-
-# Always use Supabase Storage for ALL files
-# No local file storage at all
-INSTALLED_APPS = [
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
-    'core.apps.CoreConfig',
-    'storages',  # For Supabase Storage
-]
-
-# ============================================
-# SUPABASE STORAGE CONFIGURATION
 # ============================================
 
 # Use Supabase Storage for media files
@@ -90,21 +157,6 @@ STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # ============================================
-# MIDDLEWARE (Ensure WhiteNoise is included)
-# ============================================
-
-MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',  # For static files on Vercel
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
-]
-
-# ============================================
 # VERCEL DETECTION
 # ============================================
 
@@ -118,25 +170,6 @@ if IS_VERCEL or IS_PRODUCTION:
     CSRF_COOKIE_SECURE = True
     SECURE_BROWSER_XSS_FILTER = True
     SECURE_CONTENT_TYPE_NOSNIFF = True
-
-# ============================================
-# ALLOWED HOSTS
-# ============================================
-
-ALLOWED_HOSTS = [
-    '.vercel.app',
-    '.trycloudflare.com',
-    'localhost',
-    '127.0.0.1',
-    'murnebrvgejmxdxzxtfe.supabase.co',
-]
-
-CSRF_TRUSTED_ORIGINS = [
-    'https://*.vercel.app',
-    'https://*.trycloudflare.com',
-    'https://*.supabase.co',
-    'http://localhost:8000',
-]
 
 # ============================================
 # SESSION & CACHE (Use Database)
