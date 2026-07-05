@@ -125,12 +125,22 @@ else:
     }
 
 # ============================================
-# SUPABASE STORAGE - ALL FILES GO HERE
+# FORCE SUPABASE STORAGE - ✅ ADD THIS SECTION
 # ============================================
 
 print("📦 Configuring Supabase Storage...")
 
-# Force Django to use Supabase Storage
+# ✅ Force Django to use Supabase Storage
+STORAGES = {
+    'default': {
+        'BACKEND': 'storages.backends.s3boto3.S3Boto3Storage',
+    },
+    'staticfiles': {
+        'BACKEND': 'whitenoise.storage.CompressedManifestStaticFilesStorage',
+    },
+}
+
+# For compatibility
 DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 
 # Supabase S3 Credentials
