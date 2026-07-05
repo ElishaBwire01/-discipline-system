@@ -13,6 +13,13 @@ dotenv.load_dotenv()
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # ============================================
+# VERCEL DETECTION
+# ============================================
+
+IS_VERCEL = os.environ.get('VERCEL', '0') == '1'
+IS_PRODUCTION = os.environ.get('DJANGO_ENV') == 'production'
+
+# ============================================
 # DJANGO CORE SETTINGS
 # ============================================
 
@@ -57,7 +64,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'core.apps.CoreConfig',
-    'storages',  # For Supabase Storage (kept for future use)
+    'storages',  # For Supabase Storage
 ]
 
 # ============================================
@@ -66,7 +73,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',  # For static files on Vercel
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -110,7 +117,6 @@ if DATABASE_URL:
         )
     }
 else:
-    # Local development fallback
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
@@ -119,27 +125,15 @@ else:
     }
 
 # ============================================
-# STORAGE CONFIGURATION - LOCAL STORAGE
+# SUPABASE STORAGE - ALL FILES GO HERE
 # ============================================
 
-print("📁 Configuring local storage...")
+print("📦 Configuring Supabase Storage...")
 
-# ✅ Using local storage for stability
-DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
+# Force Django to use Supabase Storage
+DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 
-# Media files configuration
-MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-os.makedirs(MEDIA_ROOT, exist_ok=True)
-
-print(f"📁 Local media directory: {MEDIA_ROOT}")
-
-# ============================================
-# SUPABASE STORAGE (KEPT FOR FUTURE USE)
-# ============================================
-
-# Supabase S3 Credentials (from environment variables)
-# These are kept for reference when re-enabling Supabase Storage
+# Supabase S3 Credentials
 AWS_ACCESS_KEY_ID = os.environ.get('SUPABASE_ACCESS_KEY_ID')
 AWS_SECRET_ACCESS_KEY = os.environ.get('SUPABASE_SECRET_ACCESS_KEY')
 AWS_STORAGE_BUCKET_NAME = os.environ.get('SUPABASE_BUCKET', 'media')
@@ -149,19 +143,21 @@ AWS_S3_OBJECT_PARAMETERS = {
     'CacheControl': 'max-age=86400',
 }
 
-# Public URL for Supabase Storage
+# Public URL for images
 AWS_S3_CUSTOM_DOMAIN = os.environ.get('SUPABASE_PUBLIC_URL')
 
-# ⚠️ To re-enable Supabase Storage, uncomment below:
-# STORAGES = {
-#     'default': {
-#         'BACKEND': 'storages.backends.s3boto3.S3Boto3Storage',
-#     },
-#     'staticfiles': {
-#         'BACKEND': 'whitenoise.storage.CompressedManifestStaticFilesStorage',
-#     },
-# }
-# DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+# Media URL - points to Supabase Storage
+if AWS_S3_ENDPOINT_URL and AWS_STORAGE_BUCKET_NAME:
+    MEDIA_URL = f"{AWS_S3_ENDPOINT_URL}/public/{AWS_STORAGE_BUCKET_NAME}/"
+else:
+    MEDIA_URL = '/media/'
+
+# No local media directory - all files go to Supabase
+MEDIA_ROOT = None
+
+print(f"📁 MEDIA_URL: {MEDIA_URL}")
+print(f"📁 Storage bucket: {AWS_STORAGE_BUCKET_NAME}")
+print(f"📁 S3 Endpoint: {AWS_S3_ENDPOINT_URL}")
 
 # ============================================
 # STATIC FILES (Handled by WhiteNoise)
@@ -173,28 +169,11 @@ STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # ============================================
-# VERCEL DETECTION
-# ============================================
-
-IS_VERCEL = os.environ.get('VERCEL', '0') == '1'
-IS_PRODUCTION = os.environ.get('DJANGO_ENV') == 'production'
-
-# Security settings for production
-if IS_VERCEL or IS_PRODUCTION:
-    SECURE_SSL_REDIRECT = True
-    SESSION_COOKIE_SECURE = True
-    CSRF_COOKIE_SECURE = True
-    SECURE_BROWSER_XSS_FILTER = True
-    SECURE_CONTENT_TYPE_NOSNIFF = True
-
-# ============================================
 # SESSION & CACHE (Use Database)
 # ============================================
 
-# Sessions stored in Supabase PostgreSQL
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 
-# Cache using database
 CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
