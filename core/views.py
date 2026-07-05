@@ -2117,7 +2117,9 @@ def ai_chat_student_context(request):
         
         return JsonResponse(data)
     except Student.DoesNotExist:
-        return JsonResponse({'error': 'Student not found'}, status=404)# ============================================
+        return JsonResponse({'error': 'Student not found'}, status=404)
+    
+# ============================================
 # ADDITIONAL AI VIEWS - Add to core/views.py
 # ============================================
 
