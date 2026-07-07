@@ -47,7 +47,7 @@
             <span class="ms-2 badge bg-light text-dark">Active</span>
             <p class="mb-0 mt-1 small opacity-75">Get real-time AI recommendations based on Kenyan Education Act 2013</p>
         </div>
-        <a href="{% url 'ai_dashboard' %}" class="btn btn-light btn-sm mt-2 mt-md-0">
+        <a href="/ai/dashboard/" class="btn btn-light btn-sm mt-2 mt-md-0">
             <i class="fas fa-robot"></i> Open AI Dashboard
         </a>
     </div>
@@ -59,7 +59,7 @@
     <span class="alert-icon"><i class="fas fa-user-clock text-warning"></i></span>
     <div>
         <strong>{{ pending_approvals }}</strong> teacher(s) waiting for approval.
-        <a href="{% url 'manage_users' %}?status=pending" class="btn btn-sm btn-warning ms-2">Review Now</a>
+        <a href="/manage-users/?status=pending" class="btn btn-sm btn-warning ms-2">Review Now</a>
     </div>
 </div>
 {% endif %}
@@ -104,21 +104,21 @@
     </div>
     <div class="card-body p-3">
         <div class="d-flex flex-wrap gap-2">
-            <a href="{% url 'manage_users' %}" class="btn-modern btn-modern-primary">
+            <a href="/manage-users/" class="btn-modern btn-modern-primary">
                 <i class="fas fa-users"></i> Manage Users
                 {% if pending_approvals > 0 %}<span class="badge bg-light text-dark ms-1">{{ pending_approvals }}</span>{% endif %}
             </a>
-            <a href="{% url 'admin_reset_requests' %}" class="btn-modern btn-modern-warning">
+            <a href="/admin-reset-requests/" class="btn-modern btn-modern-warning">
                 <i class="fas fa-key"></i> Password Resets
                 <span class="badge bg-light text-dark ms-1" id="resetCount">{{ pending_resets|default:0 }}</span>
             </a>
-            <a href="{% url 'school_setup' %}" class="btn-modern" style="background: linear-gradient(135deg, #059669, #10b981); color: white;">
+            <a href="/school-setup/" class="btn-modern" style="background: linear-gradient(135deg, #059669, #10b981); color: white;">
                 <i class="fas fa-school"></i> School Setup
             </a>
-            <a href="{% url 'ai_dashboard' %}" class="btn-modern" style="background: linear-gradient(135deg, #7c3aed, #2563eb); color: white;">
+            <a href="/ai/dashboard/" class="btn-modern" style="background: linear-gradient(135deg, #7c3aed, #2563eb); color: white;">
                 <i class="fas fa-robot"></i> AI Analysis
             </a>
-            <a href="{% url 'user_profile_settings' %}" class="btn-modern btn-modern-secondary">
+            <a href="/profile/" class="btn-modern btn-modern-secondary">
                 <i class="fas fa-user-cog"></i> My Profile
             </a>
         </div>
@@ -252,10 +252,10 @@
                         </td>
                         <td>
                             <div class="d-flex gap-1">
-                                <a href="{% url 'student_profile' student.id %}" class="btn-modern btn-modern-primary btn-modern-sm" title="View Profile">
+                                <a href="/student/{{ student.id }}/" class="btn-modern btn-modern-primary btn-modern-sm" title="View Profile">
                                     <i class="fas fa-eye"></i>
                                 </a>
-                                <a href="{% url 'student_profile' student.id %}?ai=true" class="btn-modern btn-modern-sm" style="background: linear-gradient(135deg, #7c3aed, #2563eb); color: white;" title="AI Analysis">
+                                <a href="/student/{{ student.id }}/?ai=true" class="btn-modern btn-modern-sm" style="background: linear-gradient(135deg, #7c3aed, #2563eb); color: white;" title="AI Analysis">
                                     <i class="fas fa-robot"></i>
                                 </a>
                                 <button class="btn-modern btn-modern-danger btn-modern-sm" onclick="openReportModal({{ student.id }}, '{{ student.name }}')" title="Report">
@@ -289,7 +289,7 @@
                 <h5 class="modal-title fw-bold"><i class="fas fa-flag me-2"></i>Report Student</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
-            <form method="post" action="{% url 'admin_dashboard' %}" id="reportForm">
+            <form method="post" action="/admin-dashboard/" id="reportForm">
                 {% csrf_token %}
                 <input type="hidden" name="action" value="report_student">
                 <input type="hidden" name="student_id" id="reportStudentId" value="0">
