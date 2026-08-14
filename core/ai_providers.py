@@ -33,7 +33,6 @@ def load_provider_keys() -> Dict[str, str]:
         "openrouter": os.environ.get("OPENROUTER_API_KEY", os.environ.get("API_KEY", "")),
         "groq": os.environ.get("GROQ_API_KEY", ""),
         "gemini": os.environ.get("GEMINI_API_KEY", ""),
-        "pollinations": os.environ.get("POLLINATION_API_KEY", ""),
     }
 
 def load_models() -> Dict[str, str]:
