@@ -428,7 +428,6 @@
     <div class="chat-header">
         <div class="header-left">
             <div class="ai-icon">
-                <i class="fas fa-robot"></i>
             </div>
             <div>
                 <h5>AI Education Assistant</h5>
@@ -439,18 +438,17 @@
             <!-- Mode Toggle -->
             <div class="mode-toggle">
                 <span class="mode-label">
-                    <span id="modeBadge" class="mode-badge ai">🤖 AI</span>
+                    <span id="modeBadge" class="mode-badge ai">Ã°ÂÂ¤Â AI</span>
                 </span>
                 <div class="form-check form-switch m-0">
                     <input class="form-check-input" type="checkbox" id="aiModeToggle" checked>
                 </div>
                 <span class="mode-label">
-                    <span id="modeLabel" class="mode-badge fallback" style="opacity:0.5;">📋 Fallback</span>
+                    <span id="modeLabel" class="mode-badge fallback" style="opacity:0.5;">Ã°ÂÂÂ Fallback</span>
                 </span>
             </div>
             
             <div class="student-selector">
-                <i class="fas fa-user-graduate"></i>
                 <select id="studentSelector">
                     <option value="">General Chat (All Students)</option>
                     {% for student in students %}
@@ -464,16 +462,15 @@
     <!-- Chat Messages -->
     <div class="chat-messages" id="chatMessages">
         <div class="empty-state" id="emptyState">
-            <i class="fas fa-comment-dots"></i>
             <h5>Welcome to AI Education Assistant</h5>
             <p>Ask me anything about Kenyan education law, student discipline, or school management.</p>
             <div class="mt-3">
                 <small class="text-muted">Try asking:</small>
                 <div class="d-flex gap-2 flex-wrap mt-2 justify-content-center">
-                    <button class="suggestion-btn" onclick="sendSuggestion('What are the key principles of the Kenyan Education Act 2013?')">📚 Education Act</button>
-                    <button class="suggestion-btn" onclick="sendSuggestion('How should I handle a student with critical risk?')">⚠️ Critical Risk</button>
-                    <button class="suggestion-btn" onclick="sendSuggestion('What is the escalation protocol for serious offenses?')">📋 Protocol</button>
-                    <button class="suggestion-btn" onclick="sendSuggestion('Explain positive discipline approaches')">🤝 Positive Discipline</button>
+                    <button class="suggestion-btn" onclick="sendSuggestion('What are the key principles of the Kenyan Education Act 2013?')">Ã°ÂÂÂ Education Act</button>
+                    <button class="suggestion-btn" onclick="sendSuggestion('How should I handle a student with critical risk?')">Ã¢ÂÂ Ã¯Â¸Â Critical Risk</button>
+                    <button class="suggestion-btn" onclick="sendSuggestion('What is the escalation protocol for serious offenses?')">Ã°ÂÂÂ Protocol</button>
+                    <button class="suggestion-btn" onclick="sendSuggestion('Explain positive discipline approaches')">Ã°ÂÂ¤Â Positive Discipline</button>
                 </div>
             </div>
         </div>
@@ -493,7 +490,6 @@
     <div class="chat-input">
         <textarea id="chatInput" rows="1" placeholder="Type your question here..." onkeydown="handleKeyDown(event)"></textarea>
         <button class="btn-send" id="sendBtn" onclick="sendMessage()">
-            <i class="fas fa-paper-plane"></i> Send
         </button>
     </div>
 </div>
@@ -535,12 +531,12 @@ document.addEventListener('DOMContentLoaded', function() {
         useRealAI = this.checked;
         if (useRealAI) {
             modeBadge.className = 'mode-badge ai';
-            modeBadge.textContent = '🤖 AI';
+            modeBadge.textContent = 'Ã°ÂÂ¤Â AI';
             modeLabel.style.opacity = '0.5';
             statusText.textContent = 'Powered by Pollination AI';
         } else {
             modeBadge.className = 'mode-badge fallback';
-            modeBadge.textContent = '📋 Fallback';
+            modeBadge.textContent = 'Ã°ÂÂÂ Fallback';
             modeLabel.style.opacity = '1';
             statusText.textContent = 'Using saved responses (Fallback Mode)';
         }
@@ -602,7 +598,7 @@ function sendMessage() {
         
         if (data.success) {
             // Add mode indicator to AI response
-            const modeText = data.mode === 'ai' ? '🤖 AI Response' : '📋 Fallback Response';
+            const modeText = data.mode === 'ai' ? 'Ã°ÂÂ¤Â AI Response' : 'Ã°ÂÂÂ Fallback Response';
             const modeClass = data.mode === 'ai' ? 'ai-mode' : 'fallback-mode';
             const formattedResponse = `<span class="mode-indicator"><span class="${modeClass}">${modeText}</span></span><br>${data.response}`;
             
@@ -620,12 +616,12 @@ function sendMessage() {
         } else {
             // Show error with retry option
             const errorMsg = data.error || 'Unknown error occurred';
-            addMessage('ai', `❌ **Error:** ${errorMsg}\n\n<button class="retry-btn" onclick="sendMessage()">🔄 Try Again</button>`);
+            addMessage('ai', `Ã¢ÂÂ **Error:** ${errorMsg}\n\n<button class="retry-btn" onclick="sendMessage()">Ã°ÂÂÂ Try Again</button>`);
         }
     })
     .catch(error => {
         removeTypingIndicator();
-        addMessage('ai', '❌ **Network Error:** Could not connect to the AI service. Please check your connection and try again.\n\n<button class="retry-btn" onclick="sendMessage()">🔄 Try Again</button>');
+        addMessage('ai', 'Ã¢ÂÂ **Network Error:** Could not connect to the AI service. Please check your connection and try again.\n\n<button class="retry-btn" onclick="sendMessage()">Ã°ÂÂÂ Try Again</button>');
         console.error('Chat error:', error);
     })
     .finally(() => {
@@ -717,7 +713,6 @@ function showContextMessage(message) {
     contextDiv.className = 'text-center my-2';
     contextDiv.innerHTML = `
         <span class="context-badge">
-            <i class="fas fa-info-circle"></i> ${message}
         </span>
     `;
     messagesContainer.appendChild(contextDiv);

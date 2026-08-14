@@ -1,0 +1,4527 @@
+{
+  "timestamp": "2026-07-12T02:01:52.037139",
+  "total_files": 63,
+  "analyzed_files": 63,
+  "total_issues": 1060,
+  "critical_issues": 42,
+  "warnings": 870,
+  "info": 107,
+  "suggestions": 39,
+  "auto_fixes_applied": 79,
+  "manual_fixes_needed": 0,
+  "issues_by_category": {
+    "syntax": 37,
+    "django": 140,
+    "style": 867,
+    "security": 14
+  },
+  "issues_by_severity": {
+    "ERROR": 37,
+    "SUGGESTION": 39,
+    "WARNING": 870,
+    "CRITICAL": 5,
+    "INFO": 107
+  },
+  "issues": [
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\add_columns.py",
+      "line": 1,
+      "severity": "ERROR",
+      "category": "syntax",
+      "message": "Syntax error: invalid non-printable character U+FEFF",
+      "auto_fixable": true,
+      "suggestion": "Fix the syntax error"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\add_custom_category.py",
+      "line": 1,
+      "severity": "ERROR",
+      "category": "syntax",
+      "message": "Syntax error: invalid non-printable character U+FEFF",
+      "auto_fixable": true,
+      "suggestion": "Fix the syntax error"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\add_rating.py",
+      "line": 1,
+      "severity": "ERROR",
+      "category": "syntax",
+      "message": "Syntax error: invalid non-printable character U+FEFF",
+      "auto_fixable": true,
+      "suggestion": "Fix the syntax error"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\add_rating_column.py",
+      "line": 1,
+      "severity": "ERROR",
+      "category": "syntax",
+      "message": "Syntax error: invalid non-printable character U+FEFF",
+      "auto_fixable": true,
+      "suggestion": "Fix the syntax error"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\add_reports.py",
+      "line": 1,
+      "severity": "ERROR",
+      "category": "syntax",
+      "message": "Syntax error: invalid non-printable character U+FEFF",
+      "auto_fixable": true,
+      "suggestion": "Fix the syntax error"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\add_reports.py",
+      "line": 2,
+      "severity": "SUGGESTION",
+      "category": "django",
+      "message": "Consider using settings.AUTH_USER_MODEL for better flexibility",
+      "auto_fixable": false,
+      "suggestion": null
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\add_reports.py",
+      "line": 11,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\add_reports.py",
+      "line": 17,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\add_reports.py",
+      "line": 23,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\add_reports.py",
+      "line": 26,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\add_reports.py",
+      "line": 28,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\add_reports.py",
+      "line": 34,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\add_reports.py",
+      "line": 47,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\add_reports.py",
+      "line": 60,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\add_sample_reports.py",
+      "line": 1,
+      "severity": "ERROR",
+      "category": "syntax",
+      "message": "Syntax error: invalid non-printable character U+FEFF",
+      "auto_fixable": true,
+      "suggestion": "Fix the syntax error"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\add_sample_reports.py",
+      "line": 2,
+      "severity": "SUGGESTION",
+      "category": "django",
+      "message": "Consider using settings.AUTH_USER_MODEL for better flexibility",
+      "auto_fixable": false,
+      "suggestion": null
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\add_sample_reports.py",
+      "line": 27,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\check_fields.py",
+      "line": 1,
+      "severity": "ERROR",
+      "category": "syntax",
+      "message": "Syntax error: invalid non-printable character U+FEFF",
+      "auto_fixable": true,
+      "suggestion": "Fix the syntax error"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\create_admin.py",
+      "line": 1,
+      "severity": "ERROR",
+      "category": "syntax",
+      "message": "Syntax error: invalid non-printable character U+FEFF",
+      "auto_fixable": true,
+      "suggestion": "Fix the syntax error"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\create_admin.py",
+      "line": 7,
+      "severity": "SUGGESTION",
+      "category": "django",
+      "message": "Consider using settings.AUTH_USER_MODEL for better flexibility",
+      "auto_fixable": false,
+      "suggestion": null
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\create_admin.py",
+      "line": 17,
+      "severity": "SUGGESTION",
+      "category": "django",
+      "message": "Consider using .update() for batch operations",
+      "auto_fixable": false,
+      "suggestion": null
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\create_admin.py",
+      "line": 13,
+      "severity": "CRITICAL",
+      "category": "security",
+      "message": "Hardcoded password detected",
+      "auto_fixable": false,
+      "suggestion": "Use environment variables instead"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\create_admin_avatar.py",
+      "line": 3,
+      "severity": "SUGGESTION",
+      "category": "django",
+      "message": "Consider using settings.AUTH_USER_MODEL for better flexibility",
+      "auto_fixable": false,
+      "suggestion": null
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\create_admin_avatar.py",
+      "line": 11,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\create_admin_avatar.py",
+      "line": 16,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\create_admin_avatar.py",
+      "line": 23,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\create_admin_avatar.py",
+      "line": 33,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\create_admin_avatar.py",
+      "line": 37,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\create_sample_reports.py",
+      "line": 1,
+      "severity": "ERROR",
+      "category": "syntax",
+      "message": "Syntax error: invalid non-printable character U+FEFF",
+      "auto_fixable": true,
+      "suggestion": "Fix the syntax error"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\create_sample_reports.py",
+      "line": 7,
+      "severity": "SUGGESTION",
+      "category": "django",
+      "message": "Consider using settings.AUTH_USER_MODEL for better flexibility",
+      "auto_fixable": false,
+      "suggestion": null
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\create_sample_reports.py",
+      "line": 15,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\debug_and_clean_views.py",
+      "line": 36,
+      "severity": "INFO",
+      "category": "django",
+      "message": "Good: Using login_required decorator",
+      "auto_fixable": false,
+      "suggestion": null
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\debug_and_clean_views.py",
+      "line": 38,
+      "severity": "INFO",
+      "category": "django",
+      "message": "Good: Using login_required decorator",
+      "auto_fixable": false,
+      "suggestion": null
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\debug_and_clean_views.py",
+      "line": 39,
+      "severity": "INFO",
+      "category": "django",
+      "message": "Good: Using login_required decorator",
+      "auto_fixable": false,
+      "suggestion": null
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\debug_and_clean_views.py",
+      "line": 41,
+      "severity": "INFO",
+      "category": "django",
+      "message": "Good: Using login_required decorator",
+      "auto_fixable": false,
+      "suggestion": null
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\debug_and_clean_views.py",
+      "line": 42,
+      "severity": "INFO",
+      "category": "django",
+      "message": "Good: Using login_required decorator",
+      "auto_fixable": false,
+      "suggestion": null
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\debug_and_clean_views.py",
+      "line": 52,
+      "severity": "INFO",
+      "category": "django",
+      "message": "Good: Using login_required decorator",
+      "auto_fixable": false,
+      "suggestion": null
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\debug_and_clean_views.py",
+      "line": 52,
+      "severity": "INFO",
+      "category": "django",
+      "message": "Good: Using login_required decorator",
+      "auto_fixable": false,
+      "suggestion": null
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\debug_and_clean_views.py",
+      "line": 54,
+      "severity": "INFO",
+      "category": "django",
+      "message": "Good: Using login_required decorator",
+      "auto_fixable": false,
+      "suggestion": null
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\debug_and_clean_views.py",
+      "line": 212,
+      "severity": "INFO",
+      "category": "django",
+      "message": "Good: Using login_required decorator",
+      "auto_fixable": false,
+      "suggestion": null
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\debug_and_clean_views.py",
+      "line": 214,
+      "severity": "INFO",
+      "category": "django",
+      "message": "Good: Using login_required decorator",
+      "auto_fixable": false,
+      "suggestion": null
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\debug_and_clean_views.py",
+      "line": 216,
+      "severity": "INFO",
+      "category": "django",
+      "message": "Good: Using login_required decorator",
+      "auto_fixable": false,
+      "suggestion": null
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\debug_and_clean_views.py",
+      "line": 217,
+      "severity": "INFO",
+      "category": "django",
+      "message": "Good: Using login_required decorator",
+      "auto_fixable": false,
+      "suggestion": null
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\debug_and_clean_views.py",
+      "line": 221,
+      "severity": "INFO",
+      "category": "django",
+      "message": "Good: Using login_required decorator",
+      "auto_fixable": false,
+      "suggestion": null
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\debug_and_clean_views.py",
+      "line": 222,
+      "severity": "INFO",
+      "category": "django",
+      "message": "Good: Using login_required decorator",
+      "auto_fixable": false,
+      "suggestion": null
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\debug_and_clean_views.py",
+      "line": 224,
+      "severity": "INFO",
+      "category": "django",
+      "message": "Good: Using login_required decorator",
+      "auto_fixable": false,
+      "suggestion": null
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\debug_and_clean_views.py",
+      "line": 217,
+      "severity": "INFO",
+      "category": "django",
+      "message": "Good: Using user_passes_test decorator",
+      "auto_fixable": false,
+      "suggestion": null
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\debug_and_clean_views.py",
+      "line": 97,
+      "severity": "SUGGESTION",
+      "category": "django",
+      "message": "Consider using settings.AUTH_USER_MODEL for better flexibility",
+      "auto_fixable": false,
+      "suggestion": null
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\debug_and_clean_views.py",
+      "line": 14,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\debug_and_clean_views.py",
+      "line": 19,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\debug_and_clean_views.py",
+      "line": 21,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\debug_and_clean_views.py",
+      "line": 25,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\debug_and_clean_views.py",
+      "line": 28,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\debug_and_clean_views.py",
+      "line": 32,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\debug_and_clean_views.py",
+      "line": 37,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\debug_and_clean_views.py",
+      "line": 46,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\debug_and_clean_views.py",
+      "line": 51,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\debug_and_clean_views.py",
+      "line": 57,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\debug_and_clean_views.py",
+      "line": 62,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\debug_and_clean_views.py",
+      "line": 64,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\debug_and_clean_views.py",
+      "line": 66,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\debug_and_clean_views.py",
+      "line": 67,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\debug_and_clean_views.py",
+      "line": 69,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\debug_and_clean_views.py",
+      "line": 73,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\debug_and_clean_views.py",
+      "line": 77,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\debug_and_clean_views.py",
+      "line": 81,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\debug_and_clean_views.py",
+      "line": 88,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\debug_and_clean_views.py",
+      "line": 93,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\debug_and_clean_views.py",
+      "line": 113,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\debug_and_clean_views.py",
+      "line": 118,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\debug_and_clean_views.py",
+      "line": 124,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\debug_and_clean_views.py",
+      "line": 129,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\debug_and_clean_views.py",
+      "line": 133,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\debug_and_clean_views.py",
+      "line": 139,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\debug_and_clean_views.py",
+      "line": 144,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\debug_and_clean_views.py",
+      "line": 148,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\debug_and_clean_views.py",
+      "line": 154,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\debug_and_clean_views.py",
+      "line": 159,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\debug_and_clean_views.py",
+      "line": 163,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\debug_and_clean_views.py",
+      "line": 169,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\debug_and_clean_views.py",
+      "line": 174,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\debug_and_clean_views.py",
+      "line": 181,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\debug_and_clean_views.py",
+      "line": 186,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\debug_and_clean_views.py",
+      "line": 191,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\debug_and_clean_views.py",
+      "line": 200,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\debug_and_clean_views.py",
+      "line": 205,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\debug_and_clean_views.py",
+      "line": 210,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\debug_and_clean_views.py",
+      "line": 215,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\debug_and_clean_views.py",
+      "line": 217,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Line too long (729 > 120 characters)",
+      "auto_fixable": true,
+      "suggestion": "Break the line into multiple lines"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\debug_and_clean_views.py",
+      "line": 218,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\debug_and_clean_views.py",
+      "line": 225,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\debug_and_clean_views.py",
+      "line": 230,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\debug_and_clean_views.py",
+      "line": 242,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\debug_and_clean_views.py",
+      "line": 247,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\debug_and_clean_views.py",
+      "line": 251,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\debug_and_clean_views.py",
+      "line": 257,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\debug_and_clean_views.py",
+      "line": 262,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\debug_and_clean_views.py",
+      "line": 277,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\debug_and_clean_views.py",
+      "line": 282,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\debug_and_clean_views.py",
+      "line": 291,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\debug_and_clean_views.py",
+      "line": 300,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\debug_and_clean_views.py",
+      "line": 306,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\debug_and_clean_views.py",
+      "line": 312,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\debug_and_clean_views.py",
+      "line": 321,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\debug_and_clean_views.py",
+      "line": 324,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\debug_and_clean_views.py",
+      "line": 331,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\debug_and_clean_views.py",
+      "line": 333,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\debug_and_clean_views.py",
+      "line": 340,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\ensure_streams.py",
+      "line": 1,
+      "severity": "ERROR",
+      "category": "syntax",
+      "message": "Syntax error: invalid non-printable character U+FEFF",
+      "auto_fixable": true,
+      "suggestion": "Fix the syntax error"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\ensure_streams.py",
+      "line": 22,
+      "severity": "INFO",
+      "category": "django",
+      "message": "Consider using .objects.all() with pagination for large querysets",
+      "auto_fixable": false,
+      "suggestion": null
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_encoding.py",
+      "line": 22,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Line too long (125 > 120 characters)",
+      "auto_fixable": true,
+      "suggestion": "Break the line into multiple lines"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_encoding.py",
+      "line": 53,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_encoding.py",
+      "line": 55,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 308,
+      "severity": "INFO",
+      "category": "django",
+      "message": "Good: Using login_required decorator",
+      "auto_fixable": false,
+      "suggestion": null
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 309,
+      "severity": "INFO",
+      "category": "django",
+      "message": "Good: Using user_passes_test decorator",
+      "auto_fixable": false,
+      "suggestion": null
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 310,
+      "severity": "SUGGESTION",
+      "category": "django",
+      "message": "Consider using settings.AUTH_USER_MODEL for better flexibility",
+      "auto_fixable": false,
+      "suggestion": null
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 311,
+      "severity": "INFO",
+      "category": "django",
+      "message": "Consider using .objects.all() with pagination for large querysets",
+      "auto_fixable": false,
+      "suggestion": null
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 113,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 139,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 163,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 168,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 171,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 174,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 177,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 180,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 195,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 202,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 204,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 207,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 231,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 244,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 249,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 254,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 259,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 264,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 266,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 271,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 283,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 291,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 299,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 303,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 306,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Line too long (141 > 120 characters)",
+      "auto_fixable": true,
+      "suggestion": "Break the line into multiple lines"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 310,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Line too long (141 > 120 characters)",
+      "auto_fixable": true,
+      "suggestion": "Break the line into multiple lines"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 314,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 327,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 329,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 333,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 346,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 358,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 370,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 372,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 376,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 380,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 394,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 396,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 400,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 408,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 422,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 437,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 439,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 452,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 455,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 466,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 473,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 479,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 487,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 489,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 497,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 503,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 517,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 519,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 526,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 528,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 532,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 540,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 542,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 546,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 553,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 555,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 559,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 571,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 578,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 583,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 592,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 599,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 603,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 608,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 612,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 616,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 619,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 622,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 626,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 628,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 639,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 643,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 647,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 656,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 662,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 666,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 675,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 679,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 690,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 694,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 703,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 707,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 711,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 720,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 731,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 746,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 758,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 767,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 770,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 774,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 844,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Line too long (142 > 120 characters)",
+      "auto_fixable": true,
+      "suggestion": "Break the line into multiple lines"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 852,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 879,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 882,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 889,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 909,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 921,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 924,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 928,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 955,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 958,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 967,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 975,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 982,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 986,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 992,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 997,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 1004,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 1008,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 1011,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 1013,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 1017,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 1022,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 1027,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 1031,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 1034,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 1038,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 1041,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 1045,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 1049,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 1055,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 1063,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 1069,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 1071,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 1077,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 1087,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 1112,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 1118,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 1124,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 1130,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 1136,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 1142,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 1144,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 1152,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 359,
+      "severity": "INFO",
+      "category": "style",
+      "message": "TODO/FIXME comment: # Check for TODO comments",
+      "auto_fixable": false,
+      "suggestion": null
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 361,
+      "severity": "INFO",
+      "category": "style",
+      "message": "TODO/FIXME comment: if 'TODO' in line or 'FIXME' in line:",
+      "auto_fixable": false,
+      "suggestion": null
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 367,
+      "severity": "INFO",
+      "category": "style",
+      "message": "TODO/FIXME comment: message=f\"TODO/FIXME comment: {line.strip()}\",",
+      "auto_fixable": false,
+      "suggestion": null
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 424,
+      "severity": "WARNING",
+      "category": "security",
+      "message": "Potentially dangerous function: eval(",
+      "auto_fixable": false,
+      "suggestion": "Ensure proper input sanitization"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 424,
+      "severity": "WARNING",
+      "category": "security",
+      "message": "Potentially dangerous function: exec(",
+      "auto_fixable": false,
+      "suggestion": "Ensure proper input sanitization"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 424,
+      "severity": "WARNING",
+      "category": "security",
+      "message": "Potentially dangerous function: subprocess.run",
+      "auto_fixable": false,
+      "suggestion": "Ensure proper input sanitization"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_project.py",
+      "line": 424,
+      "severity": "WARNING",
+      "category": "security",
+      "message": "Potentially dangerous function: __import__",
+      "auto_fixable": false,
+      "suggestion": "Ensure proper input sanitization"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\fix_rating_column.py",
+      "line": 1,
+      "severity": "ERROR",
+      "category": "syntax",
+      "message": "Syntax error: invalid non-printable character U+FEFF",
+      "auto_fixable": true,
+      "suggestion": "Fix the syntax error"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\i.py",
+      "line": 69,
+      "severity": "SUGGESTION",
+      "category": "django",
+      "message": "Consider using .update() for batch operations",
+      "auto_fixable": false,
+      "suggestion": null
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\i.py",
+      "line": 14,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\i.py",
+      "line": 19,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\i.py",
+      "line": 23,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\i.py",
+      "line": 27,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\i.py",
+      "line": 29,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Line too long (142 > 120 characters)",
+      "auto_fixable": true,
+      "suggestion": "Break the line into multiple lines"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\i.py",
+      "line": 33,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\i.py",
+      "line": 37,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\i.py",
+      "line": 92,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\i.py",
+      "line": 99,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\i.py",
+      "line": 110,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\i.py",
+      "line": 117,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\i.py",
+      "line": 119,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\i.py",
+      "line": 125,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\i.py",
+      "line": 129,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\i.py",
+      "line": 133,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\i.py",
+      "line": 143,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\i.py",
+      "line": 29,
+      "severity": "WARNING",
+      "category": "security",
+      "message": "Potentially dangerous function: __import__",
+      "auto_fixable": false,
+      "suggestion": "Ensure proper input sanitization"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\init_data.py",
+      "line": 1,
+      "severity": "ERROR",
+      "category": "syntax",
+      "message": "Syntax error: invalid non-printable character U+FEFF",
+      "auto_fixable": true,
+      "suggestion": "Fix the syntax error"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\init_data.py",
+      "line": 9,
+      "severity": "SUGGESTION",
+      "category": "django",
+      "message": "Consider using settings.AUTH_USER_MODEL for better flexibility",
+      "auto_fixable": false,
+      "suggestion": null
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\init_data.py",
+      "line": 48,
+      "severity": "SUGGESTION",
+      "category": "django",
+      "message": "Consider using .update() for batch operations",
+      "auto_fixable": false,
+      "suggestion": null
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\init_data.py",
+      "line": 14,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\init_data.py",
+      "line": 20,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\init_data.py",
+      "line": 32,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\init_data.py",
+      "line": 38,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\init_data.py",
+      "line": 53,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\init_data.py",
+      "line": 44,
+      "severity": "CRITICAL",
+      "category": "security",
+      "message": "Hardcoded password detected",
+      "auto_fixable": false,
+      "suggestion": "Use environment variables instead"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\init_setup.py",
+      "line": 1,
+      "severity": "ERROR",
+      "category": "syntax",
+      "message": "Syntax error: invalid non-printable character U+FEFF",
+      "auto_fixable": true,
+      "suggestion": "Fix the syntax error"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\init_setup.py",
+      "line": 7,
+      "severity": "SUGGESTION",
+      "category": "django",
+      "message": "Consider using settings.AUTH_USER_MODEL for better flexibility",
+      "auto_fixable": false,
+      "suggestion": null
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\init_setup.py",
+      "line": 15,
+      "severity": "SUGGESTION",
+      "category": "django",
+      "message": "Consider using .update() for batch operations",
+      "auto_fixable": false,
+      "suggestion": null
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\manage.py",
+      "line": 1,
+      "severity": "ERROR",
+      "category": "syntax",
+      "message": "Syntax error: invalid non-printable character U+FEFF",
+      "auto_fixable": true,
+      "suggestion": "Fix the syntax error"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\optimize_database.py",
+      "line": 22,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\optimize_database.py",
+      "line": 27,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\optimize_database.py",
+      "line": 30,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\optimize_database.py",
+      "line": 33,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\optimize_database.py",
+      "line": 34,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\optimize_database.py",
+      "line": 35,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\optimize_database.py",
+      "line": 39,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\optimize_database.py",
+      "line": 43,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\optimize_database.py",
+      "line": 49,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\optimize_database.py",
+      "line": 53,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\optimize_database.py",
+      "line": 59,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\optimize_database.py",
+      "line": 61,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\optimize_database.py",
+      "line": 65,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\optimize_database.py",
+      "line": 70,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\optimize_database.py",
+      "line": 72,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\optimize_database.py",
+      "line": 76,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\optimize_database.py",
+      "line": 84,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\optimize_database.py",
+      "line": 86,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\optimize_database.py",
+      "line": 93,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\optimize_database.py",
+      "line": 99,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 277,
+      "severity": "INFO",
+      "category": "django",
+      "message": "Good: Using login_required decorator",
+      "auto_fixable": false,
+      "suggestion": null
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 278,
+      "severity": "INFO",
+      "category": "django",
+      "message": "Good: Using user_passes_test decorator",
+      "auto_fixable": false,
+      "suggestion": null
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 279,
+      "severity": "SUGGESTION",
+      "category": "django",
+      "message": "Consider using settings.AUTH_USER_MODEL for better flexibility",
+      "auto_fixable": false,
+      "suggestion": null
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 280,
+      "severity": "INFO",
+      "category": "django",
+      "message": "Consider using .objects.all() with pagination for large querysets",
+      "auto_fixable": false,
+      "suggestion": null
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 759,
+      "severity": "SUGGESTION",
+      "category": "django",
+      "message": "Consider using .update() for batch operations",
+      "auto_fixable": false,
+      "suggestion": null
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 113,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 137,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 142,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 145,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 148,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 151,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 154,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 169,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 175,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 178,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 202,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 215,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 220,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 225,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 230,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 235,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 237,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 240,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 252,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 260,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 268,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 272,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 275,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Line too long (141 > 120 characters)",
+      "auto_fixable": true,
+      "suggestion": "Break the line into multiple lines"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 279,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Line too long (141 > 120 characters)",
+      "auto_fixable": true,
+      "suggestion": "Break the line into multiple lines"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 283,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 296,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 298,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 302,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 315,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 327,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 339,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 341,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 345,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 349,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 363,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 365,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 369,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 377,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 391,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 406,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 408,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 421,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 424,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 433,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 440,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 443,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 450,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 458,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 464,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 479,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 481,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 488,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 490,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 494,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 501,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 505,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 529,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 531,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 538,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 540,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 544,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 551,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 555,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 562,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 564,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 568,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 575,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 583,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 590,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 593,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 600,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 602,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 606,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 613,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 617,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 622,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 626,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 630,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 633,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 636,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 638,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 642,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 644,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 648,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 655,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 657,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 665,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 672,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 676,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 681,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 697,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 701,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 705,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 714,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 720,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 724,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 732,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 741,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 745,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 756,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 766,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 770,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 779,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 783,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 787,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 796,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 807,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 821,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 834,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 843,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 846,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 850,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 948,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 975,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 978,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 985,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 1005,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 1017,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 1020,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 1024,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 1051,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 1054,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 1063,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 1071,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 1078,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 1082,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 1087,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 1092,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 1099,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 1103,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 1106,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 1108,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 1112,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 1118,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 1124,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 1130,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 1136,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 1141,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 1146,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 1149,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 1153,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 1156,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 1160,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 1164,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 1170,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 1178,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 1184,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 1186,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 1192,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 1202,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 1227,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 1233,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 1239,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 1245,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 1251,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 1257,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 1259,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 1264,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 328,
+      "severity": "INFO",
+      "category": "style",
+      "message": "TODO/FIXME comment: # Check for TODO comments",
+      "auto_fixable": false,
+      "suggestion": null
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 330,
+      "severity": "INFO",
+      "category": "style",
+      "message": "TODO/FIXME comment: if 'TODO' in line or 'FIXME' in line:",
+      "auto_fixable": false,
+      "suggestion": null
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 336,
+      "severity": "INFO",
+      "category": "style",
+      "message": "TODO/FIXME comment: message=f\"TODO/FIXME comment: {line.strip()}\",",
+      "auto_fixable": false,
+      "suggestion": null
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 393,
+      "severity": "WARNING",
+      "category": "security",
+      "message": "Potentially dangerous function: eval(",
+      "auto_fixable": false,
+      "suggestion": "Ensure proper input sanitization"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 393,
+      "severity": "WARNING",
+      "category": "security",
+      "message": "Potentially dangerous function: exec(",
+      "auto_fixable": false,
+      "suggestion": "Ensure proper input sanitization"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 393,
+      "severity": "WARNING",
+      "category": "security",
+      "message": "Potentially dangerous function: subprocess.run",
+      "auto_fixable": false,
+      "suggestion": "Ensure proper input sanitization"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\python fix_project.py",
+      "line": 393,
+      "severity": "WARNING",
+      "category": "security",
+      "message": "Potentially dangerous function: __import__",
+      "auto_fixable": false,
+      "suggestion": "Ensure proper input sanitization"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\setup_admin.py",
+      "line": 1,
+      "severity": "ERROR",
+      "category": "syntax",
+      "message": "Syntax error: invalid non-printable character U+FEFF",
+      "auto_fixable": true,
+      "suggestion": "Fix the syntax error"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\setup_admin.py",
+      "line": 6,
+      "severity": "SUGGESTION",
+      "category": "django",
+      "message": "Consider using settings.AUTH_USER_MODEL for better flexibility",
+      "auto_fixable": false,
+      "suggestion": null
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\setup_admin.py",
+      "line": 14,
+      "severity": "SUGGESTION",
+      "category": "django",
+      "message": "Consider using .update() for batch operations",
+      "auto_fixable": false,
+      "suggestion": null
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\test_connection.py",
+      "line": 19,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\test_connection.py",
+      "line": 30,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\test_connection.py",
+      "line": 10,
+      "severity": "CRITICAL",
+      "category": "security",
+      "message": "Hardcoded password detected",
+      "auto_fixable": false,
+      "suggestion": "Use environment variables instead"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\test_connections.py",
+      "line": 7,
+      "severity": "CRITICAL",
+      "category": "security",
+      "message": "Hardcoded password detected",
+      "auto_fixable": false,
+      "suggestion": "Use environment variables instead"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\test_context.py",
+      "line": 1,
+      "severity": "ERROR",
+      "category": "syntax",
+      "message": "Syntax error: invalid non-printable character U+FEFF",
+      "auto_fixable": true,
+      "suggestion": "Fix the syntax error"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\test_context.py",
+      "line": 2,
+      "severity": "SUGGESTION",
+      "category": "django",
+      "message": "Consider using settings.AUTH_USER_MODEL for better flexibility",
+      "auto_fixable": false,
+      "suggestion": null
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\test_hybrid.py",
+      "line": 16,
+      "severity": "SUGGESTION",
+      "category": "django",
+      "message": "Consider using settings.AUTH_USER_MODEL for better flexibility",
+      "auto_fixable": false,
+      "suggestion": null
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\test_hybrid.py",
+      "line": 21,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\test_hybrid.py",
+      "line": 26,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\test_hybrid.py",
+      "line": 35,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    },
+    {
+      "file": "C:\\Users\\CMC BANGLADESH\\disciplinev12\\test_hybrid.py",
+      "line": 45,
+      "severity": "WARNING",
+      "category": "style",
+      "message": "Trailing whitespace detected",
+      "auto_fixable": true,
+      "suggestion": "Remove trailing whitespace"
+    }
+  ]
+}

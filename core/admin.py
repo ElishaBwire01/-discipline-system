@@ -1,8 +1,14 @@
-﻿from django.contrib import admin
+from django.contrib import admin
 from django.utils.html import format_html
+
 from .models import (
-    Stream, TeacherProfile, UserSession,
-    Student, DisciplineCategory, DisciplineReport, Notification,
+    DisciplineCategory,
+    DisciplineReport,
+    Notification,
+    Stream,
+    Student,
+    TeacherProfile,
+    UserSession,
 )
 
 

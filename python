@@ -1,0 +1,252 @@
+#!/usr/bin/env python
+# ============================================
+# FIX ALL INCORRECT URL REFERENCES
+# Automatically corrects /global/recommendations/ to /global-recommendations/
+# ============================================
+
+import os
+import re
+from pathlib import Path
+
+PROJECT_ROOT = Path(__file__).parent if '__file__' in globals() else Path.cwd()
+
+# Directories to scan
+SCAN_DIRS = [
+    PROJECT_ROOT / 'templates',
+    PROJECT_ROOT / 'core' / 'templatetags',
+    PROJECT_ROOT / 'static',
+    PROJECT_ROOT / 'core',
+]
+
+# File extensions to scan
+FILE_EXTENSIONS = ['.html', '.js', '.py', '.txt', '.css']
+
+# Wrong URL patterns and their corrections
+URL_FIXES = [
+    # AI API URL fixes
+    (r'["\']/ai/api/global/recommendations/["\']', '"/ai/api/global-recommendations/"'),
+    (r'["\']/ai/api/all/students/["\']', '"/ai/api/all-students/"'),
+    (r'["\']/ai/api/risk/stats/["\']', '"/ai/api/risk-stats/"'),
+    (r'["\']/ai/api/trend/analysis/["\']', '"/ai/api/trend-analysis/"'),
+    (r'["\']/ai/api/behavior/patterns/["\']', '"/ai/api/behavior-patterns/"'),
+    (r'["\']/ai/api/intervention/effectiveness/["\']', '"/ai/api/intervention-effectiveness/"'),
+    (r'["\']/ai/api/predictive/analysis/["\']', '"/ai/api/predictive-analysis/"'),
+    (r'["\']/ai/api/student/(\d+)/recommendations/["\']', '"/ai/api/student/\\1/recommendations/"'),  # This one is actually correct
+]
+
+# URL name fixes (for Django template tags)
+URL_NAME_FIXES = [
+    (r"{% url '([^']*)' %}", r"{% url '\1' %}"),  # Keep as is, but we'll add the correct ones
+]
+
+# Pattern to find wrong URL names in template tags
+WRONG_URL_NAMES = {
+    r"{% url 'global_recommendations' %}": "{% url 'core:global_recommendations' %}",
+    r"{% url 'all_students' %}": "{% url 'core:ai_all_students' %}",
+    r"{% url 'risk_stats' %}": "{% url 'core:ai_risk_stats' %}",
+    r"{% url 'trend_analysis' %}": "{% url 'core:ai_trend_analysis' %}",
+    r"{% url 'behavior_patterns' %}": "{% url 'core:ai_behavior_patterns' %}",
+}
+
+# JavaScript fetch/axios URL fixes
+JS_FIXES = [
+    (r"fetch\(['\"]/ai/api/global/recommendations/['\"]", 'fetch("/ai/api/global-recommendations/")'),
+    (r"fetch\(['\"]/ai/api/all/students/['\"]", 'fetch("/ai/api/all-students/")'),
+    (r"fetch\(['\"]/ai/api/risk/stats/['\"]", 'fetch("/ai/api/risk-stats/")'),
+    (r"fetch\(['\"]/ai/api/trend/analysis/['\"]", 'fetch("/ai/api/trend-analysis/")'),
+    (r"fetch\(['\"]/ai/api/behavior/patterns/['\"]", 'fetch("/ai/api/behavior-patterns/")'),
+]
+
+# URL patterns to check in urls.py (make sure they exist)
+REQUIRED_URL_PATTERNS = [
+    "global-recommendations",
+    "all-students",
+    "risk-stats",
+    "trend-analysis",
+    "behavior-patterns",
+    "predictive-analysis",
+    "intervention-effectiveness",
+]
+
+
+def scan_and_fix_file(file_path):
+    """Scan and fix a single file."""
+    try:
+        with open(file_path, 'r', encoding='utf-8') as f:
+            content = f.read()
+    except (UnicodeDecodeError, FileNotFoundError):
+        return False, "Skipped (binary or not found)"
+
+    original_content = content
+    changes_made = []
+
+    # Fix URL patterns
+    for pattern, replacement in URL_FIXES:
+        if re.search(pattern, content):
+            new_content = re.sub(pattern, replacement, content)
+            if new_content != content:
+                changes_made.append(f"URL: {pattern} → {replacement}")
+                content = new_content
+
+    # Fix JS fetch patterns
+    for pattern, replacement in JS_FIXES:
+        if re.search(pattern, content):
+            new_content = re.sub(pattern, replacement, content)
+            if new_content != content:
+                changes_made.append(f"JS: {pattern} → {replacement}")
+                content = new_content
+
+    # Fix Django template URL tags
+    for pattern, replacement in WRONG_URL_NAMES.items():
+        if pattern in content:
+            content = content.replace(pattern, replacement)
+            changes_made.append(f"Template: {pattern} → {replacement}")
+
+    # Fix common wrong URL patterns in strings
+    common_fixes = [
+        ("'/ai/api/global/recommendations/'", '"/ai/api/global-recommendations/"'),
+        ('"/ai/api/global/recommendations/"', '"/ai/api/global-recommendations/"'),
+        ("'/ai/api/all/students/'", '"/ai/api/all-students/"'),
+        ('"/ai/api/all/students/"', '"/ai/api/all-students/"'),
+        ("'/ai/api/risk/stats/'", '"/ai/api/risk-stats/"'),
+        ('"/ai/api/risk/stats/"', '"/ai/api/risk-stats/"'),
+    ]
+    
+    for old, new in common_fixes:
+        if old in content:
+            content = content.replace(old, new)
+            changes_made.append(f"String: {old} → {new}")
+
+    # Write changes if any
+    if content != original_content:
+        with open(file_path, 'w', encoding='utf-8') as f:
+            f.write(content)
+        return True, changes_made
+    
+    return False, []
+
+
+def check_urls_file():
+    """Check if core/urls.py has all required URL patterns."""
+    urls_file = PROJECT_ROOT / 'core' / 'urls.py'
+    if not urls_file.exists():
+        print("❌ core/urls.py not found!")
+        return False
+
+    with open(urls_file, 'r', encoding='utf-8') as f:
+        content = f.read()
+
+    missing = []
+    for pattern in REQUIRED_URL_PATTERNS:
+        if pattern not in content:
+            missing.append(pattern)
+
+    if missing:
+        print(f"⚠️ Missing URL patterns in core/urls.py: {', '.join(missing)}")
+        return False
+    
+    print("✅ All required URL patterns found in core/urls.py")
+    return True
+
+
+def fix_urls_file():
+    """Fix core/urls.py if patterns are missing."""
+    urls_file = PROJECT_ROOT / 'core' / 'urls.py'
+    if not urls_file.exists():
+        print("❌ core/urls.py not found!")
+        return False
+
+    with open(urls_file, 'r', encoding='utf-8') as f:
+        content = f.read()
+
+    # Check if AI API section exists
+    if "ai/api/global-recommendations/" not in content:
+        # Find where to insert AI API patterns
+        ai_section = """
+    # ============================================
+    # AI API ENDPOINTS
+    # ============================================
+    path("ai/api/global-recommendations/", views.global_recommendations, name="global_recommendations"),
+    path("ai/api/all-students/", views.ai_all_students, name="ai_all_students"),
+    path("ai/api/risk-stats/", views.ai_risk_stats, name="ai_risk_stats"),
+    path("ai/api/trend-analysis/", views.ai_trend_analysis, name="ai_trend_analysis"),
+    path("ai/api/behavior-patterns/", views.ai_behavior_patterns, name="ai_behavior_patterns"),
+    path("ai/api/predictive-analysis/", views.ai_predictive_analysis, name="ai_predictive_analysis"),
+    path("ai/api/intervention-effectiveness/", views.ai_intervention_effectiveness, name="ai_intervention_effectiveness"),
+"""
+        # Insert after AI CHAT section
+        if "ai/chat/api/" in content:
+            content = content.replace("ai/chat/api/", "ai/chat/api/" + ai_section)
+        else:
+            # Insert at the end before the closing bracket
+            content = content.replace("]", ai_section + "\n]")
+
+        with open(urls_file, 'w', encoding='utf-8') as f:
+            f.write(content)
+        print("✅ Added missing AI API patterns to core/urls.py")
+        return True
+
+    return True
+
+
+def main():
+    """Main function."""
+    print("=" * 80)
+    print("🔧 FIXING INCORRECT URL REFERENCES")
+    print("=" * 80)
+    print()
+
+    # Check URL patterns
+    print("📋 Checking URL patterns...")
+    check_urls_file()
+    fix_urls_file()
+    print()
+
+    # Scan directories
+    print("🔍 Scanning files for incorrect URLs...")
+    total_fixed = 0
+    total_files_scanned = 0
+
+    for scan_dir in SCAN_DIRS:
+        if not scan_dir.exists():
+            continue
+        
+        for ext in FILE_EXTENSIONS:
+            for file_path in scan_dir.rglob(f"*{ext}"):
+                if '__pycache__' in str(file_path) or 'migrations' in str(file_path):
+                    continue
+                
+                total_files_scanned += 1
+                fixed, changes = scan_and_fix_file(file_path)
+                
+                if fixed:
+                    total_fixed += 1
+                    print(f"  ✅ Fixed: {file_path.relative_to(PROJECT_ROOT)}")
+                    for change in changes[:3]:  # Show first 3 changes
+                        print(f"      → {change}")
+                    if len(changes) > 3:
+                        print(f"      → ... and {len(changes) - 3} more")
+
+    print()
+    print("=" * 80)
+    print("📊 SUMMARY")
+    print("=" * 80)
+    print(f"  Files scanned: {total_files_scanned}")
+    print(f"  Files fixed: {total_fixed}")
+    print()
+
+    if total_fixed == 0:
+        print("✅ No incorrect URLs found! All URLs are correct.")
+    else:
+        print("✅ All incorrect URLs have been fixed!")
+    
+    print()
+    print("📝 Next steps:")
+    print("  1. Run: python manage.py runserver")
+    print("  2. Login and test: /ai/api/global-recommendations/")
+    print("  3. Check your JavaScript and templates for correct URLs")
+    print("=" * 80)
+
+
+if __name__ == "__main__":
+    main()

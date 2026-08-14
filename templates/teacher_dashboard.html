@@ -1,20 +1,72 @@
-﻿{% extends 'base.html' %}
+{% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Teacher Dashboard - Charles Lwanga High School{% endblock %}
+{% block title %}Teacher Dashboard - {{ school_name|default:"Disciplinary System" }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .export-student-btn {
+        background: #e2e8f0;
+        color: #475569;
+        border: none;
+        padding: 0.25rem 0.5rem;
+        border-radius: 6px;
+        font-size: 0.7rem;
+        transition: all 0.2s ease;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+    }
+    
+    .export-student-btn:hover {
+        background: #2563eb;
+        color: white;
+        transform: translateY(-1px);
+    }
+    
+    .teacher-stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 0.75rem;
+        margin-bottom: 1rem;
+    }
+    
+    .teacher-stat-item {
+        background: #f8fafc;
+        border-radius: 10px;
+        padding: 0.75rem 1rem;
+        text-align: center;
+        border: 1px solid #e5e7eb;
+    }
+    
+    .teacher-stat-item .stat-number {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #0f172a;
+    }
+    
+    .teacher-stat-item .stat-label {
+        font-size: 0.7rem;
+        color: #64748b;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+</style>
+{% endblock %}
 
 {% block content %}
 <!-- AI Insights Banner -->
 <div class="alert-modern alert alert-info mb-4" data-aos="fade-up" style="background: linear-gradient(135deg, #7c3aed, #2563eb); color: white; border: none;">
     <div class="d-flex justify-content-between align-items-center flex-wrap">
         <div>
-            <i class="fas fa-robot fa-2x me-3"></i>
             <strong>AI-Powered Discipline Reporting</strong>
             <span class="ms-2 badge bg-light text-dark">Active</span>
             <p class="mb-0 mt-1 small opacity-75">Get AI insights while reporting students</p>
         </div>
         <a href="/ai/dashboard/" class="btn btn-light btn-sm mt-2 mt-md-0">
-            <i class="fas fa-robot"></i> AI Insights
         </a>
     </div>
 </div>
@@ -26,13 +78,10 @@
             <div class="card-body p-3">
                 <div class="d-flex flex-wrap gap-2">
                     <a href="/ai/dashboard/" class="btn-modern" style="background: linear-gradient(135deg, #7c3aed, #2563eb); color: white;">
-                        <i class="fas fa-robot"></i> AI Analysis
                     </a>
-                    <a href="{% url 'user_profile_settings' %}" class="btn-modern btn-modern-secondary">
-                        <i class="fas fa-user-cog"></i> Profile
+                    <a href="/profile/" class="btn-modern btn-modern-secondary">
                     </a>
-                    <a href="{% url 'teacher_dashboard' %}" class="btn-modern btn-modern-primary">
-                        <i class="fas fa-tachometer-alt"></i> Dashboard
+                    <a href="/teacher-dashboard/" class="btn-modern btn-modern-primary">
                     </a>
                 </div>
             </div>
@@ -40,15 +89,33 @@
     </div>
 </div>
 
+<!-- Teacher Statistics -->
+<div class="teacher-stats-grid" data-aos="fade-up">
+    <div class="teacher-stat-item">
+        <div class="stat-number">{{ students.paginator.count|default:0 }}</div>
+        <div class="stat-label">Total Students</div>
+    </div>
+    <div class="teacher-stat-item">
+        <div class="stat-number">{{ total_reports|default:0 }}</div>
+        <div class="stat-label">Total Reports</div>
+    </div>
+    <div class="teacher-stat-item">
+        <div class="stat-number">{{ reports_today|default:0 }}</div>
+        <div class="stat-label">Reports Today</div>
+    </div>
+    <div class="teacher-stat-item">
+        <div class="stat-number">{{ notification_count|default:0 }}</div>
+        <div class="stat-label">Notifications</div>
+    </div>
+</div>
+
 <!-- Search -->
 <div class="card-modern mb-4" data-aos="fade-up">
     <div class="card-header-modern">
-        <span class="header-icon"><i class="fas fa-search"></i></span>
         Search & Report Students
     </div>
     <div class="card-body p-4">
         <div class="search-box">
-            <span class="search-icon"><i class="fas fa-search"></i></span>
             <input type="text" id="searchStudent" placeholder="Search by name or admission number..." autocomplete="off">
         </div>
         <div id="searchResults" class="mt-3"></div>
@@ -58,7 +125,6 @@
 <!-- Students -->
 <div class="card-modern" data-aos="fade-up">
     <div class="card-header-modern">
-        <span class="header-icon"><i class="fas fa-list"></i></span>
         All Students
         <span class="badge bg-light text-dark ms-2">{{ students.paginator.count }}</span>
     </div>
@@ -99,31 +165,27 @@
                         </td>
                         <td>
                             {% if student.is_critical %}
-                            <span class="badge-modern badge-critical"><i class="fas fa-exclamation-circle"></i> Critical</span>
                             {% elif student.risk_score >= 30 %}
-                            <span class="badge-modern badge-warning"><i class="fas fa-exclamation-triangle"></i> Warning</span>
                             {% else %}
-                            <span class="badge-modern badge-success"><i class="fas fa-check-circle"></i> Good</span>
                             {% endif %}
                         </td>
                         <td>
                             <div class="d-flex gap-1">
-                                <a href="{% url 'student_profile' student.id %}" class="btn-modern btn-modern-primary btn-modern-sm" title="View Profile">
-                                    <i class="fas fa-eye"></i>
+                                <a href="/student/{{ student.id }}/" class="btn-modern btn-modern-primary btn-modern-sm" title="View Profile">
                                 </a>
-                                <a href="{% url 'student_profile' student.id %}?ai=true" class="btn-modern btn-modern-sm" style="background: linear-gradient(135deg, #7c3aed, #2563eb); color: white;" title="AI Analysis">
-                                    <i class="fas fa-robot"></i>
+                                <a href="/student/{{ student.id }}/?ai=true" class="btn-modern btn-modern-sm" style="background: linear-gradient(135deg, #7c3aed, #2563eb); color: white;" title="AI Analysis">
                                 </a>
                                 <button class="btn-modern btn-modern-danger btn-modern-sm" onclick="openReportModal({{ student.id }}, '{{ student.name }}')" title="Report">
-                                    <i class="fas fa-flag"></i>
                                 </button>
+                                <!-- Export Student Report -->
+                                <a href="/reports/student/{{ student.id }}/export/" class="export-student-btn" title="Export Student Reports">
+                                </a>
                             </div>
                         </td>
                     </tr>
                     {% empty %}
                     <tr>
                         <td colspan="8" class="text-center py-4 text-muted">
-                            <i class="fas fa-inbox fa-2x d-block mb-2"></i>
                             No students found.
                         </td>
                     </tr>
@@ -134,18 +196,17 @@
     </div>
 </div>
 
-<!-- Pagination -->
-{% include 'includes/pagination.html' with page_obj=students %}
+<!-- Pagination with per_page support -->
+{% include "includes/pagination_unified.html" with page_obj=students per_page=per_page %}
 
 <!-- Report Modal -->
 <div class="modal fade" id="reportModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 shadow-lg rounded-4">
             <div class="modal-header border-0" style="background: linear-gradient(135deg, #ef4444, #dc2626); color: white; border-radius: 16px 16px 0 0;">
-                <h5 class="modal-title fw-bold"><i class="fas fa-flag me-2"></i>Report Student</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
-            <form method="post" action="{% url 'teacher_dashboard' %}" id="reportForm">
+            <form method="post" action="/teacher-dashboard/" id="reportForm">
                 {% csrf_token %}
                 <input type="hidden" name="action" value="report_student">
                 <input type="hidden" name="student_id" id="reportStudentId" value="0">
@@ -156,7 +217,6 @@
                 <div class="modal-footer border-0">
                     <button type="button" class="btn-modern btn-modern-secondary" data-bs-dismiss="modal">Cancel</button>
                     <button type="submit" class="btn-modern" style="background: linear-gradient(135deg, #ef4444, #dc2626); color: white;" id="submitReportBtn">
-                        <i class="fas fa-paper-plane"></i> Submit Report
                     </button>
                 </div>
             </form>
@@ -200,13 +260,10 @@ document.getElementById('searchStudent')?.addEventListener('keyup', function() {
                                 </div>
                                 <div class="d-flex gap-1 mt-2 mt-md-0">
                                     <button class="btn btn-sm btn-outline-primary" onclick="viewStudentProfile(${s.id})" title="View Profile">
-                                        <i class="fas fa-eye"></i>
                                     </button>
                                     <button class="btn btn-sm" style="background: linear-gradient(135deg, #7c3aed, #2563eb); color: white;" onclick="viewStudentAI(${s.id})" title="AI Analysis">
-                                        <i class="fas fa-robot"></i> AI
                                     </button>
                                     <button class="btn btn-sm btn-danger" onclick="openReportModal(${s.id}, '${s.name}')" title="Report">
-                                        <i class="fas fa-flag"></i>
                                     </button>
                                 </div>
                             </div>
@@ -238,5 +295,41 @@ function openReportModal(id, name) {
     var modal = new bootstrap.Modal(document.getElementById('reportModal'));
     modal.show();
 }
+
+// Keyboard shortcuts for pagination
+document.addEventListener('keydown', function(e) {
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+    
+    // Ctrl+Home for first page
+    if (e.ctrlKey && e.key === 'Home') {
+        e.preventDefault();
+        window.location.href = '?page=1{% if per_page %}&per_page={{ per_page }}{% endif %}';
+    }
+    
+    // Ctrl+End for last page
+    if (e.ctrlKey && e.key === 'End') {
+        e.preventDefault();
+        window.location.href = '?page={{ students.paginator.num_pages }}{% if per_page %}&per_page={{ per_page }}{% endif %}';
+    }
+});
+
+// Auto-refresh notifications every 30 seconds
+setInterval(function() {
+    fetch('/api/notifications/')
+        .then(r => r.json())
+        .then(data => {
+            const badge = document.querySelector('.notification-badge');
+            if (badge && data.count !== undefined) {
+                if (data.count > 0) {
+                    badge.textContent = data.count;
+                    badge.style.display = 'block';
+                } else {
+                    badge.style.display = 'none';
+                }
+            }
+        })
+        .catch(() => {});
+}, 30000);
 </script>
+
 {% endblock %}

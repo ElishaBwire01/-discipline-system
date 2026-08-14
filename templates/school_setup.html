@@ -1,12 +1,189 @@
-﻿{% extends 'base.html' %}
+<!-- templates/school_setup.html -->
+{% extends 'base.html' %}
+{% load static %}
 
-{% block title %}School Setup{% endblock %}
+{% block title %}School Setup - {{ school_name|default:"Disciplinary System" }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .upload-zone {
+        border: 2px dashed #d1d5db;
+        border-radius: 12px;
+        padding: 2rem;
+        text-align: center;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        background: #fafbfc;
+    }
+    
+    .upload-zone:hover {
+        border-color: #2563eb;
+        background: #f0f7ff;
+    }
+    
+    .upload-zone.dragover {
+        border-color: #2563eb;
+        background: #eff6ff;
+        transform: scale(1.01);
+    }
+    
+    .upload-zone .upload-icon {
+        font-size: 3rem;
+        color: #94a3b8;
+        margin-bottom: 0.5rem;
+    }
+    
+    .upload-zone .upload-text {
+        font-weight: 600;
+        color: #475569;
+    }
+    
+    .upload-zone .upload-subtext {
+        font-size: 0.875rem;
+        color: #94a3b8;
+    }
+    
+    .file-info {
+        display: none;
+        background: #f1f5f9;
+        border-radius: 8px;
+        padding: 0.75rem 1rem;
+        margin-top: 0.75rem;
+        align-items: center;
+        gap: 0.75rem;
+    }
+    
+    .file-info.show {
+        display: flex;
+    }
+    
+    .file-info .file-name {
+        font-weight: 600;
+        color: #0f172a;
+        flex: 1;
+        word-break: break-all;
+    }
+    
+    .file-info .file-size {
+        color: #64748b;
+        font-size: 0.875rem;
+    }
+    
+    .file-info .file-remove {
+        color: #ef4444;
+        cursor: pointer;
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        transition: all 0.2s ease;
+    }
+    
+    .file-info .file-remove:hover {
+        background: #fef2f2;
+    }
+    
+    .format-badge {
+        display: inline-block;
+        padding: 0.125rem 0.5rem;
+        border-radius: 4px;
+        font-size: 0.65rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+    
+    .format-badge.excel {
+        background: #d1fae5;
+        color: #059669;
+    }
+    
+    .format-badge.csv {
+        background: #dbeafe;
+        color: #2563eb;
+    }
+    
+    .format-badge.text {
+        background: #fef3c7;
+        color: #d97706;
+    }
+    
+    .upload-progress {
+        display: none;
+        margin-top: 1rem;
+    }
+    
+    .upload-progress.show {
+        display: block;
+    }
+    
+    .upload-progress .progress-bar {
+        height: 6px;
+        border-radius: 999px;
+        background: #e5e7eb;
+        overflow: hidden;
+    }
+    
+    .upload-progress .progress-bar .progress-fill {
+        height: 100%;
+        width: 0%;
+        background: linear-gradient(135deg, #2563eb, #7c3aed);
+        border-radius: 999px;
+        transition: width 0.5s ease;
+    }
+    
+    .upload-progress .progress-text {
+        font-size: 0.813rem;
+        color: #64748b;
+        margin-top: 0.25rem;
+        text-align: center;
+    }
+    
+    .template-buttons {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+        margin-top: 0.75rem;
+    }
+    
+    .template-buttons .btn-modern-sm {
+        font-size: 0.75rem;
+        padding: 0.375rem 0.75rem;
+    }
+    
+    .upload-preview {
+        max-height: 200px;
+        overflow-y: auto;
+        background: #f8fafc;
+        border-radius: 8px;
+        padding: 0.75rem;
+        margin-top: 0.75rem;
+        display: none;
+        font-family: 'Courier New', monospace;
+        font-size: 0.75rem;
+        white-space: pre-wrap;
+        word-break: break-all;
+    }
+    
+    .upload-preview.show {
+        display: block;
+    }
+    
+    .upload-preview::-webkit-scrollbar {
+        width: 4px;
+    }
+    .upload-preview::-webkit-scrollbar-track {
+        background: #f1f5f9;
+    }
+    .upload-preview::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 10px;
+    }
+</style>
+{% endblock %}
 
 {% block content %}
 <div class="row">
     <div class="col-md-12">
         <div class="alert alert-info alert-modern mb-4">
-            <i class="fas fa-info-circle"></i>
             <strong>School Setup</strong> - Configure your school details, grades, streams, and academic terms.
         </div>
     </div>
@@ -19,7 +196,6 @@
     <div class="col-md-6" data-aos="fade-up">
         <div class="card-modern">
             <div class="card-header-modern">
-                <span class="header-icon"><i class="fas fa-school"></i></span>
                 School Details
             </div>
             <div class="card-body p-4">
@@ -87,7 +263,6 @@
                         </div>
                     </div>
                     <button type="submit" class="btn-modern btn-modern-primary w-100">
-                        <i class="fas fa-save"></i> Save School Details
                     </button>
                 </form>
             </div>
@@ -100,7 +275,6 @@
     <div class="col-md-6" data-aos="fade-up" data-aos-delay="100">
         <div class="card-modern">
             <div class="card-header-modern">
-                <span class="header-icon"><i class="fas fa-graduation-cap"></i></span>
                 Grades / Forms
                 <span class="badge bg-light text-dark ms-2">{{ grades|length }}</span>
             </div>
@@ -115,7 +289,6 @@
                         <input type="text" name="grade_code" class="form-control-modern" placeholder="F1" required>
                     </div>
                     <div class="col-md-2">
-                        <button type="submit" class="btn-modern btn-modern-primary w-100"><i class="fas fa-plus"></i></button>
                     </div>
                 </form>
                 
@@ -131,7 +304,6 @@
                             {% csrf_token %}
                             <input type="hidden" name="action" value="delete_grade">
                             <input type="hidden" name="grade_id" value="{{ grade.id }}">
-                            <button type="submit" class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></button>
                         </form>
                     </div>
                     {% empty %}
@@ -153,7 +325,6 @@
     <div class="col-md-6" data-aos="fade-up" data-aos-delay="200">
         <div class="card-modern">
             <div class="card-header-modern">
-                <span class="header-icon"><i class="fas fa-people-group"></i></span>
                 Streams / Classes
                 <span class="badge bg-light text-dark ms-2">{{ streams|length }}</span>
             </div>
@@ -168,7 +339,6 @@
                         <input type="text" name="stream_code" class="form-control-modern" placeholder="Code" required>
                     </div>
                     <div class="col-md-2">
-                        <button type="submit" class="btn-modern btn-modern-primary w-100"><i class="fas fa-plus"></i></button>
                     </div>
                 </form>
                 
@@ -184,7 +354,6 @@
                             {% csrf_token %}
                             <input type="hidden" name="action" value="delete_stream">
                             <input type="hidden" name="stream_id" value="{{ stream.id }}">
-                            <button type="submit" class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></button>
                         </form>
                     </div>
                     {% empty %}
@@ -201,7 +370,6 @@
     <div class="col-md-6" data-aos="fade-up" data-aos-delay="300">
         <div class="card-modern">
             <div class="card-header-modern">
-                <span class="header-icon"><i class="fas fa-calendar-alt"></i></span>
                 Academic Terms
                 <span class="badge bg-light text-dark ms-2">{{ terms|length }}</span>
             </div>
@@ -213,7 +381,7 @@
                         <input type="text" name="term_name" class="form-control-modern" placeholder="Term 1" required>
                     </div>
                     <div class="col-md-2">
-                        <input type="number" name="term_number" class="form-control-modern" placeholder="1" required>
+                        <input type="number" name="term_number" class="form-control-modern" placeholder="#1" required>
                     </div>
                     <div class="col-md-2">
                         <input type="number" name="term_year" class="form-control-modern" placeholder="2026" value="2026" required>
@@ -225,7 +393,6 @@
                         <input type="date" name="end_date" class="form-control-modern" required>
                     </div>
                     <div class="col-md-1">
-                        <button type="submit" class="btn-modern btn-modern-primary w-100"><i class="fas fa-plus"></i></button>
                     </div>
                     <div class="col-12">
                         <textarea name="notes" class="form-control-modern" rows="2" placeholder="Notes about this term (e.g., Games Term, Exam Term, etc.)"></textarea>
@@ -241,15 +408,11 @@
                                 <span class="badge bg-secondary">#{{ term.term_number }}</span>
                                 <span class="badge bg-secondary">{{ term.year }}</span>
                                 {% if term.is_current %}
-                                <span class="badge bg-success"><i class="fas fa-check-circle"></i> Current</span>
                                 {% endif %}
-                                <span class="badge bg-info"><i class="far fa-clock"></i> {{ term.get_duration_display }}</span>
                             </div>
                             <div class="small text-muted mt-1">
-                                <i class="far fa-calendar-alt"></i>
                                 {{ term.start_date|date:"M d, Y" }} - {{ term.end_date|date:"M d, Y" }}
                                 {% if term.notes %}
-                                <br><i class="fas fa-sticky-note"></i> <span class="text-dark">{{ term.notes }}</span>
                                 {% endif %}
                             </div>
                         </div>
@@ -257,7 +420,6 @@
                             {% csrf_token %}
                             <input type="hidden" name="action" value="delete_term">
                             <input type="hidden" name="term_id" value="{{ term.id }}">
-                            <button type="submit" class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></button>
                         </form>
                     </div>
                     {% empty %}
@@ -270,39 +432,101 @@
 </div>
 
 <!-- ============================================ -->
-<!-- BULK UPLOAD -->
+<!-- BULK UPLOAD - ENHANCED -->
 <!-- ============================================ -->
 <div class="row mt-4">
     <div class="col-md-12">
         <div class="card-modern" data-aos="fade-up" data-aos-delay="400">
             <div class="card-header-modern">
-                <span class="header-icon"><i class="fas fa-upload"></i></span>
                 Bulk Upload Students
             </div>
             <div class="card-body p-4">
-                <form method="post" action="{% url 'bulk_upload_students' %}" enctype="multipart/form-data">
+                <form method="post" action="/bulk-upload-students/" enctype="multipart/form-data" id="bulkUploadForm">
                     {% csrf_token %}
-                    <div class="row g-3 align-items-end">
-                        <div class="col-md-8">
-                            <label class="form-label-modern">Upload Excel File (.xlsx, .xls)</label>
-                            <input type="file" name="excel_file" class="form-control-modern" accept=".xlsx,.xls">
-                            <small class="text-muted">
-                                <i class="fas fa-info-circle"></i>
-                                Required columns: <strong>name</strong>, <strong>admission_number</strong>, <strong>grade</strong>, <strong>stream</strong>
-                            </small>
+                    
+                    <!-- Upload Zone -->
+                    <div class="upload-zone" id="uploadZone">
+                        <div class="upload-icon">
                         </div>
-                        <div class="col-md-4">
-                            <button type="submit" class="btn-modern btn-modern-success w-100">
-                                <i class="fas fa-cloud-upload-alt"></i> Upload Students
+                        <div class="upload-text">Drop your file here or click to browse</div>
+                        <div class="upload-subtext">
+                            Supports <span class="format-badge excel">.xlsx</span>
+                            <span class="format-badge csv">.csv</span>
+                            <span class="format-badge text">.txt</span>
+                        </div>
+                        <input type="file" name="upload_file" id="uploadFile" accept=".xlsx,.xls,.csv,.txt" style="display: none;" required>
+                        <div class="mt-2">
+                            <button type="button" class="btn-modern btn-modern-primary btn-modern-sm" onclick="document.getElementById('uploadFile').click();">
                             </button>
                         </div>
                     </div>
+                    
+                    <!-- File Info -->
+                    <div class="file-info" id="fileInfo">
+                        <span class="file-name" id="fileName">No file selected</span>
+                        <span class="file-size" id="fileSize">0 KB</span>
+                        <span class="file-remove" onclick="removeFile()" title="Remove file">
+                        </span>
+                    </div>
+                    
+                    <!-- Upload Preview -->
+                    <div class="upload-preview" id="uploadPreview"></div>
+                    
+                    <!-- Upload Progress -->
+                    <div class="upload-progress" id="uploadProgress">
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="progressFill"></div>
+                        </div>
+                        <div class="progress-text" id="progressText">Uploading... 0%</div>
+                    </div>
+                    
+                    <!-- Submit Button -->
+                    <div class="mt-3">
+                        <button type="submit" class="btn-modern btn-modern-success w-100" id="uploadBtn">
+                        </button>
+                    </div>
                 </form>
                 
-                <div class="mt-3">
-                    <button class="btn-modern btn-modern-secondary btn-modern-sm" onclick="downloadTemplate()">
-                        <i class="fas fa-download"></i> Download Excel Template
+                <!-- Template Downloads -->
+                <div class="template-buttons">
+                    <button class="btn-modern btn-modern-secondary btn-modern-sm" onclick="downloadTemplate('excel')">
                     </button>
+                    <button class="btn-modern btn-modern-secondary btn-modern-sm" onclick="downloadTemplate('text')">
+                    </button>
+                    <button class="btn-modern btn-modern-secondary btn-modern-sm" onclick="downloadTemplate('csv')">
+                    </button>
+                </div>
+                
+                <!-- Quick Format Guide -->
+                <div class="mt-3 p-3" style="background: #f8fafc; border-radius: 8px; border: 1px solid #e5e7eb;">
+                    <div class="d-flex align-items-center gap-2 mb-2">
+                        <strong>Supported Formats:</strong>
+                    </div>
+                    <div class="row g-2">
+                        <div class="col-md-4">
+                            <div class="p-2 bg-white rounded border" style="font-size: 0.8rem;">
+                                <strong>Excel (.xlsx)</strong>
+                                <div class="text-muted small">Multi-sheet support</div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="p-2 bg-white rounded border" style="font-size: 0.8rem;">
+                                <strong>CSV (.csv)</strong>
+                                <div class="text-muted small">Comma-separated values</div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="p-2 bg-white rounded border" style="font-size: 0.8rem;">
+                                <strong>Text (.txt)</strong>
+                                <div class="text-muted small">Intelligent parsing</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-2 small text-muted">
+                        Required columns: <strong>name</strong>, <strong>admission_number</strong>, <strong>grade</strong>, <strong>stream</strong>
+                        <br>
+                        <strong>Tip:</strong> Text files can use any format - the system intelligently extracts data!
+                    </div>
                 </div>
             </div>
         </div>
@@ -310,23 +534,166 @@
 </div>
 
 <script>
-function downloadTemplate() {
-    var data = [
-        ['name', 'admission_number', 'grade', 'stream', 'form', 'year', 'notes'],
-        ['John Doe', 'ADM001', 'Form 1', 'Mulumba', 'Form 1', '2026', 'Good student'],
-        ['Jane Smith', 'ADM002', 'Form 2', 'Kizza', 'Form 2', '2026', 'Needs attention'],
-    ];
+// ============================================
+// ENHANCED BULK UPLOAD JAVASCRIPT
+// ============================================
+
+// File input handling
+document.getElementById('uploadFile')?.addEventListener('change', function(e) {
+    const file = this.files[0];
+    if (!file) return;
     
-    var csv = data.map(function(row) { return row.join(','); }).join('\n');
-    var blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
-    var url = window.URL.createObjectURL(blob);
-    var a = document.createElement('a');
-    a.href = url;
-    a.download = 'student_upload_template.csv';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    window.URL.revokeObjectURL(url);
+    handleFile(file);
+});
+
+// Drag and drop
+const uploadZone = document.getElementById('uploadZone');
+if (uploadZone) {
+    uploadZone.addEventListener('dragover', function(e) {
+        e.preventDefault();
+        this.classList.add('dragover');
+    });
+    
+    uploadZone.addEventListener('dragleave', function(e) {
+        e.preventDefault();
+        this.classList.remove('dragover');
+    });
+    
+    uploadZone.addEventListener('drop', function(e) {
+        e.preventDefault();
+        this.classList.remove('dragover');
+        
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+            const file = files[0];
+            const input = document.getElementById('uploadFile');
+            // Create a new FileList (can't set directly, use DataTransfer)
+            const dt = new DataTransfer();
+            dt.items.add(file);
+            input.files = dt.files;
+            handleFile(file);
+        }
+    });
+    
+    uploadZone.addEventListener('click', function(e) {
+        if (e.target.tagName !== 'BUTTON') {
+            document.getElementById('uploadFile').click();
+        }
+    });
 }
+
+function handleFile(file) {
+    const fileInfo = document.getElementById('fileInfo');
+    const fileName = document.getElementById('fileName');
+    const fileSize = document.getElementById('fileSize');
+    const preview = document.getElementById('uploadPreview');
+    const uploadBtn = document.getElementById('uploadBtn');
+    
+    // Show file info
+    fileInfo.classList.add('show');
+    fileName.textContent = file.name;
+    fileSize.textContent = (file.size / 1024).toFixed(1) + ' KB';
+    
+    // Enable upload button
+    uploadBtn.disabled = false;
+    
+    // Preview file content for text files
+    if (file.type === 'text/plain' || file.name.endsWith('.txt') || file.name.endsWith('.csv')) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const content = e.target.result;
+            preview.textContent = content.length > 500 ? content.substring(0, 500) + '...\n\n(Preview limited to 500 characters)' : content;
+            preview.classList.add('show');
+        };
+        reader.readAsText(file);
+    } else if (file.name.endsWith('.xlsx') || file.name.endsWith('.xls')) {
+        preview.textContent = '?? Excel file detected. Will process all sheets.';
+        preview.classList.add('show');
+    } else {
+        preview.classList.remove('show');
+    }
+}
+
+function removeFile() {
+    const input = document.getElementById('uploadFile');
+    input.value = '';
+    document.getElementById('fileInfo').classList.remove('show');
+    document.getElementById('uploadPreview').classList.remove('show');
+    document.getElementById('uploadBtn').disabled = true;
+}
+
+// Form submission with progress
+document.getElementById('bulkUploadForm')?.addEventListener('submit', function(e) {
+    const file = document.getElementById('uploadFile').files[0];
+    if (!file) {
+        e.preventDefault();
+        alert('Please select a file to upload.');
+        return;
+    }
+    
+    // Show progress
+    const progress = document.getElementById('uploadProgress');
+    const fill = document.getElementById('progressFill');
+    const text = document.getElementById('progressText');
+    
+    progress.classList.add('show');
+    fill.style.width = '0%';
+    text.textContent = 'Processing file... 0%';
+    
+    // Simulate progress (since actual progress from server is limited)
+    let progressValue = 0;
+    const interval = setInterval(function() {
+        progressValue += Math.random() * 15;
+        if (progressValue > 100) progressValue = 100;
+        fill.style.width = progressValue + '%';
+        text.textContent = 'Uploading... ' + Math.round(progressValue) + '%';
+        if (progressValue >= 100) {
+            clearInterval(interval);
+            text.textContent = 'Processing... Please wait.';
+        }
+    }, 200);
+    
+    // Store interval to clear if needed
+    this.dataset.interval = interval;
+});
+
+// Template download functions
+function downloadTemplate(type) {
+    if (type === 'excel') {
+        window.location.href = '/download-template/';
+    } else if (type === 'csv') {
+        // Generate CSV template
+        const headers = ['name', 'admission_number', 'grade', 'stream', 'year', 'notes'];
+        const sampleData = [
+            ['John Doe', '8896', 'Form 1', 'Gonza', '2026', ''],
+            ['Jane Smith', '8902', 'Form 2', 'Kizza', '2026', ''],
+            ['Bob Johnson', '8916', 'Form 3', 'Lwanga', '2026', ''],
+            ['Alice Williams', '8938', 'Form 4', 'Mulumba', '2026', ''],
+        ];
+        
+        let csv = headers.join(',') + '\n';
+        sampleData.forEach(row => {
+            csv += row.join(',') + '\n';
+        });
+        
+        const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'student_upload_template.csv';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    } else if (type === 'text') {
+        window.location.href = '/download-text-template/';
+    }
+}
+
+// Auto-submit after file selection (optional)
+document.getElementById('uploadFile')?.addEventListener('change', function() {
+    // Optionally auto-submit after 2 seconds
+    // setTimeout(function() { document.getElementById('bulkUploadForm').submit(); }, 2000);
+});
 </script>
 {% endblock %}

@@ -1,4 +1,4 @@
-﻿{% extends "base.html" %}
+{% extends "base.html" %}
 {% load static %}
 
 {% block title %}AI Discipline Intelligence{% endblock %}
@@ -374,7 +374,7 @@
     }
     
     .ai-recommendation .rec-steps li::before {
-        content: '›';
+        content: 'ÃƒÂ‚Ã¢Â€Âº';
         position: absolute;
         left: 0;
         color: #7c3aed;
@@ -591,10 +591,8 @@
         <div class="header-content d-flex flex-wrap align-items-center justify-content-between">
             <div>
                 <h1>
-                    <i class="fas fa-brain me-2"></i>AI Discipline Intelligence
                     <span class="highlight">v3.0</span>
                 </h1>
-                <p><i class="fas fa-gavel me-2"></i>Powered by Kenyan Education Act 2013 · Advanced AI Analytics</p>
             </div>
             <div class="d-flex gap-3 mt-3 mt-md-0 flex-wrap">
                 <span class="ai-status-badge">
@@ -602,7 +600,6 @@
                     <span id="statusText">System Online</span>
                 </span>
                 <span class="ai-status-badge">
-                    <i class="fas fa-sync-alt fa-fw" id="refreshIcon" style="cursor: pointer;" onclick="refreshData()"></i>
                     <span id="lastUpdate">Just now</span>
                 </span>
             </div>
@@ -613,34 +610,27 @@
     <div class="ai-stat-grid" id="statsGrid">
         <div class="ai-stat-card">
             <div class="stat-top">
-                <div class="stat-icon purple"><i class="fas fa-users"></i></div>
                 <span class="stat-trend">Active</span>
             </div>
             <div class="stat-value" id="totalStudents">-</div>
             <div class="stat-label">Total Students</div>
-            <div class="stat-change positive"><i class="fas fa-arrow-up"></i> Enrolled</div>
         </div>
         <div class="ai-stat-card">
             <div class="stat-top">
-                <div class="stat-icon red"><i class="fas fa-exclamation-triangle"></i></div>
                 <span class="stat-trend down">Alert</span>
             </div>
             <div class="stat-value" id="criticalCount">-</div>
             <div class="stat-label">Critical Risk</div>
-            <div class="stat-change negative"><i class="fas fa-arrow-up"></i> Needs Intervention</div>
         </div>
         <div class="ai-stat-card">
             <div class="stat-top">
-                <div class="stat-icon blue"><i class="fas fa-flag"></i></div>
                 <span class="stat-trend">Total</span>
             </div>
             <div class="stat-value" id="totalReports">-</div>
             <div class="stat-label">Total Reports</div>
-            <div class="stat-change positive"><i class="fas fa-arrow-up"></i> All-time</div>
         </div>
         <div class="ai-stat-card">
             <div class="stat-top">
-                <div class="stat-icon orange"><i class="fas fa-chart-line"></i></div>
                 <span class="stat-trend">Current</span>
             </div>
             <div class="stat-value" id="avgRisk">-</div>
@@ -652,16 +642,12 @@
     <!-- AI Tabs -->
     <div class="ai-tabs">
         <button class="ai-tab-btn active" onclick="switchTab('recommendations')">
-            <i class="fas fa-lightbulb"></i> Recommendations
         </button>
         <button class="ai-tab-btn" onclick="switchTab('predictive')">
-            <i class="fas fa-robot"></i> Predictive Analysis
         </button>
         <button class="ai-tab-btn" onclick="switchTab('patterns')">
-            <i class="fas fa-chart-pie"></i> Behavior Patterns
         </button>
         <button class="ai-tab-btn" onclick="switchTab('effectiveness')">
-            <i class="fas fa-check-circle"></i> Intervention Effectiveness
         </button>
     </div>
 
@@ -670,11 +656,9 @@
         <!-- Global Recommendations -->
         <div class="ai-card">
             <div class="ai-card-header">
-                <span class="header-icon"><i class="fas fa-globe-africa"></i></span>
                 Global Recommendations
                 <span class="badge bg-light text-dark ms-2" id="recCount">0</span>
                 <span class="ms-auto badge bg-light text-dark" style="background: rgba(255,255,255,0.2) !important; color: white !important;">
-                    <i class="fas fa-bolt me-1"></i> Live
                 </span>
             </div>
             <div class="ai-card-body" id="globalRecommendations">
@@ -692,7 +676,6 @@
             <!-- Student Search -->
             <div class="ai-search-container">
                 <div class="search-title">
-                    <span class="title-icon purple"><i class="fas fa-search"></i></span>
                     Student AI Analysis
                     <span class="badge bg-primary ms-auto" id="studentSearchStatus">Ready</span>
                 </div>
@@ -701,7 +684,6 @@
                            placeholder="Search by name or admission number..." 
                            autocomplete="off">
                     <button class="btn-ai-search" id="searchStudentBtn">
-                        <i class="fas fa-robot"></i> Analyze
                     </button>
                 </div>
                 <div id="studentAnalysisResult" class="mt-3"></div>
@@ -710,7 +692,6 @@
             <!-- Class Analysis -->
             <div class="ai-search-container">
                 <div class="search-title">
-                    <span class="title-icon blue"><i class="fas fa-users"></i></span>
                     Class Analysis
                     <span class="badge bg-primary ms-auto" id="classSearchStatus">Ready</span>
                 </div>
@@ -722,7 +703,6 @@
                         {% endfor %}
                     </select>
                     <button class="btn-ai-search" id="analyzeClassBtn">
-                        <i class="fas fa-chart-bar"></i> Analyze
                     </button>
                 </div>
                 <div id="classAnalysisResult" class="mt-3"></div>
@@ -734,10 +714,8 @@
     <div id="tab-predictive" class="ai-tab-content">
         <div class="ai-card">
             <div class="ai-card-header">
-                <span class="header-icon"><i class="fas fa-robot"></i></span>
                 Predictive Risk Analysis
                 <span class="ms-auto badge bg-light text-dark" style="background: rgba(255,255,255,0.2) !important; color: white !important;">
-                    <i class="fas fa-clock me-1"></i> AI Powered
                 </span>
             </div>
             <div class="ai-card-body" id="predictiveAnalysis">
@@ -755,10 +733,8 @@
     <div id="tab-patterns" class="ai-tab-content">
         <div class="ai-card">
             <div class="ai-card-header">
-                <span class="header-icon"><i class="fas fa-chart-pie"></i></span>
                 Behavior Pattern Analysis
                 <span class="ms-auto badge bg-light text-dark" style="background: rgba(255,255,255,0.2) !important; color: white !important;">
-                    <i class="fas fa-chart-line me-1"></i> Insights
                 </span>
             </div>
             <div class="ai-card-body" id="behaviorPatterns">
@@ -776,10 +752,8 @@
     <div id="tab-effectiveness" class="ai-tab-content">
         <div class="ai-card">
             <div class="ai-card-header">
-                <span class="header-icon"><i class="fas fa-check-circle"></i></span>
                 Intervention Effectiveness
                 <span class="ms-auto badge bg-light text-dark" style="background: rgba(255,255,255,0.2) !important; color: white !important;">
-                    <i class="fas fa-chart-bar me-1"></i> Results
                 </span>
             </div>
             <div class="ai-card-body" id="interventionEffectiveness">
@@ -796,34 +770,29 @@
     <!-- Kenyan Education Guidelines -->
     <div class="ai-guidelines">
         <div class="guideline-title">
-            <i class="fas fa-gavel text-primary"></i>
             Kenyan Education Guidelines
             <span class="badge bg-primary ms-2">Reference</span>
         </div>
         <div class="guideline-grid">
             <div class="guideline-item" onclick="showGuideline('Basic Education Act 2013')">
-                <div class="g-icon"><i class="fas fa-book"></i></div>
                 <div class="g-content">
                     <div class="g-title">Basic Education Act 2013</div>
                     <div class="g-desc">Every child's right to education</div>
                 </div>
             </div>
             <div class="guideline-item" onclick="showGuideline('Positive Discipline')">
-                <div class="g-icon"><i class="fas fa-handshake"></i></div>
                 <div class="g-content">
                     <div class="g-title">Positive Discipline</div>
                     <div class="g-desc">Non-violent, restorative approaches</div>
                 </div>
             </div>
             <div class="guideline-item" onclick="showGuideline('Escalation Protocol')">
-                <div class="g-icon"><i class="fas fa-arrow-up"></i></div>
                 <div class="g-content">
                     <div class="g-title">Escalation Protocol</div>
-                    <div class="g-desc">Warning → Suspension → Committee → Expulsion</div>
+                    <div class="g-desc">Warning ? Suspension ? Committee ? Expulsion</div>
                 </div>
             </div>
             <div class="guideline-item" onclick="showGuideline('Child Protection')">
-                <div class="g-icon"><i class="fas fa-shield-alt"></i></div>
                 <div class="g-content">
                     <div class="g-title">Child Protection</div>
                     <div class="g-desc">Children's Act 2001 compliance</div>
@@ -874,7 +843,7 @@ function loadStats() {
     if (dashboardState.isLoading) return;
     dashboardState.isLoading = true;
     
-    fetch('/ai/api/global/recommendations/', {
+    fetch("/ai/api/global-recommendations/", {
         credentials: 'include',
         headers: { 'X-Requested-With': 'XMLHttpRequest' }
     })
@@ -937,7 +906,6 @@ function renderRecommendations(data) {
         countBadge.textContent = '0';
         container.innerHTML = `
             <div class="text-center py-4">
-                <i class="fas fa-check-circle text-success fa-3x mb-3"></i>
                 <p class="text-muted mb-0">No urgent recommendations. Continue monitoring.</p>
             </div>
         `;
@@ -1039,8 +1007,8 @@ function renderPredictiveAnalysis(data, container) {
                        p.predicted_level === 'WARNING' ? 'warning' : 'success';
         var urgencyColor = p.urgency === 'HIGH' ? 'danger' : 
                           p.urgency === 'MEDIUM' ? 'warning' : 'success';
-        var trendIcon = p.severity_trend === 'WORSENING' ? 'fa-arrow-up text-danger' : 
-                       p.severity_trend === 'IMPROVING' ? 'fa-arrow-down text-success' : 'fa-minus text-secondary';
+        var trendIcon = p.severity_trend === 'WORSENING' ? 'icon-arrow-up icon-danger' : 
+                       p.severity_trend === 'IMPROVING' ? 'icon-arrow-down icon-success' : 'icon-minus icon-secondary';
         
         html += `
             <tr>
@@ -1049,7 +1017,7 @@ function renderPredictiveAnalysis(data, container) {
                 <td>${p.current_risk}%</td>
                 <td><strong>${p.predicted_risk}%</strong></td>
                 <td><span class="badge bg-${riskColor}">${p.predicted_level}</span></td>
-                <td><i class="fas ${trendIcon}"></i> ${p.severity_trend}</td>
+                <td><i class="fas fa-${trendIcon}"></i> ${p.severity_trend}</td>
                 <td><span class="badge bg-${urgencyColor}">${p.urgency}</span></td>
             </tr>
         `;
@@ -1094,7 +1062,6 @@ function renderBehaviorPatterns(data, container) {
             <div class="col-md-6">
                 <div class="card bg-light">
                     <div class="card-body">
-                        <h6><i class="fas fa-calendar-alt me-2"></i>Analysis Period</h6>
                         <p class="mb-0">Last ${data.period_days} days</p>
                         <p class="text-muted small">Total Reports: ${data.total_reports}</p>
                     </div>
@@ -1103,7 +1070,6 @@ function renderBehaviorPatterns(data, container) {
             <div class="col-md-6">
                 <div class="card bg-light">
                     <div class="card-body">
-                        <h6><i class="fas fa-lightbulb me-2"></i>Insights</h6>
                         <p class="mb-0">${data.insights ? data.insights.length : 0} insights detected</p>
                     </div>
                 </div>
@@ -1113,21 +1079,19 @@ function renderBehaviorPatterns(data, container) {
     
     // Insights
     if (data.insights && data.insights.length > 0) {
-        html += '<h6 class="mt-3"><i class="fas fa-lightbulb text-warning me-2"></i>Key Insights</h6>';
         data.insights.forEach(function(insight) {
-            var icon = insight.type === 'category_dominance' ? 'fa-chart-bar' :
-                      insight.type === 'peak_day' ? 'fa-calendar-day' :
-                      insight.type === 'frequent_offenders' ? 'fa-user-graduate' :
-                      insight.type === 'risk_trend' ? 'fa-chart-line' : 'fa-info-circle';
+            var icon = insight.type === 'category_dominance' ? 'icon-chart-bar' :
+                      insight.type === 'peak_day' ? 'icon-calendar-day' :
+                      insight.type === 'frequent_offenders' ? 'icon-user-graduate' :
+                      insight.type === 'risk_trend' ? 'icon-chart-line' : 'icon-info-circle';
             var color = insight.type === 'category_dominance' ? 'primary' :
                        insight.type === 'risk_trend' && insight.title.includes('Worsening') ? 'danger' : 'info';
             
             html += `
                 <div class="alert alert-${color} alert-sm">
-                    <i class="fas ${icon} me-2"></i>
+                    <i class="fas fa-${icon} me-2"></i>
                     <strong>${insight.title}</strong>
                     <p class="mb-0 small">${insight.description}</p>
-                    <p class="mb-0 text-muted small"><i class="fas fa-arrow-right me-1"></i>${insight.recommendation}</p>
                 </div>
             `;
         });
@@ -1135,7 +1099,6 @@ function renderBehaviorPatterns(data, container) {
     
     // Category Patterns
     if (data.category_patterns && data.category_patterns.length > 0) {
-        html += '<h6 class="mt-3"><i class="fas fa-tag me-2"></i>Top Categories</h6>';
         html += '<div class="row">';
         data.category_patterns.forEach(function(cat) {
             html += `
@@ -1152,7 +1115,6 @@ function renderBehaviorPatterns(data, container) {
     
     // Weekday Patterns
     if (data.weekday_patterns && data.weekday_patterns.length > 0) {
-        html += '<h6 class="mt-3"><i class="fas fa-calendar-week me-2"></i>Weekday Distribution</h6>';
         html += '<div class="row">';
         data.weekday_patterns.forEach(function(day) {
             html += `
@@ -1169,7 +1131,6 @@ function renderBehaviorPatterns(data, container) {
     
     // Top Students
     if (data.top_students && data.top_students.length > 0) {
-        html += '<h6 class="mt-3"><i class="fas fa-user-graduate me-2"></i>Frequent Offenders</h6>';
         html += '<div class="table-responsive"><table class="table table-sm">';
         html += '<thead><tr><th>Student</th><th>Stream</th><th>Reports</th></tr></thead><tbody>';
         data.top_students.forEach(function(s) {
@@ -1214,7 +1175,6 @@ function renderInterventionEffectiveness(data, container) {
     if (!data.effectiveness_data || data.effectiveness_data.length === 0) {
         container.innerHTML = `
             <div class="text-center py-4">
-                <i class="fas fa-info-circle fa-3x text-muted mb-3"></i>
                 <p>No students with interventions recorded yet.</p>
                 <p class="text-muted small">Start recording interventions to measure effectiveness.</p>
             </div>
@@ -1262,7 +1222,6 @@ function renderInterventionEffectiveness(data, container) {
     
     // Recommendations
     if (data.recommendations && data.recommendations.length > 0) {
-        html += '<h6 class="mt-3"><i class="fas fa-lightbulb text-warning me-2"></i>Recommendations</h6>';
         data.recommendations.forEach(function(rec) {
             var color = rec.type === 'success' ? 'success' :
                        rec.type === 'warning' ? 'warning' :
@@ -1271,14 +1230,12 @@ function renderInterventionEffectiveness(data, container) {
                 <div class="alert alert-${color} alert-sm">
                     <strong>${rec.title}</strong>
                     <p class="mb-0 small">${rec.description}</p>
-                    <p class="mb-0 text-muted small"><i class="fas fa-arrow-right me-1"></i>${rec.action}</p>
                 </div>
             `;
         });
     }
     
     // Effectiveness data table
-    html += '<h6 class="mt-3"><i class="fas fa-table me-2"></i>Student Details</h6>';
     html += '<div class="table-responsive"><table class="table table-hover table-sm">';
     html += `
         <thead>
@@ -1367,10 +1324,10 @@ function updateTimestamp() {
 
 function refreshData() {
     var icon = document.getElementById('refreshIcon');
-    if (icon) icon.classList.add('fa-spin');
+    if (icon) icon.classList.add('icon-spin');
     loadStats();
     setTimeout(function() {
-        if (icon) icon.classList.remove('fa-spin');
+        if (icon) icon.classList.remove('icon-spin');
     }, 1000);
 }
 
@@ -1419,7 +1376,6 @@ document.getElementById('searchStudentBtn').addEventListener('click', function()
         } else {
             container.innerHTML = `
                 <div class="alert alert-warning">
-                    <i class="fas fa-user-slash"></i> Student "${query}" not found.
                 </div>
             `;
             status.textContent = 'Not Found';
@@ -1456,8 +1412,8 @@ function displayStudentResult(container, studentData) {
             <div class="card border-${riskColor}">
                 <div class="card-header bg-${riskColor} bg-opacity-10 d-flex justify-content-between align-items-center">
                     <div>
-                        <strong>👤 ${s.name}</strong>
-                        <br><small class="text-muted">${s.admission_number} · ${s.stream} · Form ${s.form}</small>
+                        <strong>?? ${s.name}</strong>
+                        <br><small class="text-muted">${s.admission_number} ÃƒÂ‚Ã‚Â· ${s.stream} ÃƒÂ‚Ã‚Â· Form ${s.form}</small>
                     </div>
                     <span class="badge bg-${riskColor}">${s.risk_level}</span>
                 </div>
@@ -1473,25 +1429,22 @@ function displayStudentResult(container, studentData) {
                     
                     ${studentData.recommendations && studentData.recommendations.length > 0 ? `
                         <div class="mt-2">
-                            <small><strong><i class="fas fa-robot text-primary"></i> AI Recommendations:</strong></small>
                             ${studentData.recommendations.map(function(rec) {
                                 return `
                                     <div class="alert alert-${rec.type === 'critical' ? 'danger' : rec.type === 'warning' ? 'warning' : rec.type === 'pattern' ? 'info' : 'success'} alert-sm mt-1" style="padding:0.4rem;font-size:0.8rem;">
                                         <strong>${rec.title}</strong>
                                         <div style="font-size:0.75rem;white-space:pre-line;">${rec.description}</div>
-                                        ${rec.steps ? `<div class="mt-1"><small>${rec.steps.map(function(step) { return '• ' + step; }).join('<br>')}</small></div>` : ''}
+                                        ${rec.steps ? `<div class="mt-1"><small>${rec.steps.map(function(step) { return 'ÃƒÂ‚Ã¢Â€Â¢ ' + step; }).join('<br>')}</small></div>` : ''}
                                     </div>
                                 `;
                             }).join('')}
                         </div>
                     ` : `
                         <div class="alert alert-success alert-sm mt-2">
-                            <i class="fas fa-check-circle"></i> No issues detected.
                         </div>
                     `}
                     
                     <a href="/student/${s.id}/?ai=true" class="btn btn-sm btn-primary w-100 mt-2">
-                        <i class="fas fa-external-link-alt"></i> View Full Profile
                     </a>
                 </div>
             </div>
@@ -1540,7 +1493,7 @@ document.getElementById('analyzeClassBtn').addEventListener('click', function() 
             <div class="ai-result-card">
                 <div class="card">
                     <div class="card-header bg-primary bg-opacity-10 d-flex justify-content-between align-items-center">
-                        <strong>📊 ${data.stream} Analysis</strong>
+                        <strong>?? ${data.stream} Analysis</strong>
                         <span class="badge bg-primary">${stats.total_students || 0} students</span>
                     </div>
                     <div class="card-body">
@@ -1557,7 +1510,7 @@ document.getElementById('analyzeClassBtn').addEventListener('click', function() 
                         
                         ${data.recommendations && data.recommendations.length > 0 ? `
                             <div class="mt-2">
-                                <small><strong>💡 Recommendations:</strong></small>
+                                <small><strong>?? Recommendations:</strong></small>
                                 ${data.recommendations.map(function(rec) {
                                     var color = rec.type === 'URGENT' ? 'danger' : 
                                                rec.type === 'WARNING' ? 'warning' : 
@@ -1566,7 +1519,7 @@ document.getElementById('analyzeClassBtn').addEventListener('click', function() 
                                         <div class="alert alert-${color} alert-sm mt-1" style="padding:0.4rem;font-size:0.8rem;">
                                             <strong>${rec.action}</strong>
                                             <div class="small">${rec.details}</div>
-                                            ${rec.steps ? `<div class="mt-1"><small>${rec.steps.map(function(step) { return '• ' + step; }).join('<br>')}</small></div>` : ''}
+                                            ${rec.steps ? `<div class="mt-1"><small>${rec.steps.map(function(step) { return 'ÃƒÂ‚Ã¢Â€Â¢ ' + step; }).join('<br>')}</small></div>` : ''}
                                         </div>
                                     `;
                                 }).join('')}
@@ -1575,7 +1528,7 @@ document.getElementById('analyzeClassBtn').addEventListener('click', function() 
                         
                         ${data.top_offenders && data.top_offenders.length > 0 ? `
                             <div class="mt-2">
-                                <small><strong>👤 Top offenders:</strong></small>
+                                <small><strong>?? Top offenders:</strong></small>
                                 <div class="d-flex flex-wrap gap-1 mt-1">
                                     ${data.top_offenders.map(function(o) {
                                         return `<span class="badge bg-warning text-dark">${o.name} (${o.reports} reports)</span>`;
@@ -1606,7 +1559,7 @@ function showGuideline(title) {
     var guidelines = {
         'Basic Education Act 2013': 'Section 30: Every child has the right to basic education. Section 36: School discipline must respect the child\'s dignity. Section 37: Corporal punishment is strictly prohibited.',
         'Positive Discipline': 'Use of counseling and guidance instead of punishment. Non-violent approaches to discipline. Restorative justice practices. Community service as alternative to suspension.',
-        'Escalation Protocol': 'Step 1: Verbal warning & Counseling → Step 2: Written warning & Parent meeting → Step 3: Suspension (1-10 days) & Behavior plan → Step 4: Disciplinary committee review → Step 5: Expulsion (refer to County Education Director)',
+        'Escalation Protocol': 'Step 1: Verbal warning & Counseling ? Step 2: Written warning & Parent meeting ? Step 3: Suspension (1-10 days) & Behavior plan ? Step 4: Disciplinary committee review ? Step 5: Expulsion (refer to County Education Director)',
         'Child Protection': 'Children\'s Act 2001 compliance. Every child has the right to protection from abuse, neglect, and exploitation. Schools must have child protection policies in place.'
     };
     
@@ -1626,10 +1579,10 @@ function showToast(message, type, duration) {
     };
     
     var icons = {
-        info: 'fa-info-circle',
-        warning: 'fa-exclamation-triangle',
-        success: 'fa-check-circle',
-        danger: 'fa-exclamation-circle'
+        info: 'icon-info-circle',
+        warning: 'icon-exclamation-triangle',
+        success: 'icon-check-circle',
+        danger: 'icon-exclamation-circle'
     };
     
     var toast = document.createElement('div');
@@ -1639,7 +1592,7 @@ function showToast(message, type, duration) {
     toast.innerHTML = `
         <div class="d-flex">
             <div class="toast-body">
-                <i class="fas ' + icons[type] + ' me-2"></i>
+                <i class="fas fa-' + icons[type] + ' me-2"></i>
                 ${message}
             </div>
             <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
@@ -1696,6 +1649,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-console.log('🚀 AI Dashboard v3 loaded with advanced AI features!');
+console.log('?? AI Dashboard v3 loaded with advanced AI features!');
 </script>
 {% endblock %}

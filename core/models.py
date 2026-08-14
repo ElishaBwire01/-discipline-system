@@ -1,7 +1,9 @@
-﻿from django.db import models
+from django.db import models
+import os
+
 from django.contrib.auth.models import User
-from django.core.validators import MinValueValidator, MaxValueValidator
-from django.db.models import Sum
+from django.core.validators import MaxValueValidator, MinValueValidator
+from django.db.models import Count, Sum
 from django.utils import timezone
 
 # ============================================
@@ -23,10 +25,10 @@ class School(models.Model):
     require_teacher_approval = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    
+
     class Meta:
         verbose_name_plural = "School Settings"
-    
+
     def __str__(self):
         return self.name
 
@@ -37,11 +39,11 @@ class GradeLevel(models.Model):
     code = models.CharField(max_length=10)
     order = models.PositiveIntegerField(default=0)
     is_active = models.BooleanField(default=True)
-    
+
     class Meta:
         ordering = ['order', 'name']
         unique_together = ['school', 'name']
-    
+
     def __str__(self):
         return f"{self.name} ({self.school.name})"
 
@@ -56,21 +58,21 @@ class AcademicTerm(models.Model):
     is_active = models.BooleanField(default=True)
     is_current = models.BooleanField(default=False)
     notes = models.TextField(blank=True, null=True)
-    
+
     def get_duration_days(self):
         if self.start_date and self.end_date:
             delta = self.end_date - self.start_date
             return delta.days
         return 0
-    
+
     def get_duration_weeks(self):
         days = self.get_duration_days()
         return round(days / 7, 1)
-    
+
     def get_duration_months(self):
         days = self.get_duration_days()
         return round(days / 30.44, 1)
-    
+
     def get_duration_display(self):
         days = self.get_duration_days()
         if days == 0:
@@ -85,11 +87,11 @@ class AcademicTerm(models.Model):
             return f"{months} month{'s' if months != 1 else ''}"
         else:
             return f"{days} days"
-    
+
     class Meta:
         ordering = ['-year', '-term_number']
         unique_together = ['school', 'year', 'term_number']
-    
+
     def __str__(self):
         return f"{self.name} ({self.year})"
 
@@ -101,11 +103,11 @@ class Stream(models.Model):
     description = models.TextField(blank=True)
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
-    
+
     class Meta:
         ordering = ['name']
         unique_together = ['school', 'name']
-    
+
     def __str__(self):
         return self.name
 
@@ -125,10 +127,10 @@ class TeacherProfile(models.Model):
     suspended_at = models.DateTimeField(blank=True, null=True)
     approved_at = models.DateTimeField(blank=True, null=True)
     approved_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='approved_teachers')
-    
+
     def __str__(self):
         return f"{self.user.get_full_name()} - {self.assigned_stream}"
-    
+
     def is_active_user(self):
         return self.is_approved and not self.is_suspended
 
@@ -141,10 +143,10 @@ class UserSession(models.Model):
     login_time = models.DateTimeField(auto_now_add=True)
     last_activity = models.DateTimeField(auto_now=True)
     is_active = models.BooleanField(default=True)
-    
+
     class Meta:
         ordering = ['-last_activity']
-    
+
     def __str__(self):
         return f"{self.user.username} - {self.login_time}"
 
@@ -174,7 +176,7 @@ class DisciplineCategory(models.Model):
         ('ENVIRONMENT', 'Environmental & Sanitation Offenses'),
         ('CRIMINAL', 'Criminal & Legal Offenses'),
     ]
-    
+
     key = models.CharField(max_length=30, choices=CATEGORY_KEYS, unique=True)
     name = models.CharField(max_length=120)
     description = models.TextField(blank=True)
@@ -187,8 +189,7 @@ class DisciplineCategory(models.Model):
     ], default='MODERATE')
     is_active = models.BooleanField(default=True)
     order = models.PositiveSmallIntegerField(default=0)
-    
-    # AI-specific fields for better risk calculation
+
     risk_weight = models.PositiveSmallIntegerField(
         default=1,
         choices=[(1, 'Very Low'), (2, 'Low'), (3, 'Medium'), (4, 'High'), (5, 'Very High')],
@@ -199,35 +200,34 @@ class DisciplineCategory(models.Model):
         choices=[(1, 'Very Low'), (2, 'Low'), (3, 'Medium'), (4, 'High'), (5, 'Very High')],
         help_text="Severity level of the offense"
     )
-    
+
     class Meta:
         verbose_name_plural = 'Discipline Categories'
         ordering = ['order', 'name']
-    
+
     def __str__(self):
         return self.name
-    
+
     def get_risk_multiplier(self):
-        """Get risk multiplier based on severity level"""
         return self.severity_level
 
 
 class Student(models.Model):
     FORM_CHOICES = [(f'Form {i}', f'Form {i}') for i in range(1, 11)]
-    
+
     RISK_LEVEL_CHOICES = [
         ('GOOD', 'Good'),
         ('WARNING', 'Warning'),
         ('CRITICAL', 'Critical'),
     ]
-    
+
     ACADEMIC_STATUS_CHOICES = [
         ('ACTIVE', 'Active'),
         ('TRANSFERRED', 'Transferred'),
         ('DROPPED', 'Dropped Out'),
         ('GRADUATED', 'Graduated'),
     ]
-    
+
     admission_number = models.CharField(max_length=20, unique=True, db_index=True)
     name = models.CharField(max_length=200, db_index=True)
     stream = models.ForeignKey(Stream, on_delete=models.CASCADE, related_name='students')
@@ -236,8 +236,7 @@ class Student(models.Model):
     year = models.IntegerField(default=timezone.now().year)
     optional_notes = models.TextField(blank=True)
     profile_picture = models.ImageField(upload_to='student_pics/', null=True, blank=True)
-    
-    # Risk Management Fields
+
     risk_score = models.IntegerField(default=0, validators=[MinValueValidator(0), MaxValueValidator(100)])
     risk_level = models.CharField(
         max_length=20,
@@ -245,27 +244,24 @@ class Student(models.Model):
         default='GOOD',
         db_index=True
     )
-    
-    # AI-specific fields for advanced analytics
+
     ai_risk_factors = models.JSONField(default=dict, blank=True, null=True)
     ai_last_analysis = models.DateTimeField(null=True, blank=True)
     intervention_count = models.PositiveIntegerField(default=0)
     last_incident_date = models.DateTimeField(null=True, blank=True)
-    
-    # Student Status Fields
+
     enrollment_date = models.DateField(null=True, blank=True)
     academic_status = models.CharField(
         max_length=20,
         choices=ACADEMIC_STATUS_CHOICES,
         default='ACTIVE'
     )
-    
-    # Timestamps
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='created_students')
     is_active = models.BooleanField(default=True)
-    
+
     class Meta:
         ordering = ['-created_at']
         indexes = [
@@ -277,68 +273,62 @@ class Student(models.Model):
             models.Index(fields=['last_incident_date']),
             models.Index(fields=['academic_status']),
         ]
-    
+
     def __str__(self):
         return f"{self.name} ({self.admission_number})"
-    
+
     def update_risk_score(self):
-        """Update risk score based on all reports"""
         total = self.reports.aggregate(total=Sum('points'))['total'] or 0
         self.risk_score = min(total, 100)
         self.update_risk_level()
         self.save(update_fields=['risk_score', 'risk_level', 'updated_at'])
         return self.risk_score
-    
+
     def update_risk_level(self):
-        """Update risk level based on risk score"""
         if self.risk_score >= 60:
             self.risk_level = 'CRITICAL'
         elif self.risk_score >= 30:
             self.risk_level = 'WARNING'
         else:
             self.risk_level = 'GOOD'
-    
+
     def update_last_incident(self):
-        """Update last incident date from latest report"""
         latest_report = self.reports.order_by('-reported_at').first()
         if latest_report:
             self.last_incident_date = latest_report.reported_at
             self.save(update_fields=['last_incident_date'])
-    
+
     def increment_intervention(self):
-        """Increment intervention counter"""
         self.intervention_count += 1
         self.save(update_fields=['intervention_count'])
-    
+
     def save(self, *args, **kwargs):
-        """Override save to auto-update risk level"""
-        self.update_risk_level()
+        """Save with proper handling of update_fields."""
+        if not kwargs.get('update_fields') or 'risk_level' in kwargs.get('update_fields', []):
+            self.update_risk_level()
         super().save(*args, **kwargs)
-    
+
     @property
     def is_critical(self):
         return self.risk_score >= 60
-    
+
     @property
     def total_reports(self):
         return self.reports.count()
-    
+
     @property
     def days_since_last_incident(self):
-        """Calculate days since last incident"""
         if self.last_incident_date:
             delta = timezone.now() - self.last_incident_date
             return delta.days
         return None
-    
+
     @property
     def risk_trend(self):
-        """Determine risk trend based on recent reports"""
         recent_reports = self.reports.order_by('-reported_at')[:5]
         if recent_reports.count() < 2:
             return 'stable'
-        
-        # Compare points from oldest to newest
+
         points = [r.points for r in recent_reports]
         if points[0] > points[-1]:
             return 'improving'
@@ -355,7 +345,7 @@ class DisciplineReport(models.Model):
         ('SERIOUS', 'Serious'),
         ('VERY_SERIOUS', 'Very Serious'),
     ]
-    
+
     student = models.ForeignKey(Student, on_delete=models.CASCADE, related_name='reports')
     reported_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='reports_made')
     category = models.ForeignKey(DisciplineCategory, on_delete=models.PROTECT, related_name='reports')
@@ -364,7 +354,7 @@ class DisciplineReport(models.Model):
     rating = models.CharField(max_length=20, choices=RATING_CHOICES, default='MODERATE')
     points = models.IntegerField(default=10)
     reported_at = models.DateTimeField(auto_now_add=True, db_index=True)
-    
+
     class Meta:
         ordering = ['-reported_at']
         indexes = [
@@ -373,10 +363,10 @@ class DisciplineReport(models.Model):
             models.Index(fields=['rating']),
             models.Index(fields=['points']),
         ]
-    
+
     def __str__(self):
         return f"{self.student.name} - {self.category_name} by {self.reported_by.username}"
-    
+
     def save(self, *args, **kwargs):
         self.category_name = self.category.name
         rating_points = {
@@ -386,7 +376,6 @@ class DisciplineReport(models.Model):
             'SERIOUS': 30,
             'VERY_SERIOUS': 40,
         }
-        # Apply category risk weight multiplier
         base_points = rating_points.get(self.rating, 10)
         self.points = base_points * self.category.risk_weight
         super().save(*args, **kwargs)
@@ -396,15 +385,16 @@ class DisciplineReport(models.Model):
         if self.student.total_reports >= 20 or self.student.risk_score >= 60:
             self._notify_admin()
         self._create_ai_analysis()
-    
+
     def _notify_class_teacher(self):
+        from .models import Notification
         class_teachers = User.objects.filter(
             teacher_profile__assigned_stream=self.student.stream,
             groups__name='ClassTeacher'
         )
         if class_teachers.exists():
             notification = Notification.objects.create(
-                title=f'📝 New Report: {self.student.name}',
+                title=f'?? New Report: {self.student.name}',
                 message=(
                     f'Student: {self.student.name} (ID: {self.student.admission_number})\n'
                     f'Category: {self.category_name}\n'
@@ -417,12 +407,12 @@ class DisciplineReport(models.Model):
                 student=self.student,
             )
             notification.target_users.set(class_teachers)
-    
+
     def _notify_admin(self):
         admins = User.objects.filter(is_superuser=True)
         if admins.exists():
             notification = Notification.objects.create(
-                title=f'⚠️ CRITICAL ALERT: {self.student.name}',
+                title=f'?? CRITICAL ALERT: {self.student.name}',
                 message=(
                     f'Student: {self.student.name} (ID: {self.student.admission_number})\n'
                     f'Total Reports: {self.student.total_reports}\n'
@@ -437,12 +427,11 @@ class DisciplineReport(models.Model):
             )
             notification.target_users.set(admins)
             notification.save()
-    
+
     def _create_ai_analysis(self):
-        """Create AI analysis for the student"""
-        from django.utils import timezone
         import json
-        
+
+
         student = self.student
         analysis = {
             'last_analysis': timezone.now().isoformat(),
@@ -453,14 +442,24 @@ class DisciplineReport(models.Model):
             'days_since_incident': student.days_since_last_incident,
             'intervention_count': student.intervention_count,
             'category_breakdown': list(
-                student.reports.values('category__name')
-                .annotate(count=models.Count('id'))
+                student.reports.select_related("category").values('category__name')
+                .annotate(count=Count('id'))
                 .order_by('-count')
             )
         }
         student.ai_risk_factors = analysis
         student.ai_last_analysis = timezone.now()
         student.save(update_fields=['ai_risk_factors', 'ai_last_analysis'])
+
+    def get_rating_display(self):
+        rating_map = {
+            'VERY_MINOR': 'Very Minor',
+            'MINOR': 'Minor',
+            'MODERATE': 'Moderate',
+            'SERIOUS': 'Serious',
+            'VERY_SERIOUS': 'Very Serious',
+        }
+        return rating_map.get(self.rating, self.rating)
 
 
 class Notification(models.Model):
@@ -470,7 +469,7 @@ class Notification(models.Model):
         ('info', 'Information'),
         ('success', 'Success'),
     ]
-    
+
     title = models.CharField(max_length=200)
     message = models.TextField()
     notification_type = models.CharField(max_length=20, choices=NOTIFICATION_TYPES)
@@ -478,7 +477,7 @@ class Notification(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     is_read = models.BooleanField(default=False)
     target_users = models.ManyToManyField(User, related_name='notifications')
-    
+
     class Meta:
         ordering = ['-created_at']
         indexes = [
@@ -486,10 +485,10 @@ class Notification(models.Model):
             models.Index(fields=['is_read']),
             models.Index(fields=['notification_type']),
         ]
-    
+
     def __str__(self):
         return f"{self.title} - {self.notification_type}"
-    
+
     def mark_read(self, user):
         self.target_users.remove(user)
         if not self.target_users.exists():
@@ -504,7 +503,7 @@ class PasswordReset(models.Model):
         ('completed', 'Completed'),
         ('rejected', 'Rejected'),
     ]
-    
+
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='password_resets')
     requested_at = models.DateTimeField(auto_now_add=True)
     resolved_at = models.DateTimeField(null=True, blank=True)
@@ -512,14 +511,14 @@ class PasswordReset(models.Model):
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
     new_password = models.CharField(max_length=128, blank=True, null=True)
     notes = models.TextField(blank=True)
-    
+
     class Meta:
         ordering = ['-requested_at']
         indexes = [
             models.Index(fields=['status']),
             models.Index(fields=['requested_at']),
         ]
-    
+
     def __str__(self):
         return f"{self.user.username} - {self.status} - {self.requested_at}"
 
@@ -529,7 +528,6 @@ class PasswordReset(models.Model):
 # ============================================
 
 def create_admin_notification(title, message, notification_type='info', student=None):
-    """Create a notification for all admin users"""
     admins = User.objects.filter(is_superuser=True)
     if admins.exists():
         notification = Notification.objects.create(
@@ -544,7 +542,6 @@ def create_admin_notification(title, message, notification_type='info', student=
 
 
 def create_user_notification(user, title, message, notification_type='info', student=None):
-    """Create a notification for a specific user"""
     notification = Notification.objects.create(
         title=title,
         message=message,
@@ -553,27 +550,25 @@ def create_user_notification(user, title, message, notification_type='info', stu
     )
     notification.target_users.add(user)
     if notification_type == 'critical':
-        create_admin_notification(f'⚠️ {title}', message, 'critical', student)
+        create_admin_notification(f'?? {title}', message, 'critical', student)
     return notification
 
 
 def bulk_update_risk_levels():
-    """Utility function to update all students' risk levels"""
     from django.db import transaction
-    
+
     with transaction.atomic():
         for student in Student.objects.all():
             student.update_risk_level()
             student.save(update_fields=['risk_level'])
-    print(f"✅ Updated risk levels for {Student.objects.count()} students")
+    print(f"? Updated risk levels for {Student.objects.count()} students")
 
 
 def calculate_risk_trend(student):
-    """Calculate risk trend for a student"""
     recent_reports = student.reports.order_by('-reported_at')[:5]
     if recent_reports.count() < 2:
         return 'stable'
-    
+
     points = [r.points for r in recent_reports]
     if points[0] > points[-1]:
         return 'improving'

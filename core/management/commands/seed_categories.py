@@ -1,5 +1,6 @@
-﻿from django.core.management.base import BaseCommand
+from django.core.management.base import BaseCommand
 from core.models import DisciplineCategory
+
 
 class Command(BaseCommand):
     help = 'Seed discipline categories'
@@ -44,8 +45,8 @@ class Command(BaseCommand):
             )
             if created:
                 count += 1
-                self.stdout.write(f'✅ Created: {name}')
+                self.stdout.write(f'? Created: {name}')
             else:
-                self.stdout.write(f'⚠️ Already exists: {name}')
+                self.stdout.write(f'?? Already exists: {name}')
 
-        self.stdout.write(self.style.SUCCESS(f'✅ {count} categories created successfully!'))
+        self.stdout.write(self.style.SUCCESS(f'? {count} categories created successfully!'))

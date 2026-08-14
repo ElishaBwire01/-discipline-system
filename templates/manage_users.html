@@ -1,11 +1,10 @@
-﻿{% extends 'base.html' %}
+{% extends 'base.html' %}
 
 {% block title %}Manage Users{% endblock %}
 
 {% block content %}
 <div class="card-modern" data-aos="fade-up">
     <div class="card-header-modern">
-        <span class="header-icon"><i class="fas fa-users-cog"></i></span>
         User Management
         {% if pending_approvals > 0 %}<span class="badge bg-light text-dark ms-2">{{ pending_approvals }} pending</span>{% endif %}
         <span class="badge bg-light text-dark ms-2 ms-auto">Total: {{ teacher_users|length }}</span>
@@ -32,20 +31,16 @@
                         <td>
                             <div class="d-flex gap-1 flex-wrap">
                                 {% if not user.teacher_profile.is_approved and not user.teacher_profile.is_suspended and not user.is_superuser %}
-                                <form method="post" action="{% url 'approve_user' user.id %}">
-                                    {% csrf_token %}<button type="submit" class="btn-modern btn-modern-success btn-modern-sm"><i class="fas fa-check"></i></button>
+                                <form method="post" action="/approve_user/{{ user.id }}/">
                                 </form>
                                 {% endif %}
                                 {% if user.teacher_profile.is_approved and not user.teacher_profile.is_suspended and not user.is_superuser %}
-                                <button class="btn-modern btn-modern-warning btn-modern-sm" onclick="suspendUser({{ user.id }})"><i class="fas fa-pause"></i></button>
                                 {% endif %}
                                 {% if user.teacher_profile.is_suspended and not user.is_superuser %}
-                                <form method="post" action="{% url 'unsuspend_user' user.id %}">
-                                    {% csrf_token %}<button type="submit" class="btn-modern btn-modern-success btn-modern-sm"><i class="fas fa-play"></i></button>
+                                <form method="post" action="/unsuspend_user/{{ user.id }}/">
                                 </form>
                                 {% endif %}
                                 {% if not user.is_superuser %}
-                                <button class="btn-modern btn-modern-danger btn-modern-sm" onclick="deleteUser({{ user.id }}, '{{ user.username }}')"><i class="fas fa-trash"></i></button>
                                 {% endif %}
                             </div>
                         </td>
@@ -60,7 +55,6 @@
 <!-- Suspend Modal -->
 <div class="modal fade" id="suspendModal" tabindex="-1">
     <div class="modal-dialog"><div class="modal-content border-0 shadow-lg rounded-4">
-        <div class="modal-header border-0"><h5 class="modal-title"><i class="fas fa-pause text-warning me-2"></i>Suspend User</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
         <form method="post" id="suspendForm"><div class="modal-body"><p>Reason for suspension</p><textarea name="reason" class="form-control-modern" rows="3" placeholder="Enter reason..." required></textarea></div><div class="modal-footer border-0"><button type="button" class="btn-modern btn-modern-secondary" data-bs-dismiss="modal">Cancel</button><button type="submit" class="btn-modern btn-modern-warning">Suspend</button></div></form>
     </div></div>
 </div>
@@ -68,8 +62,7 @@
 <!-- Ban Modal -->
 <div class="modal fade" id="deleteModal" tabindex="-1">
     <div class="modal-dialog"><div class="modal-content border-0 shadow-lg rounded-4">
-        <div class="modal-header border-0"><h5 class="modal-title text-danger"><i class="fas fa-exclamation-triangle me-2"></i>Permanent Ban</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
-        <form method="post" id="deleteForm"><div class="modal-body"><p class="text-danger fw-bold">⚠️ This action is irreversible!</p><p>Ban <strong id="deleteUserName"></strong> permanently.</p><textarea name="reason" class="form-control-modern" rows="3" placeholder="Reason for ban..." required></textarea></div><div class="modal-footer border-0"><button type="button" class="btn-modern btn-modern-secondary" data-bs-dismiss="modal">Cancel</button><button type="submit" class="btn-modern btn-modern-danger">Permanently Ban</button></div></form>
+        <form method="post" id="deleteForm"><div class="modal-body"><p class="text-danger fw-bold">?? This action is irreversible!</p><p>Ban <strong id="deleteUserName"></strong> permanently.</p><textarea name="reason" class="form-control-modern" rows="3" placeholder="Reason for ban..." required></textarea></div><div class="modal-footer border-0"><button type="button" class="btn-modern btn-modern-secondary" data-bs-dismiss="modal">Cancel</button><button type="submit" class="btn-modern btn-modern-danger">Permanently Ban</button></div></form>
     </div></div>
 </div>
 

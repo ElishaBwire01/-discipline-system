@@ -1,6 +1,8 @@
-﻿from django.contrib.auth.decorators import user_passes_test
-from django.core.exceptions import PermissionDenied
+from django.contrib.auth.decorators import user_passes_test
 from functools import wraps
+
+from django.core.exceptions import PermissionDenied
+
 
 def admin_only(view_func):
     """Decorator to allow only admin users"""
@@ -30,7 +32,7 @@ def teacher_only(view_func):
     def wrapper(request, *args, **kwargs):
         if not request.user.is_authenticated:
             return redirect('login')
-        if not (request.user.is_superuser or 
+        if not (request.user.is_superuser or
                 request.user.groups.filter(name='ClassTeacher').exists() or
                 request.user.groups.filter(name='Teacher').exists()):
             raise PermissionDenied("Teacher access required")
