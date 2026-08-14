@@ -688,37 +688,7 @@ You are the ultimate assistant for this school's discipline management - use you
                 # If we exit the loop without success, return last seen error
                 return {"success": False, "error": f"http_{resp.status_code if resp else 'no_response'}", "raw": last_body, "retry_after": last_retry_after}
 
-            if provider == "pollinations":
-                # Pollinations simple text generation (example)
-                url = os.environ.get("POLLINATIONS_URL", "https://gen.pollinations.ai/v1/chat/completions")
-                headers = {"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"}
-                payload = {"model": model_name, "messages": messages}
-                resp = requests.post(url, headers=headers, json=payload, timeout=30)
-                if resp.status_code != 200:
-                    try:
-                        body = resp.text
-                    except Exception:
-                        body = "<unreadable>"
-                    retry_after = 0
-                    try:
-                        retry_after = int(resp.headers.get("Retry-After") or resp.headers.get("retry-after") or 0)
-                    except Exception:
-                        retry_after = 0
-                    safe_headers = {k: v for k, v in resp.headers.items() if k.lower() != "authorization"}
-                    self.logger.warning(
-                        "Provider %s returned %s for %s (model=%s): %s headers=%s",
-                        provider,
-                        resp.status_code,
-                        url,
-                        model_name,
-                        (body[:1000] + "...") if len(body) > 1000 else body,
-                        safe_headers,
-                    )
-                    return {"success": False, "error": f"http_{resp.status_code}", "raw": body, "retry_after": retry_after}
-                data = resp.json()
-                # Best-effort parse
-                text = data.get("choices", [{}])[0].get("message", {}).get("content") or data.get("output") or json.dumps(data)
-                return {"success": True, "response": text, "usage": data.get("usage", {}), "model_used": model_name}
+            # Pollinations provider removed from supported providers per project policy
 
             return {"success": False, "error": "unknown_provider"}
         except Exception as e:
