@@ -12,7 +12,7 @@ PROVIDERS: List[str] = [
     "gemini",
     "openrouter",
     "openai",
-    "pollinations",
+    # 'pollinations' intentionally excluded per project policy
 ]
 
 # Task-specific provider routing. Keys are normalized task identifiers.
@@ -41,8 +41,9 @@ def load_models() -> Dict[str, str]:
         "openai": os.environ.get("OPENAI_MODEL", "gpt-3.5-turbo"),
         "openrouter": os.environ.get("OPENROUTER_MODEL", "openai/gpt-3.5-turbo"),
         "groq": os.environ.get("GROQ_MODEL", "openai/gpt-oss-120b"),
-        "gemini": os.environ.get("GEMINI_MODEL", "gemma-4-26b-a4b-it"),
-        "pollinations": os.environ.get("POLLINATION_MODEL", "mistral"),
+        # Prefer the Gemma family when using Gemini
+        "gemini": os.environ.get("GEMINI_MODEL", "gemma"),
+        # Pollinations intentionally not used
     }
 
 def configured_providers() -> List[str]:
