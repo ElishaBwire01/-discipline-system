@@ -15,6 +15,18 @@ PROVIDERS: List[str] = [
     "pollinations",
 ]
 
+# Task-specific provider routing. Keys are normalized task identifiers.
+TASK_ROUTING = {
+    # incident classification: prefer Google Gemini, fall back to Groq
+    "incident_classification": ["gemini", "groq", "openrouter", "openai"],
+    # report generation: Gemini first, Groq as fallback
+    "report_generation": ["gemini", "groq", "openrouter", "openai"],
+    # short responses: Groq first for concise replies, then Gemini
+    "short_responses": ["groq", "gemini", "openrouter", "openai"],
+    # long-context analysis: Gemini preferred (long-context engines), then Groq
+    "long_context_analysis": ["gemini", "groq", "openrouter", "openai"],
+}
+
 def load_provider_keys() -> Dict[str, str]:
     return {
         "openai": os.environ.get("OPENAI_API_KEY", ""),
@@ -37,6 +49,32 @@ def configured_providers() -> List[str]:
     keys = load_provider_keys()
     # Return providers that have a non-empty key, preserving order
     return [p for p in PROVIDERS if keys.get(p)]
+
+
+def get_providers_for_task(task_type: str) -> List[str]:
+    """Return ordered list of providers for a given task_type.
+
+    If the task_type is unknown, return the configured providers in their
+    default order. The returned list only includes providers that have
+    non-empty API keys (configured).
+    """
+    if not task_type:
+        return configured_providers()
+
+    normalized = re_normalize_task = task_type.lower().strip().replace(" ", "_")
+    # If a mapping exists, pick it; otherwise, return configured providers
+    mapping = TASK_ROUTING.get(normalized)
+    if not mapping:
+        return configured_providers()
+
+    # Filter mapping by providers that are actually configured
+    configured = configured_providers()
+    ordered = [p for p in mapping if p in configured]
+    # Append any remaining configured providers not already present
+    for p in configured:
+        if p not in ordered:
+            ordered.append(p)
+    return ordered
 
 def any_provider_configured() -> bool:
     return any(bool(v) for v in load_provider_keys().values())

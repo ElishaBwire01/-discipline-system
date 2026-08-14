@@ -5,7 +5,7 @@ import re
 import time
 import logging
 from datetime import datetime, timedelta
-from core.ai_providers import load_provider_keys, load_models, PROVIDERS
+from core.ai_providers import load_provider_keys, load_models, PROVIDERS, get_providers_for_task, configured_providers
 
 import requests
 from django.db.models import Avg, Count, Q, Sum
@@ -34,7 +34,8 @@ class PollinationAIChat:
         self.logger.setLevel(logging.INFO)
 
         # Provider configuration is centralized in core.ai_providers
-        self.providers = PROVIDERS
+        # Default provider order is the set of configured providers (those with keys)
+        self.providers = configured_providers()
         self.provider_keys = load_provider_keys()
         self.models = load_models()
 
@@ -681,10 +682,15 @@ You are the ultimate assistant for this school's discipline management - use you
             self.logger.exception("Provider %s call failed", provider)
             return {"success": False, "error": str(e)}
 
-    def _call_providers_in_order(self, messages):
-        """Try providers in configured order with retries and exponential backoff."""
+    def _call_providers_in_order(self, messages, provider_order=None):
+        """Try providers in the given order (or configured order) with retries and exponential backoff.
+
+        `provider_order` may be supplied (list of provider keys) to prioritize certain
+        providers for a task. Only providers with configured API keys are attempted.
+        """
         last_error = None
-        for provider in self.providers:
+        order = provider_order or self.providers
+        for provider in order:
             # Skip providers without keys
             if not self.provider_keys.get(provider):
                 self.logger.debug("Provider %s skipped (no key)", provider)
@@ -968,8 +974,26 @@ You are the ultimate assistant for this school's discipline management - use you
 
         messages.append({"role": "user", "content": user_message})
 
-        # Try configured providers in order with automatic failover
-        provider_result = self._call_providers_in_order(messages)
+        # Determine provider order based on task routing (if any)
+        task_type = intent.get("type")
+        # Map internal intent types to routing keys when possible
+        routing_key = None
+        if task_type == "student":
+            routing_key = "report_generation"
+        elif task_type == "stats":
+            routing_key = "report_generation"
+        elif intent.get("action") == "reports":
+            routing_key = "report_generation"
+        # Allow explicit short/long hints in message (quick heuristic)
+        if any(word in user_message.lower() for word in ["short", "brief", "one-liner"]):
+            routing_key = "short_responses"
+        if any(word in user_message.lower() for word in ["analyze", "deep", "long", "detailed", "thorough"]):
+            routing_key = routing_key or "long_context_analysis"
+
+        provider_order = get_providers_for_task(routing_key) if routing_key else None
+
+        # Try providers in order with automatic failover
+        provider_result = self._call_providers_in_order(messages, provider_order=provider_order)
         if provider_result.get("success"):
             return {
                 "success": True,
