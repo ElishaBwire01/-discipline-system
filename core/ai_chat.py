@@ -529,14 +529,57 @@ You are the ultimate assistant for this school's discipline management - use you
                             safe_headers,
                         )
                         return {"success": False, "error": f"http_{resp.status_code}", "raw": body, "retry_after": retry_after}
-                    data = resp.json()
-                # Parse OpenAI-style response
+                    try:
+                        data = resp.json()
+                    except Exception:
+                        data = None
+                else:
+                    # Standard OpenAI-style payload for openai/openrouter
+                    payload = {
+                        "model": model_name,
+                        "messages": messages,
+                        "temperature": float(os.environ.get("AI_TEMPERATURE", "0.7")),
+                        "max_tokens": int(os.environ.get("AI_MAX_TOKENS", "1024")),
+                        "top_p": float(os.environ.get("AI_TOP_P", "1")),
+                    }
+                    resp = requests.post(url, headers=headers, json=payload, timeout=30)
+                    if resp.status_code != 200:
+                        try:
+                            body = resp.text
+                        except Exception:
+                            body = "<unreadable>"
+                        retry_after = 0
+                        try:
+                            retry_after = int(resp.headers.get("Retry-After") or resp.headers.get("retry-after") or 0)
+                        except Exception:
+                            retry_after = 0
+                        safe_headers = {k: v for k, v in resp.headers.items() if k.lower() != "authorization"}
+                        self.logger.warning(
+                            "Provider %s returned %s for %s (model=%s): %s headers=%s",
+                            provider,
+                            resp.status_code,
+                            url,
+                            model_name,
+                            (body[:1000] + "...") if len(body) > 1000 else body,
+                            safe_headers,
+                        )
+                        return {"success": False, "error": f"http_{resp.status_code}", "raw": body, "retry_after": retry_after}
+                    try:
+                        data = resp.json()
+                    except Exception:
+                        data = None
+
+                # Parse OpenAI-style response if present
                 try:
-                    text = data["choices"][0]["message"]["content"]
+                    if isinstance(data, dict) and data.get("choices"):
+                        # Chat completions v1
+                        text = data["choices"][0].get("message", {}).get("content") or data["choices"][0].get("text")
+                    else:
+                        text = json.dumps(data)
                 except Exception:
-                    # Some providers return top-level text
-                    text = data.get("choices", [{}])[0].get("text") or json.dumps(data)
-                return {"success": True, "response": text, "usage": data.get("usage", {}), "model_used": model_name}
+                    text = json.dumps(data) if data is not None else ""
+
+                return {"success": True, "response": text, "usage": data.get("usage", {}) if isinstance(data, dict) else {}, "model_used": model_name}
 
             if provider == "gemini":
                 # Google Generative Language: try multiple payload shapes to maximize compatibility
