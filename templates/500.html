@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -110,19 +110,15 @@
 </head>
 <body>
     <div class="error-box">
-        <div class="error-icon"><i class="fas fa-exclamation-triangle"></i></div>
         <h1>500 - Server Error</h1>
         <p class="subtitle">Something went wrong on our end. Please try again later.</p>
         
         <div class="error-preview" id="errorPreview">
-            <strong><i class="fas fa-bug me-1"></i> Error:</strong>
             <span id="errorPreviewText">Loading error details...</span>
         </div>
         
         <div class="buttons-row">
-            <a href="/" class="btn-home"><i class="fas fa-home"></i> Go Home</a>
             <button class="btn-report" id="reportErrorBtn">
-                <i class="fas fa-bug"></i> Report Error
                 <span class="spinner-border spinner-border-sm ms-1" id="reportSpinner" style="display: none; width: 14px; height: 14px;" role="status"></span>
             </button>
         </div>
@@ -156,7 +152,6 @@
                 // Show error preview
                 const preview = document.getElementById('errorPreview');
                 preview.innerHTML = `
-                    <strong><i class="fas fa-bug me-1"></i> Error:</strong>
                     <span style="color: #dc2626;">${errorData.message || 'Unknown error'}</span>
                     <br><small style="color: #6b7280;">Type: ${errorData.type || 'Unknown'}</small>
                 `;
@@ -181,7 +176,7 @@
             btn.disabled = true;
             spinner.style.display = 'inline-block';
             status.className = 'report-status loading';
-            status.textContent = '📤 Sending error report...';
+            status.textContent = '?? Sending error report...';
             status.style.display = 'block';
 
             // Prepare data to send
@@ -208,18 +203,17 @@
                 spinner.style.display = 'none';
                 if (data.status === 'success') {
                     status.className = 'report-status success';
-                    status.textContent = '✅ Error report sent! Check your terminal.';
-                    btn.innerHTML = '<i class="fas fa-check"></i> Reported';
+                    status.textContent = '? Error report sent! Check your terminal.';
                 } else {
                     status.className = 'report-status error';
-                    status.textContent = '❌ Failed to send error report.';
+                    status.textContent = '? Failed to send error report.';
                     btn.disabled = false;
                 }
             })
             .catch(err => {
                 spinner.style.display = 'none';
                 status.className = 'report-status error';
-                status.textContent = '❌ Could not connect to server.';
+                status.textContent = '? Could not connect to server.';
                 btn.disabled = false;
             });
         });

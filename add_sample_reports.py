@@ -1,6 +1,7 @@
-﻿from core.models import Student, DisciplineCategory, DisciplineReport
-from django.contrib.auth.models import User
+from core.models import Student, DisciplineCategory, DisciplineReport
 import random
+
+from django.contrib.auth.models import User
 
 # Get admin
 admin = User.objects.filter(is_superuser=True).first()
@@ -8,7 +9,7 @@ students = Student.objects.filter(is_active=True)
 categories = DisciplineCategory.objects.filter(is_active=True)
 
 if not categories:
-    print("❌ No categories! Run: python manage.py seed_categories")
+    print("? No categories! Run: python manage.py seed_categories")
 else:
     reports_added = 0
     for student in students[:5]:  # First 5 students
@@ -23,7 +24,7 @@ else:
                 rating=rating
             )
             reports_added += 1
-            print(f"✅ Report for {student.name}: {category.name} ({rating})")
-    
-    print(f"\n✅ {reports_added} reports added!")
-    print(f"📊 Total reports: {DisciplineReport.objects.count()}")
+            print(f"? Report for {student.name}: {category.name} ({rating})")
+
+    print(f"\n? {reports_added} reports added!")
+    print(f"?? Total reports: {DisciplineReport.objects.count()}")

@@ -1,0 +1,1018 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Django Project Fix Report</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f0f2f5;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 { color: #1a1a2e; border-bottom: 3px solid #4a90d9; padding-bottom: 15px; margin-bottom: 25px; }
+        .summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 25px 0;
+        }
+        .summary-card {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .summary-card .number { font-size: 32px; font-weight: bold; color: #2c3e50; }
+        .summary-card .label { font-size: 14px; color: #7f8c8d; margin-top: 5px; }
+        .summary-card.critical .number { color: #e74c3c; }
+        .summary-card.warning .number { color: #f39c12; }
+        .summary-card.info .number { color: #3498db; }
+        .summary-card.success .number { color: #2ecc71; }
+        .issue-list { margin: 20px 0; }
+        .issue-item {
+            border-left: 4px solid #3498db;
+            padding: 10px 15px;
+            margin: 10px 0;
+            background: #f8f9fa;
+            border-radius: 4px;
+        }
+        .issue-item.ERROR { border-color: #e74c3c; background: #fdf0ee; }
+        .issue-item.CRITICAL { border-color: #e74c3c; background: #fdf0ee; }
+        .issue-item.WARNING { border-color: #f39c12; background: #fef9e7; }
+        .issue-item.INFO { border-color: #3498db; background: #ebf5fb; }
+        .issue-item.SUGGESTION { border-color: #2ecc71; background: #eafaf1; }
+        .issue-item .file { font-weight: bold; color: #2c3e50; }
+        .issue-item .message { margin: 5px 0; }
+        .issue-item .fix { color: #27ae60; font-size: 12px; }
+        .severity-badge {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: bold;
+        }
+        .severity-badge.ERROR { background: #e74c3c; color: white; }
+        .severity-badge.CRITICAL { background: #e74c3c; color: white; }
+        .severity-badge.WARNING { background: #f39c12; color: white; }
+        .severity-badge.INFO { background: #3498db; color: white; }
+        .severity-badge.SUGGESTION { background: #2ecc71; color: white; }
+        .footer { margin-top: 30px; padding-top: 20px; border-top: 1px solid #ecf0f1; text-align: center; color: #95a5a6; font-size: 12px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 Django Project Fix Report</h1>
+        <p><strong>Generated:</strong> 2026-07-12 02:01:52</p>
+        <p><strong>Project Root:</strong> 63 files analyzed</p>
+        
+        <div class="summary">
+            <div class="summary-card success">
+                <div class="number">63</div>
+                <div class="label">Total Files</div>
+            </div>
+            <div class="summary-card critical">
+                <div class="number">42</div>
+                <div class="label">Critical Issues</div>
+            </div>
+            <div class="summary-card warning">
+                <div class="number">870</div>
+                <div class="label">Warnings</div>
+            </div>
+            <div class="summary-card info">
+                <div class="number">146</div>
+                <div class="label">Info & Suggestions</div>
+            </div>
+            <div class="summary-card success">
+                <div class="number">79</div>
+                <div class="label">Auto-fixes Applied</div>
+            </div>
+        </div>
+
+        <h2>📋 Issues by Category</h2>
+        <ul>
+<li><strong>syntax:</strong> 37</li><li><strong>django:</strong> 140</li><li><strong>style:</strong> 867</li><li><strong>security:</strong> 14</li>
+        </ul>
+
+        <h2>⚠️ Issues Found</h2>
+        <div class="issue-list">
+
+            <div class="issue-item ERROR">
+                <span class="severity-badge ERROR">ERROR</span>
+                <span class="file">C:\Users\CMC BANGLADESH\disciplinev12\add_columns.py</span>
+                <span style="color: #7f8c8d;">line 1</span>
+                <div class="message">Syntax error: invalid non-printable character U+FEFF</div>
+                <div class="fix">Category: syntax</div>
+<div class="fix">💡 Fix the syntax error</div><div class="fix">✅ Auto-fixable</div>
+            </div>
+
+            <div class="issue-item ERROR">
+                <span class="severity-badge ERROR">ERROR</span>
+                <span class="file">C:\Users\CMC BANGLADESH\disciplinev12\add_custom_category.py</span>
+                <span style="color: #7f8c8d;">line 1</span>
+                <div class="message">Syntax error: invalid non-printable character U+FEFF</div>
+                <div class="fix">Category: syntax</div>
+<div class="fix">💡 Fix the syntax error</div><div class="fix">✅ Auto-fixable</div>
+            </div>
+
+            <div class="issue-item ERROR">
+                <span class="severity-badge ERROR">ERROR</span>
+                <span class="file">C:\Users\CMC BANGLADESH\disciplinev12\add_rating.py</span>
+                <span style="color: #7f8c8d;">line 1</span>
+                <div class="message">Syntax error: invalid non-printable character U+FEFF</div>
+                <div class="fix">Category: syntax</div>
+<div class="fix">💡 Fix the syntax error</div><div class="fix">✅ Auto-fixable</div>
+            </div>
+
+            <div class="issue-item ERROR">
+                <span class="severity-badge ERROR">ERROR</span>
+                <span class="file">C:\Users\CMC BANGLADESH\disciplinev12\add_rating_column.py</span>
+                <span style="color: #7f8c8d;">line 1</span>
+                <div class="message">Syntax error: invalid non-printable character U+FEFF</div>
+                <div class="fix">Category: syntax</div>
+<div class="fix">💡 Fix the syntax error</div><div class="fix">✅ Auto-fixable</div>
+            </div>
+
+            <div class="issue-item ERROR">
+                <span class="severity-badge ERROR">ERROR</span>
+                <span class="file">C:\Users\CMC BANGLADESH\disciplinev12\add_reports.py</span>
+                <span style="color: #7f8c8d;">line 1</span>
+                <div class="message">Syntax error: invalid non-printable character U+FEFF</div>
+                <div class="fix">Category: syntax</div>
+<div class="fix">💡 Fix the syntax error</div><div class="fix">✅ Auto-fixable</div>
+            </div>
+
+            <div class="issue-item SUGGESTION">
+                <span class="severity-badge SUGGESTION">SUGGESTION</span>
+                <span class="file">C:\Users\CMC BANGLADESH\disciplinev12\add_reports.py</span>
+                <span style="color: #7f8c8d;">line 2</span>
+                <div class="message">Consider using settings.AUTH_USER_MODEL for better flexibility</div>
+                <div class="fix">Category: django</div>
+
+            </div>
+
+            <div class="issue-item WARNING">
+                <span class="severity-badge WARNING">WARNING</span>
+                <span class="file">C:\Users\CMC BANGLADESH\disciplinev12\add_reports.py</span>
+                <span style="color: #7f8c8d;">line 11</span>
+                <div class="message">Trailing whitespace detected</div>
+                <div class="fix">Category: style</div>
+<div class="fix">💡 Remove trailing whitespace</div><div class="fix">✅ Auto-fixable</div>
+            </div>
+
+            <div class="issue-item WARNING">
+                <span class="severity-badge WARNING">WARNING</span>
+                <span class="file">C:\Users\CMC BANGLADESH\disciplinev12\add_reports.py</span>
+                <span style="color: #7f8c8d;">line 17</span>
+                <div class="message">Trailing whitespace detected</div>
+                <div class="fix">Category: style</div>
+<div class="fix">💡 Remove trailing whitespace</div><div class="fix">✅ Auto-fixable</div>
+            </div>
+
+            <div class="issue-item WARNING">
+                <span class="severity-badge WARNING">WARNING</span>
+                <span class="file">C:\Users\CMC BANGLADESH\disciplinev12\add_reports.py</span>
+                <span style="color: #7f8c8d;">line 23</span>
+                <div class="message">Trailing whitespace detected</div>
+                <div class="fix">Category: style</div>
+<div class="fix">💡 Remove trailing whitespace</div><div class="fix">✅ Auto-fixable</div>
+            </div>
+
+            <div class="issue-item WARNING">
+                <span class="severity-badge WARNING">WARNING</span>
+                <span class="file">C:\Users\CMC BANGLADESH\disciplinev12\add_reports.py</span>
+                <span style="color: #7f8c8d;">line 26</span>
+                <div class="message">Trailing whitespace detected</div>
+                <div class="fix">Category: style</div>
+<div class="fix">💡 Remove trailing whitespace</div><div class="fix">✅ Auto-fixable</div>
+            </div>
+
+            <div class="issue-item WARNING">
+                <span class="severity-badge WARNING">WARNING</span>
+                <span class="file">C:\Users\CMC BANGLADESH\disciplinev12\add_reports.py</span>
+                <span style="color: #7f8c8d;">line 28</span>
+                <div class="message">Trailing whitespace detected</div>
+                <div class="fix">Category: style</div>
+<div class="fix">💡 Remove trailing whitespace</div><div class="fix">✅ Auto-fixable</div>
+            </div>
+
+            <div class="issue-item WARNING">
+                <span class="severity-badge WARNING">WARNING</span>
+                <span class="file">C:\Users\CMC BANGLADESH\disciplinev12\add_reports.py</span>
+                <span style="color: #7f8c8d;">line 34</span>
+                <div class="message">Trailing whitespace detected</div>
+                <div class="fix">Category: style</div>
+<div class="fix">💡 Remove trailing whitespace</div><div class="fix">✅ Auto-fixable</div>
+            </div>
+
+            <div class="issue-item WARNING">
+                <span class="severity-badge WARNING">WARNING</span>
+                <span class="file">C:\Users\CMC BANGLADESH\disciplinev12\add_reports.py</span>
+                <span style="color: #7f8c8d;">line 47</span>
+                <div class="message">Trailing whitespace detected</div>
+                <div class="fix">Category: style</div>
+<div class="fix">💡 Remove trailing whitespace</div><div class="fix">✅ Auto-fixable</div>
+            </div>
+
+            <div class="issue-item WARNING">
+                <span class="severity-badge WARNING">WARNING</span>
+                <span class="file">C:\Users\CMC BANGLADESH\disciplinev12\add_reports.py</span>
+                <span style="color: #7f8c8d;">line 60</span>
+                <div class="message">Trailing whitespace detected</div>
+                <div class="fix">Category: style</div>
+<div class="fix">💡 Remove trailing whitespace</div><div class="fix">✅ Auto-fixable</div>
+            </div>
+
+            <div class="issue-item ERROR">
+                <span class="severity-badge ERROR">ERROR</span>
+                <span class="file">C:\Users\CMC BANGLADESH\disciplinev12\add_sample_reports.py</span>
+                <span style="color: #7f8c8d;">line 1</span>
+                <div class="message">Syntax error: invalid non-printable character U+FEFF</div>
+                <div class="fix">Category: syntax</div>
+<div class="fix">💡 Fix the syntax error</div><div class="fix">✅ Auto-fixable</div>
+            </div>
+
+            <div class="issue-item SUGGESTION">
+                <span class="severity-badge SUGGESTION">SUGGESTION</span>
+                <span class="file">C:\Users\CMC BANGLADESH\disciplinev12\add_sample_reports.py</span>
+                <span style="color: #7f8c8d;">line 2</span>
+                <div class="message">Consider using settings.AUTH_USER_MODEL for better flexibility</div>
+                <div class="fix">Category: django</div>
+
+            </div>
+
+            <div class="issue-item WARNING">
+                <span class="severity-badge WARNING">WARNING</span>
+                <span class="file">C:\Users\CMC BANGLADESH\disciplinev12\add_sample_reports.py</span>
+                <span style="color: #7f8c8d;">line 27</span>
+                <div class="message">Trailing whitespace detected</div>
+                <div class="fix">Category: style</div>
+<div class="fix">💡 Remove trailing whitespace</div><div class="fix">✅ Auto-fixable</div>
+            </div>
+
+            <div class="issue-item ERROR">
+                <span class="severity-badge ERROR">ERROR</span>
+                <span class="file">C:\Users\CMC BANGLADESH\disciplinev12\check_fields.py</span>
+                <span style="color: #7f8c8d;">line 1</span>
+                <div class="message">Syntax error: invalid non-printable character U+FEFF</div>
+                <div class="fix">Category: syntax</div>
+<div class="fix">💡 Fix the syntax error</div><div class="fix">✅ Auto-fixable</div>
+            </div>
+
+            <div class="issue-item ERROR">
+                <span class="severity-badge ERROR">ERROR</span>
+                <span class="file">C:\Users\CMC BANGLADESH\disciplinev12\create_admin.py</span>
+                <span style="color: #7f8c8d;">line 1</span>
+                <div class="message">Syntax error: invalid non-printable character U+FEFF</div>
+                <div class="fix">Category: syntax</div>
+<div class="fix">💡 Fix the syntax error</div><div class="fix">✅ Auto-fixable</div>
+            </div>
+
+            <div class="issue-item SUGGESTION">
+                <span class="severity-badge SUGGESTION">SUGGESTION</span>
+                <span class="file">C:\Users\CMC BANGLADESH\disciplinev12\create_admin.py</span>
+                <span style="color: #7f8c8d;">line 7</span>
+                <div class="message">Consider using settings.AUTH_USER_MODEL for better flexibility</div>
+                <div class="fix">Category: django</div>
+
+            </div>
+
+            <div class="issue-item SUGGESTION">
+                <span class="severity-badge SUGGESTION">SUGGESTION</span>
+                <span class="file">C:\Users\CMC BANGLADESH\disciplinev12\create_admin.py</span>
+                <span style="color: #7f8c8d;">line 17</span>
+                <div class="message">Consider using .update() for batch operations</div>
+                <div class="fix">Category: django</div>
+
+            </div>
+
+            <div class="issue-item CRITICAL">
+                <span class="severity-badge CRITICAL">CRITICAL</span>
+                <span class="file">C:\Users\CMC BANGLADESH\disciplinev12\create_admin.py</span>
+                <span style="color: #7f8c8d;">line 13</span>
+                <div class="message">Hardcoded password detected</div>
+                <div class="fix">Category: security</div>
+<div class="fix">💡 Use environment variables instead</div>
+            </div>
+
+            <div class="issue-item SUGGESTION">
+                <span class="severity-badge SUGGESTION">SUGGESTION</span>
+                <span class="file">C:\Users\CMC BANGLADESH\disciplinev12\create_admin_avatar.py</span>
+                <span style="color: #7f8c8d;">line 3</span>
+                <div class="message">Consider using settings.AUTH_USER_MODEL for better flexibility</div>
+                <div class="fix">Category: django</div>
+
+            </div>
+
+            <div class="issue-item WARNING">
+                <span class="severity-badge WARNING">WARNING</span>
+                <span class="file">C:\Users\CMC BANGLADESH\disciplinev12\create_admin_avatar.py</span>
+                <span style="color: #7f8c8d;">line 11</span>
+                <div class="message">Trailing whitespace detected</div>
+                <div class="fix">Category: style</div>
+<div class="fix">💡 Remove trailing whitespace</div><div class="fix">✅ Auto-fixable</div>
+            </div>
+
+            <div class="issue-item WARNING">
+                <span class="severity-badge WARNING">WARNING</span>
+                <span class="file">C:\Users\CMC BANGLADESH\disciplinev12\create_admin_avatar.py</span>
+                <span style="color: #7f8c8d;">line 16</span>
+                <div class="message">Trailing whitespace detected</div>
+                <div class="fix">Category: style</div>
+<div class="fix">💡 Remove trailing whitespace</div><div class="fix">✅ Auto-fixable</div>
+            </div>
+
+            <div class="issue-item WARNING">
+                <span class="severity-badge WARNING">WARNING</span>
+                <span class="file">C:\Users\CMC BANGLADESH\disciplinev12\create_admin_avatar.py</span>
+                <span style="color: #7f8c8d;">line 23</span>
+                <div class="message">Trailing whitespace detected</div>
+                <div class="fix">Category: style</div>
+<div class="fix">💡 Remove trailing whitespace</div><div class="fix">✅ Auto-fixable</div>
+            </div>
+
+            <div class="issue-item WARNING">
+                <span class="severity-badge WARNING">WARNING</span>
+                <span class="file">C:\Users\CMC BANGLADESH\disciplinev12\create_admin_avatar.py</span>
+                <span style="color: #7f8c8d;">line 33</span>
+                <div class="message">Trailing whitespace detected</div>
+                <div class="fix">Category: style</div>
+<div class="fix">💡 Remove trailing whitespace</div><div class="fix">✅ Auto-fixable</div>
+            </div>
+
+            <div class="issue-item WARNING">
+                <span class="severity-badge WARNING">WARNING</span>
+                <span class="file">C:\Users\CMC BANGLADESH\disciplinev12\create_admin_avatar.py</span>
+                <span style="color: #7f8c8d;">line 37</span>
+                <div class="message">Trailing whitespace detected</div>
+                <div class="fix">Category: style</div>
+<div class="fix">💡 Remove trailing whitespace</div><div class="fix">✅ Auto-fixable</div>
+            </div>
+
+            <div class="issue-item ERROR">
+                <span class="severity-badge ERROR">ERROR</span>
+                <span class="file">C:\Users\CMC BANGLADESH\disciplinev12\create_sample_reports.py</span>
+                <span style="color: #7f8c8d;">line 1</span>
+                <div class="message">Syntax error: invalid non-printable character U+FEFF</div>
+                <div class="fix">Category: syntax</div>
+<div class="fix">💡 Fix the syntax error</div><div class="fix">✅ Auto-fixable</div>
+            </div>
+
+            <div class="issue-item SUGGESTION">
+                <span class="severity-badge SUGGESTION">SUGGESTION</span>
+                <span class="file">C:\Users\CMC BANGLADESH\disciplinev12\create_sample_reports.py</span>
+                <span style="color: #7f8c8d;">line 7</span>
+                <div class="message">Consider using settings.AUTH_USER_MODEL for better flexibility</div>
+                <div class="fix">Category: django</div>
+
+            </div>
+
+            <div class="issue-item WARNING">
+                <span class="severity-badge WARNING">WARNING</span>
+                <span class="file">C:\Users\CMC BANGLADESH\disciplinev12\create_sample_reports.py</span>
+                <span style="color: #7f8c8d;">line 15</span>
+                <div class="message">Trailing whitespace detected</div>
+                <div class="fix">Category: style</div>
+<div class="fix">💡 Remove trailing whitespace</div><div class="fix">✅ Auto-fixable</div>
+            </div>
+
+            <div class="issue-item INFO">
+                <span class="severity-badge INFO">INFO</span>
+                <span class="file">C:\Users\CMC BANGLADESH\disciplinev12\debug_and_clean_views.py</span>
+                <span style="color: #7f8c8d;">line 36</span>
+                <div class="message">Good: Using login_required decorator</div>
+                <div class="fix">Category: django</div>
+
+            </div>
+
+            <div class="issue-item INFO">
+                <span class="severity-badge INFO">INFO</span>
+                <span class="file">C:\Users\CMC BANGLADESH\disciplinev12\debug_and_clean_views.py</span>
+                <span style="color: #7f8c8d;">line 38</span>
+                <div class="message">Good: Using login_required decorator</div>
+                <div class="fix">Category: django</div>
+
+            </div>
+
+            <div class="issue-item INFO">
+                <span class="severity-badge INFO">INFO</span>
+                <span class="file">C:\Users\CMC BANGLADESH\disciplinev12\debug_and_clean_views.py</span>
+                <span style="color: #7f8c8d;">line 39</span>
+                <div class="message">Good: Using login_required decorator</div>
+                <div class="fix">Category: django</div>
+
+            </div>
+
+            <div class="issue-item INFO">
+                <span class="severity-badge INFO">INFO</span>
+                <span class="file">C:\Users\CMC BANGLADESH\disciplinev12\debug_and_clean_views.py</span>
+                <span style="color: #7f8c8d;">line 41</span>
+                <div class="message">Good: Using login_required decorator</div>
+                <div class="fix">Category: django</div>
+
+            </div>
+
+            <div class="issue-item INFO">
+                <span class="severity-badge INFO">INFO</span>
+                <span class="file">C:\Users\CMC BANGLADESH\disciplinev12\debug_and_clean_views.py</span>
+                <span style="color: #7f8c8d;">line 42</span>
+                <div class="message">Good: Using login_required decorator</div>
+                <div class="fix">Category: django</div>
+
+            </div>
+
+            <div class="issue-item INFO">
+                <span class="severity-badge INFO">INFO</span>
+                <span class="file">C:\Users\CMC BANGLADESH\disciplinev12\debug_and_clean_views.py</span>
+                <span style="color: #7f8c8d;">line 52</span>
+                <div class="message">Good: Using login_required decorator</div>
+                <div class="fix">Category: django</div>
+
+            </div>
+
+            <div class="issue-item INFO">
+                <span class="severity-badge INFO">INFO</span>
+                <span class="file">C:\Users\CMC BANGLADESH\disciplinev12\debug_and_clean_views.py</span>
+                <span style="color: #7f8c8d;">line 52</span>
+                <div class="message">Good: Using login_required decorator</div>
+                <div class="fix">Category: django</div>
+
+            </div>
+
+            <div class="issue-item INFO">
+                <span class="severity-badge INFO">INFO</span>
+                <span class="file">C:\Users\CMC BANGLADESH\disciplinev12\debug_and_clean_views.py</span>
+                <span style="color: #7f8c8d;">line 54</span>
+                <div class="message">Good: Using login_required decorator</div>
+                <div class="fix">Category: django</div>
+
+            </div>
+
+            <div class="issue-item INFO">
+                <span class="severity-badge INFO">INFO</span>
+                <span class="file">C:\Users\CMC BANGLADESH\disciplinev12\debug_and_clean_views.py</span>
+                <span style="color: #7f8c8d;">line 212</span>
+                <div class="message">Good: Using login_required decorator</div>
+                <div class="fix">Category: django</div>
+
+            </div>
+
+            <div class="issue-item INFO">
+                <span class="severity-badge INFO">INFO</span>
+                <span class="file">C:\Users\CMC BANGLADESH\disciplinev12\debug_and_clean_views.py</span>
+                <span style="color: #7f8c8d;">line 214</span>
+                <div class="message">Good: Using login_required decorator</div>
+                <div class="fix">Category: django</div>
+
+            </div>
+
+            <div class="issue-item INFO">
+                <span class="severity-badge INFO">INFO</span>
+                <span class="file">C:\Users\CMC BANGLADESH\disciplinev12\debug_and_clean_views.py</span>
+                <span style="color: #7f8c8d;">line 216</span>
+                <div class="message">Good: Using login_required decorator</div>
+                <div class="fix">Category: django</div>
+
+            </div>
+
+            <div class="issue-item INFO">
+                <span class="severity-badge INFO">INFO</span>
+                <span class="file">C:\Users\CMC BANGLADESH\disciplinev12\debug_and_clean_views.py</span>
+                <span style="color: #7f8c8d;">line 217</span>
+                <div class="message">Good: Using login_required decorator</div>
+                <div class="fix">Category: django</div>
+
+            </div>
+
+            <div class="issue-item INFO">
+                <span class="severity-badge INFO">INFO</span>
+                <span class="file">C:\Users\CMC BANGLADESH\disciplinev12\debug_and_clean_views.py</span>
+                <span style="color: #7f8c8d;">line 221</span>
+                <div class="message">Good: Using login_required decorator</div>
+                <div class="fix">Category: django</div>
+
+            </div>
+
+            <div class="issue-item INFO">
+                <span class="severity-badge INFO">INFO</span>
+                <span class="file">C:\Users\CMC BANGLADESH\disciplinev12\debug_and_clean_views.py</span>
+                <span style="color: #7f8c8d;">line 222</span>
+                <div class="message">Good: Using login_required decorator</div>
+                <div class="fix">Category: django</div>
+
+            </div>
+
+            <div class="issue-item INFO">
+                <span class="severity-badge INFO">INFO</span>
+                <span class="file">C:\Users\CMC BANGLADESH\disciplinev12\debug_and_clean_views.py</span>
+                <span style="color: #7f8c8d;">line 224</span>
+                <div class="message">Good: Using login_required decorator</div>
+                <div class="fix">Category: django</div>
+
+            </div>
+
+            <div class="issue-item INFO">
+                <span class="severity-badge INFO">INFO</span>
+                <span class="file">C:\Users\CMC BANGLADESH\disciplinev12\debug_and_clean_views.py</span>
+                <span style="color: #7f8c8d;">line 217</span>
+                <div class="message">Good: Using user_passes_test decorator</div>
+                <div class="fix">Category: django</div>
+
+            </div>
+
+            <div class="issue-item SUGGESTION">
+                <span class="severity-badge SUGGESTION">SUGGESTION</span>
+                <span class="file">C:\Users\CMC BANGLADESH\disciplinev12\debug_and_clean_views.py</span>
+                <span style="color: #7f8c8d;">line 97</span>
+                <div class="message">Consider using settings.AUTH_USER_MODEL for better flexibility</div>
+                <div class="fix">Category: django</div>
+
+            </div>
+
+            <div class="issue-item WARNING">
+                <span class="severity-badge WARNING">WARNING</span>
+                <span class="file">C:\Users\CMC BANGLADESH\disciplinev12\debug_and_clean_views.py</span>
+                <span style="color: #7f8c8d;">line 14</span>
+                <div class="message">Trailing whitespace detected</div>
+                <div class="fix">Category: style</div>
+<div class="fix">💡 Remove trailing whitespace</div><div class="fix">✅ Auto-fixable</div>
+            </div>
+
+            <div class="issue-item WARNING">
+                <span class="severity-badge WARNING">WARNING</span>
+                <span class="file">C:\Users\CMC BANGLADESH\disciplinev12\debug_and_clean_views.py</span>
+                <span style="color: #7f8c8d;">line 19</span>
+                <div class="message">Trailing whitespace detected</div>
+                <div class="fix">Category: style</div>
+<div class="fix">💡 Remove trailing whitespace</div><div class="fix">✅ Auto-fixable</div>
+            </div>
+
+            <div class="issue-item WARNING">
+                <span class="severity-badge WARNING">WARNING</span>
+                <span class="file">C:\Users\CMC BANGLADESH\disciplinev12\debug_and_clean_views.py</span>
+                <span style="color: #7f8c8d;">line 21</span>
+                <div class="message">Trailing whitespace detected</div>
+                <div class="fix">Category: style</div>
+<div class="fix">💡 Remove trailing whitespace</div><div class="fix">✅ Auto-fixable</div>
+            </div>
+
+            <div class="issue-item WARNING">
+                <span class="severity-badge WARNING">WARNING</span>
+                <span class="file">C:\Users\CMC BANGLADESH\disciplinev12\debug_and_clean_views.py</span>
+                <span style="color: #7f8c8d;">line 25</span>
+                <div class="message">Trailing whitespace detected</div>
+                <div class="fix">Category: style</div>
+<div class="fix">💡 Remove trailing whitespace</div><div class="fix">✅ Auto-fixable</div>
+            </div>
+
+            <div class="issue-item WARNING">
+                <span class="severity-badge WARNING">WARNING</span>
+                <span class="file">C:\Users\CMC BANGLADESH\disciplinev12\debug_and_clean_views.py</span>
+                <span style="color: #7f8c8d;">line 28</span>
+                <div class="message">Trailing whitespace detected</div>
+                <div class="fix">Category: style</div>
+<div class="fix">💡 Remove trailing whitespace</div><div class="fix">✅ Auto-fixable</div>
+            </div>
+
+            <div class="issue-item WARNING">
+                <span class="severity-badge WARNING">WARNING</span>
+                <span class="file">C:\Users\CMC BANGLADESH\disciplinev12\debug_and_clean_views.py</span>
+                <span style="color: #7f8c8d;">line 32</span>
+                <div class="message">Trailing whitespace detected</div>
+                <div class="fix">Category: style</div>
+<div class="fix">💡 Remove trailing whitespace</div><div class="fix">✅ Auto-fixable</div>
+            </div>
+
+            <div class="issue-item WARNING">
+                <span class="severity-badge WARNING">WARNING</span>
+                <span class="file">C:\Users\CMC BANGLADESH\disciplinev12\debug_and_clean_views.py</span>
+                <span style="color: #7f8c8d;">line 37</span>
+                <div class="message">Trailing whitespace detected</div>
+                <div class="fix">Category: style</div>
+<div class="fix">💡 Remove trailing whitespace</div><div class="fix">✅ Auto-fixable</div>
+            </div>
+
+            <div class="issue-item WARNING">
+                <span class="severity-badge WARNING">WARNING</span>
+                <span class="file">C:\Users\CMC BANGLADESH\disciplinev12\debug_and_clean_views.py</span>
+                <span style="color: #7f8c8d;">line 46</span>
+                <div class="message">Trailing whitespace detected</div>
+                <div class="fix">Category: style</div>
+<div class="fix">💡 Remove trailing whitespace</div><div class="fix">✅ Auto-fixable</div>
+            </div>
+
+            <div class="issue-item WARNING">
+                <span class="severity-badge WARNING">WARNING</span>
+                <span class="file">C:\Users\CMC BANGLADESH\disciplinev12\debug_and_clean_views.py</span>
+                <span style="color: #7f8c8d;">line 51</span>
+                <div class="message">Trailing whitespace detected</div>
+                <div class="fix">Category: style</div>
+<div class="fix">💡 Remove trailing whitespace</div><div class="fix">✅ Auto-fixable</div>
+            </div>
+
+            <div class="issue-item WARNING">
+                <span class="severity-badge WARNING">WARNING</span>
+                <span class="file">C:\Users\CMC BANGLADESH\disciplinev12\debug_and_clean_views.py</span>
+                <span style="color: #7f8c8d;">line 57</span>
+                <div class="message">Trailing whitespace detected</div>
+                <div class="fix">Category: style</div>
+<div class="fix">💡 Remove trailing whitespace</div><div class="fix">✅ Auto-fixable</div>
+            </div>
+
+            <div class="issue-item WARNING">
+                <span class="severity-badge WARNING">WARNING</span>
+                <span class="file">C:\Users\CMC BANGLADESH\disciplinev12\debug_and_clean_views.py</span>
+                <span style="color: #7f8c8d;">line 62</span>
+                <div class="message">Trailing whitespace detected</div>
+                <div class="fix">Category: style</div>
+<div class="fix">💡 Remove trailing whitespace</div><div class="fix">✅ Auto-fixable</div>
+            </div>
+
+            <div class="issue-item WARNING">
+                <span class="severity-badge WARNING">WARNING</span>
+                <span class="file">C:\Users\CMC BANGLADESH\disciplinev12\debug_and_clean_views.py</span>
+                <span style="color: #7f8c8d;">line 64</span>
+                <div class="message">Trailing whitespace detected</div>
+                <div class="fix">Category: style</div>
+<div class="fix">💡 Remove trailing whitespace</div><div class="fix">✅ Auto-fixable</div>
+            </div>
+
+            <div class="issue-item WARNING">
+                <span class="severity-badge WARNING">WARNING</span>
+                <span class="file">C:\Users\CMC BANGLADESH\disciplinev12\debug_and_clean_views.py</span>
+                <span style="color: #7f8c8d;">line 66</span>
+                <div class="message">Trailing whitespace detected</div>
+                <div class="fix">Category: style</div>
+<div class="fix">💡 Remove trailing whitespace</div><div class="fix">✅ Auto-fixable</div>
+            </div>
+
+            <div class="issue-item WARNING">
+                <span class="severity-badge WARNING">WARNING</span>
+                <span class="file">C:\Users\CMC BANGLADESH\disciplinev12\debug_and_clean_views.py</span>
+                <span style="color: #7f8c8d;">line 67</span>
+                <div class="message">Trailing whitespace detected</div>
+                <div class="fix">Category: style</div>
+<div class="fix">💡 Remove trailing whitespace</div><div class="fix">✅ Auto-fixable</div>
+            </div>
+
+            <div class="issue-item WARNING">
+                <span class="severity-badge WARNING">WARNING</span>
+                <span class="file">C:\Users\CMC BANGLADESH\disciplinev12\debug_and_clean_views.py</span>
+                <span style="color: #7f8c8d;">line 69</span>
+                <div class="message">Trailing whitespace detected</div>
+                <div class="fix">Category: style</div>
+<div class="fix">💡 Remove trailing whitespace</div><div class="fix">✅ Auto-fixable</div>
+            </div>
+
+            <div class="issue-item WARNING">
+                <span class="severity-badge WARNING">WARNING</span>
+                <span class="file">C:\Users\CMC BANGLADESH\disciplinev12\debug_and_clean_views.py</span>
+                <span style="color: #7f8c8d;">line 73</span>
+                <div class="message">Trailing whitespace detected</div>
+                <div class="fix">Category: style</div>
+<div class="fix">💡 Remove trailing whitespace</div><div class="fix">✅ Auto-fixable</div>
+            </div>
+
+            <div class="issue-item WARNING">
+                <span class="severity-badge WARNING">WARNING</span>
+                <span class="file">C:\Users\CMC BANGLADESH\disciplinev12\debug_and_clean_views.py</span>
+                <span style="color: #7f8c8d;">line 77</span>
+                <div class="message">Trailing whitespace detected</div>
+                <div class="fix">Category: style</div>
+<div class="fix">💡 Remove trailing whitespace</div><div class="fix">✅ Auto-fixable</div>
+            </div>
+
+            <div class="issue-item WARNING">
+                <span class="severity-badge WARNING">WARNING</span>
+                <span class="file">C:\Users\CMC BANGLADESH\disciplinev12\debug_and_clean_views.py</span>
+                <span style="color: #7f8c8d;">line 81</span>
+                <div class="message">Trailing whitespace detected</div>
+                <div class="fix">Category: style</div>
+<div class="fix">💡 Remove trailing whitespace</div><div class="fix">✅ Auto-fixable</div>
+            </div>
+
+            <div class="issue-item WARNING">
+                <span class="severity-badge WARNING">WARNING</span>
+                <span class="file">C:\Users\CMC BANGLADESH\disciplinev12\debug_and_clean_views.py</span>
+                <span style="color: #7f8c8d;">line 88</span>
+                <div class="message">Trailing whitespace detected</div>
+                <div class="fix">Category: style</div>
+<div class="fix">💡 Remove trailing whitespace</div><div class="fix">✅ Auto-fixable</div>
+            </div>
+
+            <div class="issue-item WARNING">
+                <span class="severity-badge WARNING">WARNING</span>
+                <span class="file">C:\Users\CMC BANGLADESH\disciplinev12\debug_and_clean_views.py</span>
+                <span style="color: #7f8c8d;">line 93</span>
+                <div class="message">Trailing whitespace detected</div>
+                <div class="fix">Category: style</div>
+<div class="fix">💡 Remove trailing whitespace</div><div class="fix">✅ Auto-fixable</div>
+            </div>
+
+            <div class="issue-item WARNING">
+                <span class="severity-badge WARNING">WARNING</span>
+                <span class="file">C:\Users\CMC BANGLADESH\disciplinev12\debug_and_clean_views.py</span>
+                <span style="color: #7f8c8d;">line 113</span>
+                <div class="message">Trailing whitespace detected</div>
+                <div class="fix">Category: style</div>
+<div class="fix">💡 Remove trailing whitespace</div><div class="fix">✅ Auto-fixable</div>
+            </div>
+
+            <div class="issue-item WARNING">
+                <span class="severity-badge WARNING">WARNING</span>
+                <span class="file">C:\Users\CMC BANGLADESH\disciplinev12\debug_and_clean_views.py</span>
+                <span style="color: #7f8c8d;">line 118</span>
+                <div class="message">Trailing whitespace detected</div>
+                <div class="fix">Category: style</div>
+<div class="fix">💡 Remove trailing whitespace</div><div class="fix">✅ Auto-fixable</div>
+            </div>
+
+            <div class="issue-item WARNING">
+                <span class="severity-badge WARNING">WARNING</span>
+                <span class="file">C:\Users\CMC BANGLADESH\disciplinev12\debug_and_clean_views.py</span>
+                <span style="color: #7f8c8d;">line 124</span>
+                <div class="message">Trailing whitespace detected</div>
+                <div class="fix">Category: style</div>
+<div class="fix">💡 Remove trailing whitespace</div><div class="fix">✅ Auto-fixable</div>
+            </div>
+
+            <div class="issue-item WARNING">
+                <span class="severity-badge WARNING">WARNING</span>
+                <span class="file">C:\Users\CMC BANGLADESH\disciplinev12\debug_and_clean_views.py</span>
+                <span style="color: #7f8c8d;">line 129</span>
+                <div class="message">Trailing whitespace detected</div>
+                <div class="fix">Category: style</div>
+<div class="fix">💡 Remove trailing whitespace</div><div class="fix">✅ Auto-fixable</div>
+            </div>
+
+            <div class="issue-item WARNING">
+                <span class="severity-badge WARNING">WARNING</span>
+                <span class="file">C:\Users\CMC BANGLADESH\disciplinev12\debug_and_clean_views.py</span>
+                <span style="color: #7f8c8d;">line 133</span>
+                <div class="message">Trailing whitespace detected</div>
+                <div class="fix">Category: style</div>
+<div class="fix">💡 Remove trailing whitespace</div><div class="fix">✅ Auto-fixable</div>
+            </div>
+
+            <div class="issue-item WARNING">
+                <span class="severity-badge WARNING">WARNING</span>
+                <span class="file">C:\Users\CMC BANGLADESH\disciplinev12\debug_and_clean_views.py</span>
+                <span style="color: #7f8c8d;">line 139</span>
+                <div class="message">Trailing whitespace detected</div>
+                <div class="fix">Category: style</div>
+<div class="fix">💡 Remove trailing whitespace</div><div class="fix">✅ Auto-fixable</div>
+            </div>
+
+            <div class="issue-item WARNING">
+                <span class="severity-badge WARNING">WARNING</span>
+                <span class="file">C:\Users\CMC BANGLADESH\disciplinev12\debug_and_clean_views.py</span>
+                <span style="color: #7f8c8d;">line 144</span>
+                <div class="message">Trailing whitespace detected</div>
+                <div class="fix">Category: style</div>
+<div class="fix">💡 Remove trailing whitespace</div><div class="fix">✅ Auto-fixable</div>
+            </div>
+
+            <div class="issue-item WARNING">
+                <span class="severity-badge WARNING">WARNING</span>
+                <span class="file">C:\Users\CMC BANGLADESH\disciplinev12\debug_and_clean_views.py</span>
+                <span style="color: #7f8c8d;">line 148</span>
+                <div class="message">Trailing whitespace detected</div>
+                <div class="fix">Category: style</div>
+<div class="fix">💡 Remove trailing whitespace</div><div class="fix">✅ Auto-fixable</div>
+            </div>
+
+            <div class="issue-item WARNING">
+                <span class="severity-badge WARNING">WARNING</span>
+                <span class="file">C:\Users\CMC BANGLADESH\disciplinev12\debug_and_clean_views.py</span>
+                <span style="color: #7f8c8d;">line 154</span>
+                <div class="message">Trailing whitespace detected</div>
+                <div class="fix">Category: style</div>
+<div class="fix">💡 Remove trailing whitespace</div><div class="fix">✅ Auto-fixable</div>
+            </div>
+
+            <div class="issue-item WARNING">
+                <span class="severity-badge WARNING">WARNING</span>
+                <span class="file">C:\Users\CMC BANGLADESH\disciplinev12\debug_and_clean_views.py</span>
+                <span style="color: #7f8c8d;">line 159</span>
+                <div class="message">Trailing whitespace detected</div>
+                <div class="fix">Category: style</div>
+<div class="fix">💡 Remove trailing whitespace</div><div class="fix">✅ Auto-fixable</div>
+            </div>
+
+            <div class="issue-item WARNING">
+                <span class="severity-badge WARNING">WARNING</span>
+                <span class="file">C:\Users\CMC BANGLADESH\disciplinev12\debug_and_clean_views.py</span>
+                <span style="color: #7f8c8d;">line 163</span>
+                <div class="message">Trailing whitespace detected</div>
+                <div class="fix">Category: style</div>
+<div class="fix">💡 Remove trailing whitespace</div><div class="fix">✅ Auto-fixable</div>
+            </div>
+
+            <div class="issue-item WARNING">
+                <span class="severity-badge WARNING">WARNING</span>
+                <span class="file">C:\Users\CMC BANGLADESH\disciplinev12\debug_and_clean_views.py</span>
+                <span style="color: #7f8c8d;">line 169</span>
+                <div class="message">Trailing whitespace detected</div>
+                <div class="fix">Category: style</div>
+<div class="fix">💡 Remove trailing whitespace</div><div class="fix">✅ Auto-fixable</div>
+            </div>
+
+            <div class="issue-item WARNING">
+                <span class="severity-badge WARNING">WARNING</span>
+                <span class="file">C:\Users\CMC BANGLADESH\disciplinev12\debug_and_clean_views.py</span>
+                <span style="color: #7f8c8d;">line 174</span>
+                <div class="message">Trailing whitespace detected</div>
+                <div class="fix">Category: style</div>
+<div class="fix">💡 Remove trailing whitespace</div><div class="fix">✅ Auto-fixable</div>
+            </div>
+
+            <div class="issue-item WARNING">
+                <span class="severity-badge WARNING">WARNING</span>
+                <span class="file">C:\Users\CMC BANGLADESH\disciplinev12\debug_and_clean_views.py</span>
+                <span style="color: #7f8c8d;">line 181</span>
+                <div class="message">Trailing whitespace detected</div>
+                <div class="fix">Category: style</div>
+<div class="fix">💡 Remove trailing whitespace</div><div class="fix">✅ Auto-fixable</div>
+            </div>
+
+            <div class="issue-item WARNING">
+                <span class="severity-badge WARNING">WARNING</span>
+                <span class="file">C:\Users\CMC BANGLADESH\disciplinev12\debug_and_clean_views.py</span>
+                <span style="color: #7f8c8d;">line 186</span>
+                <div class="message">Trailing whitespace detected</div>
+                <div class="fix">Category: style</div>
+<div class="fix">💡 Remove trailing whitespace</div><div class="fix">✅ Auto-fixable</div>
+            </div>
+
+            <div class="issue-item WARNING">
+                <span class="severity-badge WARNING">WARNING</span>
+                <span class="file">C:\Users\CMC BANGLADESH\disciplinev12\debug_and_clean_views.py</span>
+                <span style="color: #7f8c8d;">line 191</span>
+                <div class="message">Trailing whitespace detected</div>
+                <div class="fix">Category: style</div>
+<div class="fix">💡 Remove trailing whitespace</div><div class="fix">✅ Auto-fixable</div>
+            </div>
+
+            <div class="issue-item WARNING">
+                <span class="severity-badge WARNING">WARNING</span>
+                <span class="file">C:\Users\CMC BANGLADESH\disciplinev12\debug_and_clean_views.py</span>
+                <span style="color: #7f8c8d;">line 200</span>
+                <div class="message">Trailing whitespace detected</div>
+                <div class="fix">Category: style</div>
+<div class="fix">💡 Remove trailing whitespace</div><div class="fix">✅ Auto-fixable</div>
+            </div>
+
+            <div class="issue-item WARNING">
+                <span class="severity-badge WARNING">WARNING</span>
+                <span class="file">C:\Users\CMC BANGLADESH\disciplinev12\debug_and_clean_views.py</span>
+                <span style="color: #7f8c8d;">line 205</span>
+                <div class="message">Trailing whitespace detected</div>
+                <div class="fix">Category: style</div>
+<div class="fix">💡 Remove trailing whitespace</div><div class="fix">✅ Auto-fixable</div>
+            </div>
+
+            <div class="issue-item WARNING">
+                <span class="severity-badge WARNING">WARNING</span>
+                <span class="file">C:\Users\CMC BANGLADESH\disciplinev12\debug_and_clean_views.py</span>
+                <span style="color: #7f8c8d;">line 210</span>
+                <div class="message">Trailing whitespace detected</div>
+                <div class="fix">Category: style</div>
+<div class="fix">💡 Remove trailing whitespace</div><div class="fix">✅ Auto-fixable</div>
+            </div>
+
+            <div class="issue-item WARNING">
+                <span class="severity-badge WARNING">WARNING</span>
+                <span class="file">C:\Users\CMC BANGLADESH\disciplinev12\debug_and_clean_views.py</span>
+                <span style="color: #7f8c8d;">line 215</span>
+                <div class="message">Trailing whitespace detected</div>
+                <div class="fix">Category: style</div>
+<div class="fix">💡 Remove trailing whitespace</div><div class="fix">✅ Auto-fixable</div>
+            </div>
+
+            <div class="issue-item WARNING">
+                <span class="severity-badge WARNING">WARNING</span>
+                <span class="file">C:\Users\CMC BANGLADESH\disciplinev12\debug_and_clean_views.py</span>
+                <span style="color: #7f8c8d;">line 217</span>
+                <div class="message">Line too long (729 > 120 characters)</div>
+                <div class="fix">Category: style</div>
+<div class="fix">💡 Break the line into multiple lines</div><div class="fix">✅ Auto-fixable</div>
+            </div>
+
+            <div class="issue-item WARNING">
+                <span class="severity-badge WARNING">WARNING</span>
+                <span class="file">C:\Users\CMC BANGLADESH\disciplinev12\debug_and_clean_views.py</span>
+                <span style="color: #7f8c8d;">line 218</span>
+                <div class="message">Trailing whitespace detected</div>
+                <div class="fix">Category: style</div>
+<div class="fix">💡 Remove trailing whitespace</div><div class="fix">✅ Auto-fixable</div>
+            </div>
+
+            <div class="issue-item WARNING">
+                <span class="severity-badge WARNING">WARNING</span>
+                <span class="file">C:\Users\CMC BANGLADESH\disciplinev12\debug_and_clean_views.py</span>
+                <span style="color: #7f8c8d;">line 225</span>
+                <div class="message">Trailing whitespace detected</div>
+                <div class="fix">Category: style</div>
+<div class="fix">💡 Remove trailing whitespace</div><div class="fix">✅ Auto-fixable</div>
+            </div>
+
+            <div class="issue-item WARNING">
+                <span class="severity-badge WARNING">WARNING</span>
+                <span class="file">C:\Users\CMC BANGLADESH\disciplinev12\debug_and_clean_views.py</span>
+                <span style="color: #7f8c8d;">line 230</span>
+                <div class="message">Trailing whitespace detected</div>
+                <div class="fix">Category: style</div>
+<div class="fix">💡 Remove trailing whitespace</div><div class="fix">✅ Auto-fixable</div>
+            </div>
+
+            <div class="issue-item WARNING">
+                <span class="severity-badge WARNING">WARNING</span>
+                <span class="file">C:\Users\CMC BANGLADESH\disciplinev12\debug_and_clean_views.py</span>
+                <span style="color: #7f8c8d;">line 242</span>
+                <div class="message">Trailing whitespace detected</div>
+                <div class="fix">Category: style</div>
+<div class="fix">💡 Remove trailing whitespace</div><div class="fix">✅ Auto-fixable</div>
+            </div>
+
+            <div class="issue-item WARNING">
+                <span class="severity-badge WARNING">WARNING</span>
+                <span class="file">C:\Users\CMC BANGLADESH\disciplinev12\debug_and_clean_views.py</span>
+                <span style="color: #7f8c8d;">line 247</span>
+                <div class="message">Trailing whitespace detected</div>
+                <div class="fix">Category: style</div>
+<div class="fix">💡 Remove trailing whitespace</div><div class="fix">✅ Auto-fixable</div>
+            </div>
+
+            <div class="issue-item WARNING">
+                <span class="severity-badge WARNING">WARNING</span>
+                <span class="file">C:\Users\CMC BANGLADESH\disciplinev12\debug_and_clean_views.py</span>
+                <span style="color: #7f8c8d;">line 251</span>
+                <div class="message">Trailing whitespace detected</div>
+                <div class="fix">Category: style</div>
+<div class="fix">💡 Remove trailing whitespace</div><div class="fix">✅ Auto-fixable</div>
+            </div>
+
+            <div class="issue-item WARNING">
+                <span class="severity-badge WARNING">WARNING</span>
+                <span class="file">C:\Users\CMC BANGLADESH\disciplinev12\debug_and_clean_views.py</span>
+                <span style="color: #7f8c8d;">line 257</span>
+                <div class="message">Trailing whitespace detected</div>
+                <div class="fix">Category: style</div>
+<div class="fix">💡 Remove trailing whitespace</div><div class="fix">✅ Auto-fixable</div>
+            </div>
+
+            <div class="issue-item WARNING">
+                <span class="severity-badge WARNING">WARNING</span>
+                <span class="file">C:\Users\CMC BANGLADESH\disciplinev12\debug_and_clean_views.py</span>
+                <span style="color: #7f8c8d;">line 262</span>
+                <div class="message">Trailing whitespace detected</div>
+                <div class="fix">Category: style</div>
+<div class="fix">💡 Remove trailing whitespace</div><div class="fix">✅ Auto-fixable</div>
+            </div>
+
+            <div class="issue-item WARNING">
+                <span class="severity-badge WARNING">WARNING</span>
+                <span class="file">C:\Users\CMC BANGLADESH\disciplinev12\debug_and_clean_views.py</span>
+                <span style="color: #7f8c8d;">line 277</span>
+                <div class="message">Trailing whitespace detected</div>
+                <div class="fix">Category: style</div>
+<div class="fix">💡 Remove trailing whitespace</div><div class="fix">✅ Auto-fixable</div>
+            </div>
+
+            <div class="issue-item WARNING">
+                <span class="severity-badge WARNING">WARNING</span>
+                <span class="file">C:\Users\CMC BANGLADESH\disciplinev12\debug_and_clean_views.py</span>
+                <span style="color: #7f8c8d;">line 282</span>
+                <div class="message">Trailing whitespace detected</div>
+                <div class="fix">Category: style</div>
+<div class="fix">💡 Remove trailing whitespace</div><div class="fix">✅ Auto-fixable</div>
+            </div>
+
+            <div class="issue-item WARNING">
+                <span class="severity-badge WARNING">WARNING</span>
+                <span class="file">C:\Users\CMC BANGLADESH\disciplinev12\debug_and_clean_views.py</span>
+                <span style="color: #7f8c8d;">line 291</span>
+                <div class="message">Trailing whitespace detected</div>
+                <div class="fix">Category: style</div>
+<div class="fix">💡 Remove trailing whitespace</div><div class="fix">✅ Auto-fixable</div>
+            </div>
+
+        </div>
+
+        <div class="footer">
+            <p>Django Discipline Management System - Automated Fix Report</p>
+            <p>Powered by Python AST & AI Analysis</p>
+        </div>
+    </div>
+</body>
+</html>

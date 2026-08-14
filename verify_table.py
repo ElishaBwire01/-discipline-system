@@ -1,6 +1,7 @@
-﻿import os
-import django
+import os
 import sqlite3
+
+import django
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'disciplinary_program.settings')
 django.setup()
@@ -11,14 +12,14 @@ from django.db import connection
 with connection.cursor() as cursor:
     cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='core_passwordreset'")
     result = cursor.fetchone()
-    
+
     if result:
-        print("✓ PasswordReset table exists!")
+        print("? PasswordReset table exists!")
         print(f"  Table name: {result[0]}")
     else:
-        print("✗ PasswordReset table does NOT exist!")
+        print("? PasswordReset table does NOT exist!")
         print("  Creating manually...")
-        
+
         # Create table manually
         cursor.execute('''
             CREATE TABLE IF NOT EXISTS core_passwordreset (
@@ -34,4 +35,4 @@ with connection.cursor() as cursor:
                 FOREIGN KEY (resolved_by_id) REFERENCES auth_user (id)
             )
         ''')
-        print("✓ PasswordReset table created manually!")
+        print("? PasswordReset table created manually!")

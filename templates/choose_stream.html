@@ -1,50 +1,439 @@
-﻿{% extends 'base.html' %}
+{% extends 'base.html' %}
+{% load static %}
 
-{% block title %}Choose Your Class{% endblock %}
+{% block title %}Choose Stream - {{ school_name|default:"Disciplinary System" }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .stream-selection-wrapper {
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 1rem;
+    }
+
+    .stream-card {
+        background: white;
+        border-radius: 16px;
+        padding: 2rem;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+        border: 1px solid #e5e7eb;
+        transition: all 0.3s ease;
+    }
+
+    .stream-card:hover {
+        box-shadow: 0 20px 60px rgba(0,0,0,0.12);
+        transform: translateY(-2px);
+    }
+
+    .stream-header {
+        text-align: center;
+        margin-bottom: 2rem;
+        padding-bottom: 1.5rem;
+        border-bottom: 2px solid #f1f5f9;
+    }
+
+    .stream-header .header-icon {
+        width: 72px;
+        height: 72px;
+        background: linear-gradient(135deg, #2563eb, #7c3aed);
+        border-radius: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1rem;
+        font-size: 2rem;
+        color: white;
+        box-shadow: 0 8px 24px rgba(37, 99, 235, 0.3);
+    }
+
+    .stream-header h2 {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #0f172a;
+        margin-bottom: 0.25rem;
+    }
+
+    .stream-header p {
+        color: #64748b;
+        font-size: 0.875rem;
+        margin-bottom: 0;
+    }
+
+    .form-group-modern {
+        margin-bottom: 1.25rem;
+    }
+
+    .form-group-modern label {
+        font-weight: 600;
+        font-size: 0.875rem;
+        color: #334155;
+        margin-bottom: 0.375rem;
+        display: block;
+    }
+
+    .form-group-modern .help-text {
+        font-size: 0.75rem;
+        color: #94a3b8;
+        margin-top: 0.25rem;
+    }
+
+    .input-wrapper {
+        position: relative;
+    }
+
+    .input-wrapper .input-icon {
+        position: absolute;
+        left: 0.875rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #94a3b8;
+        font-size: 1rem;
+        z-index: 2;
+    }
+
+    .input-wrapper select {
+        width: 100%;
+        padding: 0.75rem 1rem 0.75rem 2.75rem;
+        border: 2px solid #e2e8f0;
+        border-radius: 12px;
+        font-size: 0.9375rem;
+        transition: all 0.3s;
+        background: #f8fafc;
+        appearance: none;
+        -webkit-appearance: none;
+        color: #0f172a;
+        cursor: pointer;
+    }
+
+    .input-wrapper select:focus {
+        border-color: #2563eb;
+        background: white;
+        outline: none;
+        box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+    }
+
+    .input-wrapper select option {
+        color: #0f172a;
+        background: white;
+        padding: 8px 12px;
+    }
+
+    .input-wrapper .select-arrow {
+        position: absolute;
+        right: 0.875rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #94a3b8;
+        pointer-events: none;
+        z-index: 2;
+    }
+
+    .btn-submit {
+        width: 100%;
+        padding: 0.875rem;
+        background: linear-gradient(135deg, #2563eb, #7c3aed);
+        color: white;
+        border: none;
+        border-radius: 12px;
+        font-size: 1rem;
+        font-weight: 600;
+        transition: all 0.3s;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+
+    .btn-submit:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(37, 99, 235, 0.35);
+    }
+
+    .btn-submit:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        transform: none;
+    }
+
+    .btn-submit i {
+        font-size: 1rem;
+    }
+
+    .assignment-preview {
+        background: #f1f5f9;
+        border-radius: 12px;
+        padding: 1rem 1.25rem;
+        margin-top: 1rem;
+        display: none;
+        border-left: 4px solid #2563eb;
+    }
+
+    .assignment-preview.show {
+        display: block;
+        animation: fadeIn 0.3s ease;
+    }
+
+    .assignment-preview .preview-label {
+        font-size: 0.75rem;
+        color: #64748b;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .assignment-preview .preview-value {
+        font-weight: 600;
+        color: #0f172a;
+        font-size: 1.125rem;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(-10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .alert-modern {
+        border-radius: 12px;
+        border: none;
+        padding: 0.875rem 1rem;
+        font-size: 0.875rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .alert-modern.alert-warning {
+        background: #fef3c7;
+        color: #92400e;
+    }
+
+    .alert-modern.alert-info {
+        background: #eff6ff;
+        color: #1e40af;
+    }
+
+    .alert-modern.alert-success {
+        background: #d1fae5;
+        color: #065f46;
+    }
+
+    .alert-modern.alert-danger {
+        background: #fef2f2;
+        color: #991b1b;
+    }
+
+    .alert-modern i {
+        font-size: 1.125rem;
+    }
+
+    .stream-info-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.75rem;
+        margin-top: 0.5rem;
+    }
+
+    .stream-info-item {
+        background: #f8fafc;
+        padding: 0.5rem 0.75rem;
+        border-radius: 8px;
+        font-size: 0.813rem;
+        color: #475569;
+        border: 1px solid #e5e7eb;
+    }
+
+    .stream-info-item strong {
+        color: #0f172a;
+    }
+
+    @media (max-width: 480px) {
+        .stream-card { padding: 1.5rem; }
+        .stream-header h2 { font-size: 1.25rem; }
+        .stream-info-grid { grid-template-columns: 1fr; }
+    }
+</style>
+{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center" style="min-height: 70vh; align-items: center;">
-    <div class="col-lg-6 col-md-8" data-aos="fade-up">
-        <div class="card-modern">
-            <div class="card-body p-4 p-lg-5 text-center">
-                <div style="width: 72px; height: 72px; background: linear-gradient(135deg, #2563eb, #7c3aed); border-radius: 18px; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem;">
-                    <i class="fas fa-chalkboard-teacher fa-2x text-white"></i>
-                </div>
-                <h2 class="fw-bold">Welcome, {{ user.get_full_name|default:user.username }}</h2>
-                <p class="text-muted mb-4">Select your assigned class stream to continue</p>
-                
-                <div class="alert alert-info text-start"><i class="fas fa-info-circle me-2"></i>After selecting your stream, your account will be pending admin approval.</div>
-                
-                <form method="post">
-                    {% csrf_token %}
-                    <div class="mb-3 text-start">
-                        <label class="form-label-modern">Select Stream</label>
-                                            <select name="stream" class="form-control-modern" required>
-                        <option value="">-- Choose your stream --</option>
+<div class="stream-selection-wrapper">
+    <div class="stream-card" data-aos="fade-up">
+        <div class="stream-header">
+            <div class="header-icon">
+            </div>
+            <h2>Choose Your Stream</h2>
+            <p>Select the stream and form you'll be responsible for</p>
+        </div>
+
+        {% if messages %}
+            {% for message in messages %}
+            <div class="alert-modern alert-{{ message.tags }}">
+                {{ message }}
+            </div>
+            {% endfor %}
+        {% endif %}
+
+        {% if error %}
+        <div class="alert-modern alert-danger">
+        </div>
+        {% endif %}
+
+        <form method="post" id="streamForm">
+            {% csrf_token %}
+
+            <div class="form-group-modern">
+                <label for="streamSelect">
+                    Stream / Class
+                </label>
+                <div class="input-wrapper">
+                    <select name="stream_id" id="streamSelect" required>
+                        <option value="">-- Select Stream --</option>
                         {% for stream in streams %}
-                        <option value="{{ stream.id }}">{{ stream.name }}</option>
+                        <option value="{{ stream.id }}" 
+                                {% if selected_stream == stream.id %}selected{% endif %}>
+                            {{ stream.name }}
+                        </option>
                         {% endfor %}
                     </select>
+                </div>
+                <div class="help-text">
+                    Choose the stream you'll be teaching
+                </div>
+            </div>
+
+            <div class="form-group-modern">
+                <label for="formSelect">
+                    Form / Grade Level
+                </label>
+                <div class="input-wrapper">
+                    <select name="form" id="formSelect" required>
+                        <option value="">-- Select Form --</option>
+                        {% for form_key, form_name in forms %}
+                        <option value="{{ form_key }}" 
+                                {% if selected_form == form_key %}selected{% endif %}>
+                            {{ form_name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="help-text">
+                    Select the form/grade level for this stream
+                </div>
+            </div>
+
+            <!-- Assignment Preview -->
+            <div class="assignment-preview" id="assignmentPreview">
+                <div class="preview-label">Your Assignment</div>
+                <div class="preview-value">
+                    <span id="previewStream">Not selected</span>
+                    <span style="color: #94a3b8; margin: 0 0.5rem;">•</span>
+                    <span id="previewForm">Not selected</span>
+                </div>
+                <div class="stream-info-grid">
+                    <div class="stream-info-item">
+                        <strong>Role:</strong> Class Teacher
                     </div>
-                    <div class="mb-3 text-start">
-                        <label class="form-label-modern">Select Form</label>
-                        <select name="form" class="form-control-modern" required>
-                            <option value="">-- Choose your form --</option>
-                            {% for form_key, form_name in forms %}
-                            <option value="{{ form_key }}">{{ form_name }}</option>
-                            {% endfor %}
-                        </select>
+                    <div class="stream-info-item">
+                        <strong>Status:</strong> <span style="color: #2563eb;">Pending Assignment</span>
                     </div>
-                    <button type="submit" class="btn-modern btn-modern-primary w-100"><i class="fas fa-check-circle me-2"></i>Submit & Wait for Approval</button>
-                </form>
-                
-                <div class="mt-3"><small class="text-muted">Streams: {% for stream in streams %}{{ stream.get_name_display }}{% if not forloop.last %}, {% endif %}{% endfor %}</small></div>
+                </div>
+            </div>
+
+            <button type="submit" class="btn-submit" id="submitBtn" disabled>
+                Confirm Assignment
+            </button>
+        </form>
+
+        <div class="text-center mt-3">
+            <small class="text-muted">
+                You'll be assigned as Class Teacher for this stream
+            </small>
+        </div>
+    </div>
+
+    <!-- Info Box -->
+    <div class="mt-3" style="background: #f8fafc; border-radius: 12px; padding: 1rem; border: 1px solid #e5e7eb;">
+        <div class="d-flex align-items-start gap-2">
+            <div>
+                <strong style="color: #0f172a; font-size: 0.875rem;">What happens next?</strong>
+                <p style="color: #64748b; font-size: 0.813rem; margin-bottom: 0;">
+                    Once you confirm your assignment, you'll be able to:
+                    <br>
+                    • View all students in your stream and form
+                    • Submit discipline reports for your students
+                    • Track student risk levels and interventions
+                    • Export class reports and student data
+                </p>
             </div>
         </div>
     </div>
 </div>
+
+<script>
+    // ============================================
+    // REAL-TIME PREVIEW
+    // ============================================
+    const streamSelect = document.getElementById('streamSelect');
+    const formSelect = document.getElementById('formSelect');
+    const preview = document.getElementById('assignmentPreview');
+    const previewStream = document.getElementById('previewStream');
+    const previewForm = document.getElementById('previewForm');
+    const submitBtn = document.getElementById('submitBtn');
+
+    function updatePreview() {
+        const streamName = streamSelect.options[streamSelect.selectedIndex]?.text || 'Not selected';
+        const formName = formSelect.options[formSelect.selectedIndex]?.text || 'Not selected';
+
+        previewStream.textContent = streamName;
+        previewForm.textContent = formName;
+
+        // Show preview if both are selected
+        if (streamSelect.value && formSelect.value) {
+            preview.classList.add('show');
+            submitBtn.disabled = false;
+        } else {
+            preview.classList.remove('show');
+            submitBtn.disabled = true;
+        }
+    }
+
+    streamSelect.addEventListener('change', updatePreview);
+    formSelect.addEventListener('change', updatePreview);
+
+    // ============================================
+    // FORM SUBMISSION CONFIRMATION
+    // ============================================
+    document.getElementById('streamForm').addEventListener('submit', function(e) {
+        const streamName = streamSelect.options[streamSelect.selectedIndex]?.text;
+        const formName = formSelect.options[formSelect.selectedIndex]?.text;
+
+            e.preventDefault();
+            return false;
+        }
+
+        // Show loading state
+        submitBtn.disabled = true;
+        return true;
+    });
+
+    // ============================================
+    // KEYBOARD SHORTCUTS
+    // ============================================
+    document.addEventListener('keydown', function(e) {
+        // Ctrl+Enter to submit
+        if (e.ctrlKey && e.key === 'Enter') {
+            if (!submitBtn.disabled) {
+                document.getElementById('streamForm').submit();
+            }
+        }
+    });
+
+    // ============================================
+    // INITIAL PREVIEW
+    // ============================================
+    updatePreview();
+
+    // Log for debugging
+</script>
 {% endblock %}
-
-
-
 

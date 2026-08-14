@@ -1,5 +1,6 @@
-﻿from django.test import RequestFactory
+from django.test import RequestFactory
 from django.contrib.auth.models import User
+
 from core.views import admin_dashboard
 
 # Create a mock request

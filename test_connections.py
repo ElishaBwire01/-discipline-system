@@ -1,8 +1,9 @@
-import psycopg2
 import os
 
+import psycopg2
+
 # Your Supabase details
-host = "murnebrvgejmxdxzxtfe.supabase.co"
+host = "wlzlngbdgaofbilcymrj.supabase.co"
 user = "postgres"
 password = "10.20.30.40"  # Your password
 dbname = "postgres"
@@ -27,7 +28,7 @@ for config in configs:
             dbname=dbname,
             port=config.get("port", 5432),
             sslmode=config.get("sslmode", "require"),
-            connect_timeout=config.get("connect_timeout", 30)
+            connect_timeout=config.get("connect_timeout", 30),
         )
         print(f"? Connected! Configuration: {config}")
         conn.close()
@@ -37,10 +38,10 @@ for config in configs:
 
 # Alternative: Try connection string
 try:
-    import os
+
     # Try with full connection string
     conn = psycopg2.connect(
-        "postgresql://postgres:10.20.30.40@murnebrvgejmxdxzxtfe.supabase.co:5432/postgres?sslmode=require"
+        "postgresql://postgres:10.20.30.40@wlzlngbdgaofbilcymrj.supabase.co:5432/postgres?sslmode=require"
     )
     print("? Connected with connection string!")
     conn.close()

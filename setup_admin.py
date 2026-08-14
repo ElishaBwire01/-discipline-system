@@ -1,10 +1,12 @@
-﻿import os
+import os
 import django
+
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'disciplinary_program.settings')
 django.setup()
 
-from django.contrib.auth.models import User, Group
-from core.models import Stream, DisciplineCategory
+from django.contrib.auth.models import Group, User
+
+from core.models import DisciplineCategory, Stream
 
 # Create admin
 if not User.objects.filter(is_superuser=True).exists():
@@ -12,7 +14,7 @@ if not User.objects.filter(is_superuser=True).exists():
     admin.first_name = 'System'
     admin.last_name = 'Administrator'
     admin.save()
-    print("✓ Admin created")
+    print("? Admin created")
 
 # Create groups
 Group.objects.get_or_create(name='ClassTeacher')
@@ -22,7 +24,7 @@ Group.objects.get_or_create(name='Teacher')
 streams = ['MULUMBA', 'KIZZA', 'LUKA', 'GONZA', 'KAAGWA', 'MUKASA', 'WASWA', 'MUWANGA', 'KIZITO']
 for s in streams:
     Stream.objects.get_or_create(name=s)
-print("✓ Streams created")
+print("? Streams created")
 
 # Create categories
 categories = [
@@ -34,4 +36,4 @@ categories = [
 ]
 for key, name, points in categories:
     DisciplineCategory.objects.get_or_create(key=key, defaults={'name': name, 'points': points})
-print("✓ Categories created")
+print("? Categories created")

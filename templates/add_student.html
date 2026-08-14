@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Add Student - {{ school_name|default:"Disciplinary System" }}{% endblock %}
+
+{% block content %}
+<div class="card-modern" data-aos="fade-up">
+    <div class="card-header-modern">
+        Add Student
+        <a href="{% url 'core:bulk_upload_students' %}" class="btn btn-sm btn-outline-light float-end">
+        </a>
+    </div>
+    <div class="card-body">
+        <form method="post" class="row g-3">
+            {% csrf_token %}
+
+            <div class="col-md-6">
+                <label class="form-label-modern">Admission Number *</label>
+                <input type="text" name="admission_number" class="form-control-modern"
+                       placeholder="e.g., 2024-001" required>
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label-modern">Full Name *</label>
+                <input type="text" name="name" class="form-control-modern"
+                       placeholder="Enter full name" required>
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label-modern">Stream/Class</label>
+                <select name="stream" class="form-control-modern">
+                    <option value="">-- Select Stream --</option>
+                    {% for stream in streams %}
+                        <option value="{{ stream.id }}">{{ stream.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label-modern">Grade Level</label>
+                <select name="grade_level" class="form-control-modern">
+                    <option value="">-- Select Grade --</option>
+                    {% for grade in grade_levels %}
+                        <option value="{{ grade.id }}">{{ grade.name }} ({{ grade.code }})</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label-modern">Form</label>
+                <select name="form" class="form-control-modern">
+                    <option value="">-- Select Form --</option>
+                    {% for form_key, form_name in forms %}
+                        <option value="{{ form_key }}">{{ form_name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="col-md-12">
+                <label class="form-label-modern">Year</label>
+                <input type="number" name="year" class="form-control-modern"
+                       value="{% now 'Y' %}" required>
+            </div>
+
+            <div class="col-12">
+                <label class="form-label-modern">Optional Notes</label>
+                <textarea name="optional_notes" class="form-control-modern" rows="3"
+                          placeholder="Any additional information about the student..."></textarea>
+            </div>
+
+            <div class="col-12">
+                <button type="submit" class="btn-modern btn-modern-primary">
+                </button>
+                <a href="{% url 'core:dashboard' %}" class="btn-modern btn-modern-secondary">
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+    .form-label-modern {
+        font-weight: 600;
+        font-size: 0.875rem;
+        color: #334155;
+        margin-bottom: 0.375rem;
+        display: block;
+    }
+    .form-control-modern {
+        width: 100%;
+        padding: 0.625rem 0.875rem;
+        border: 2px solid #e2e8f0;
+        border-radius: 10px;
+        font-size: 0.9375rem;
+        transition: all 0.3s;
+        background: #f8fafc;
+    }
+    .form-control-modern:focus {
+        border-color: #2563eb;
+        background: white;
+        outline: none;
+        box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+    }
+    .form-control-modern option {
+        color: #0f172a !important;
+        background: white !important;
+    }
+</style>
+{% endblock %}

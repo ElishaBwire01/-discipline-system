@@ -1,4 +1,4 @@
-﻿import os
+import os
 import django
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'disciplinary_program.settings')
@@ -15,6 +15,6 @@ if not User.objects.filter(is_superuser=True).exists():
     admin.first_name = 'System'
     admin.last_name = 'Administrator'
     admin.save()
-    print("✓ Admin created: admin / Admin@2025#")
+    print("? Admin created: admin / Admin@2025#")
 else:
-    print("✓ Admin already exists")
+    print("? Admin already exists")

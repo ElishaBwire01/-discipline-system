@@ -15,24 +15,27 @@ if os.path.exists(views_path):
     print(f"✅ Backup created: {backup_path}")
 
 # Read the file
-with open(views_path, 'r', encoding='utf-8') as f:
+with open(views_path, "r", encoding="utf-8") as f:
     content = f.read()
 
 # Fix 1: Escaped quotes in docstring
-content = content.replace('\\"\\"\\"Test if media files are accessible\\"\\"\\"', '"""Test if media files are accessible"""')
+content = content.replace(
+    '\\"\\"\\"Test if media files are accessible\\"\\"\\"',
+    '"""Test if media files are accessible"""',
+)
 
 # Fix 2: Replace emojis with text labels
 replacements = {
-    '🚨': 'ALERT: ',
-    '⚠️': 'WARNING: ',
-    '🔔': 'NOTICE: ',
-    '📈': 'IMPROVING: ',
-    '✅': 'SUCCESS: ',
-    '📊': 'INFO: ',
-    '🔴': 'CRITICAL: ',
-    '–': '-',
-    '—': '-',
-    '�': '',
+    "🚨": "ALERT: ",
+    "⚠️": "WARNING: ",
+    "🔔": "NOTICE: ",
+    "📈": "IMPROVING: ",
+    "✅": "SUCCESS: ",
+    "📊": "INFO: ",
+    "🔴": "CRITICAL: ",
+    "–": "-",
+    "—": "-",
+    "�": "",
 }
 
 for old, new in replacements.items():
@@ -40,7 +43,10 @@ for old, new in replacements.items():
 
 # Fix 3: Specific title fixes
 title_fixes = [
-    ("'title': 'CRITICAL - Immediate Action Required'", "'title': 'CRITICAL - Immediate Action Required'"),
+    (
+        "'title': 'CRITICAL - Immediate Action Required'",
+        "'title': 'CRITICAL - Immediate Action Required'",
+    ),
     ("'title': 'WARNING - Monitor Closely'", "'title': 'WARNING - Monitor Closely'"),
     ("'title': 'Student Status: Good'", "'title': 'Student Status: Good'"),
     ("'title': 'No Interventions Recorded'", "'title': 'No Interventions Recorded'"),
@@ -50,13 +56,19 @@ for old, new in title_fixes:
     content = content.replace(old, new)
 
 # Fix 4: Fix f-strings with escaped quotes
-content = re.sub(r"'title': f'Pattern Detected: {cat\\[\"category__name\"\\]}'", 
-                 "'title': f'Pattern Detected: {cat[\"category__name\"]}'", content)
-content = re.sub(r"'title': f'Emerging Pattern: {cat\\[\"category__name\"\\]}'", 
-                 "'title': f'Emerging Pattern: {cat[\"category__name\"]}'", content)
+content = re.sub(
+    r"'title': f'Pattern Detected: {cat\\[\"category__name\"\\]}'",
+    "'title': f'Pattern Detected: {cat[\"category__name\"]}'",
+    content,
+)
+content = re.sub(
+    r"'title': f'Emerging Pattern: {cat\\[\"category__name\"\\]}'",
+    "'title': f'Emerging Pattern: {cat[\"category__name\"]}'",
+    content,
+)
 
 # Write the fixed content
-with open(views_path, 'w', encoding='utf-8') as f:
+with open(views_path, "w", encoding="utf-8") as f:
     f.write(content)
 
 print("✅ Views.py fixed!")

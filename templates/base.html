@@ -2,6 +2,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <!-- Font Awesome 6 Free -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Bootstrap Icons -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Disciplinary Management System{% endblock %}</title>
@@ -9,8 +12,8 @@
     <!-- Bootstrap 5 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     
+
     <!-- Font Awesome 6 -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel='stylesheet' href='{% static 'css/profile-fixes.css' %}'>
     
     <!-- Google Fonts - Inter -->
@@ -810,8 +813,7 @@
     <nav class="navbar-modern navbar navbar-expand-lg">
         <div class="container">
             <!-- Brand -->
-            <a class="navbar-brand" href="{% url 'dashboard' %}">
-                <span class="brand-icon"><i class="fas fa-gavel"></i></span>
+            <a class="navbar-brand" href="/dashboard/">
                 <span class="brand-text">
                     <span class="school-name">{{ school_name|default:"Disciplinary System" }}</span>
                     {% if school_motto %}
@@ -830,22 +832,19 @@
                 <ul class="navbar-nav ms-auto align-items-lg-center">
                     <!-- AI Dashboard -->
                     <li class="nav-item">
-                        <a class="nav-link ai-nav-link" href="{% url 'ai_dashboard' %}">
-                            <i class="fas fa-brain"></i> AI Dashboard
+                        <a class="nav-link ai-nav-link" href="/ai/dashboard/">
                         </a>
                     </li>
                     
                     <!-- AI Chat -->
                     <li class="nav-item">
-                        <a class="nav-link ai-chat-link" href="{% url 'ai_chat_page' %}">
-                            <i class="fas fa-comment-dots"></i> AI Chat
+                        <a class="nav-link ai-chat-link" href="/ai/chat/">
                         </a>
                     </li>
                     
                     <!-- Notifications -->
                     <li class="nav-item position-relative">
                         <div class="notification-icon" id="notificationIcon">
-                            <i class="fas fa-bell bell-icon"></i>
                             {% if notification_count > 0 %}
                             <span class="notification-badge" id="notificationBadge">
                                 {{ notification_count }}
@@ -853,7 +852,6 @@
                             {% endif %}
                             <div class="notification-dropdown" id="notificationDropdown">
                                 <div class="notification-dropdown-header">
-                                    <span><i class="fas fa-bell me-2"></i>Notifications</span>
                                     <span class="badge bg-primary" id="notificationCount">{{ notification_count }}</span>
                                 </div>
                                 <div id="notificationList">
@@ -861,12 +859,10 @@
                                         {% for notif in unread_notifications %}
                                         <div class="notification-item" onclick="markNotificationRead({{ notif.id }})">
                                             <div class="notif-icon {{ notif.notification_type }}">
-                                                <i class="fas {% if notif.notification_type == 'critical' %}fa-exclamation-triangle{% elif notif.notification_type == 'warning' %}fa-exclamation-circle{% else %}fa-info-circle{% endif %}"></i>
                                             </div>
                                             <div class="notif-content">
                                                 <div class="notif-title">{{ notif.title }}</div>
                                                 <div class="notif-message">{{ notif.message|truncatechars:80 }}</div>
-                                                <div class="notif-time"><i class="far fa-clock me-1"></i>{{ notif.created_at|date:"M d, H:i" }}</div>
                                             </div>
                                         </div>
                                         {% endfor %}
@@ -874,8 +870,7 @@
                                     
                                     {% if user.is_superuser %}
                                         {% if pending_approvals > 0 %}
-                                        <div class="notification-item" onclick="location.href='{% url 'manage_users' %}?status=pending'">
-                                            <div class="notif-icon warning"><i class="fas fa-user-check"></i></div>
+                                        <div class="notification-item" onclick="location.href='/manage-users/?status=pending'">
                                             <div class="notif-content">
                                                 <div class="notif-title">{{ pending_approvals }} Pending Approvals</div>
                                                 <div class="notif-message">Teachers waiting for account approval</div>
@@ -885,8 +880,7 @@
                                         {% endif %}
                                         
                                         {% if pending_resets > 0 %}
-                                        <div class="notification-item" onclick="location.href='{% url 'admin_reset_requests' %}'">
-                                            <div class="notif-icon info"><i class="fas fa-key"></i></div>
+                                        <div class="notification-item" onclick="location.href='/admin-reset-requests/'">
                                             <div class="notif-content">
                                                 <div class="notif-title">{{ pending_resets }} Password Reset Requests</div>
                                                 <div class="notif-message">Teachers requesting password reset</div>
@@ -898,7 +892,6 @@
                                     
                                     {% if not unread_notifications and not pending_approvals and not pending_resets %}
                                     <div class="text-center py-4">
-                                        <i class="fas fa-check-circle text-success" style="font-size: 2rem;"></i>
                                         <p class="text-muted mt-2 mb-0">All caught up!</p>
                                     </div>
                                     {% endif %}
@@ -929,15 +922,9 @@
                             {% if request.user.teacher_profile and not request.user.teacher_profile.is_approved %}
                             <span class="pending-badge">Pending</span>
                             {% endif %}
-                            <span class="dropdown-arrow"><i class="fas fa-chevron-down"></i></span>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end">
-                            <li><a class="dropdown-item" href="{% url 'user_profile_settings' %}"><i class="fas fa-user-cog text-primary"></i> My Profile</a></li>
-                            <li><a class="dropdown-item" href="{% url 'dashboard' %}"><i class="fas fa-tachometer-alt text-info"></i> Dashboard</a></li>
-                            <li><a class="dropdown-item" href="{% url 'ai_dashboard' %}"><i class="fas fa-brain text-purple" style="color: #7c3aed;"></i> AI Dashboard</a></li>
-                            <li><a class="dropdown-item" href="{% url 'ai_chat_page' %}"><i class="fas fa-comment-dots text-success"></i> AI Chat</a></li>
                             <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item text-danger" href="{% url 'logout' %}"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
                         </ul>
                     </li>
                 </ul>
@@ -951,10 +938,6 @@
             {% for message in messages %}
             <div class="alert-modern alert alert-{{ message.tags }} fade-in-up" role="alert">
                 <span class="alert-icon">
-                    {% if message.tags == 'success' %}<i class="fas fa-check-circle text-success"></i>
-                    {% elif message.tags == 'error' %}<i class="fas fa-exclamation-circle text-danger"></i>
-                    {% elif message.tags == 'warning' %}<i class="fas fa-exclamation-triangle text-warning"></i>
-                    {% else %}<i class="fas fa-info-circle text-primary"></i>{% endif %}
                 </span>
                 <div>{{ message }}</div>
                 <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>
@@ -1002,3 +985,23 @@
     {% block extra_js %}{% endblock %}
 </body>
 </html>
+
+<style>
+    width: 1.2em;
+    height: 1.2em;
+    display: inline-block;
+    vertical-align: middle;
+    fill: currentColor;
+    flex-shrink: 0;
+    transition: all 0.2s ease;
+}
+.icon-label {
+    vertical-align: middle;
+    margin-left: 0.25rem;
+}
+    width: 1em;
+    height: 1em;
+}
+    transform: scale(1.1);
+}
+</style>
