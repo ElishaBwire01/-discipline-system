@@ -1,0 +1,299 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Reset Request Sent - {{ school_name|default:"Disciplinary System" }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .reset-sent-wrapper {
+        max-width: 480px;
+        margin: 0 auto;
+        padding: 1rem;
+    }
+
+    .reset-sent-card {
+        background: white;
+        border-radius: 24px;
+        padding: 2.5rem;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+        text-align: center;
+        border: 1px solid #e5e7eb;
+    }
+
+    .reset-sent-icon {
+        width: 80px;
+        height: 80px;
+        background: linear-gradient(135deg, #f59e0b, #d97706);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1.5rem;
+        font-size: 2.5rem;
+        color: white;
+        box-shadow: 0 8px 24px rgba(245, 158, 11, 0.3);
+        animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+        100% { transform: scale(1); }
+    }
+
+    .reset-sent-card h2 {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #0f172a;
+        margin-bottom: 0.5rem;
+    }
+
+    .reset-sent-card p {
+        color: #64748b;
+        font-size: 0.9375rem;
+        line-height: 1.6;
+    }
+
+    .reset-sent-card .alert-box {
+        background: #fef3c7;
+        border-radius: 12px;
+        padding: 1rem 1.25rem;
+        margin: 1.5rem 0;
+        border-left: 4px solid #f59e0b;
+        text-align: left;
+    }
+
+    .reset-sent-card .alert-box i {
+        color: #d97706;
+        margin-right: 0.5rem;
+    }
+
+    .reset-sent-card .alert-box strong {
+        color: #92400e;
+    }
+
+    .reset-sent-card .alert-box .pending-status {
+        display: inline-block;
+        background: #f59e0b;
+        color: white;
+        padding: 0.125rem 0.75rem;
+        border-radius: 999px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        margin-left: 0.5rem;
+    }
+
+    .status-timeline {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin: 1.5rem 0;
+        padding: 0 1rem;
+    }
+
+    .status-timeline .step {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        flex: 1;
+        position: relative;
+    }
+
+    .status-timeline .step .step-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1rem;
+        color: white;
+        margin-bottom: 0.5rem;
+        z-index: 2;
+    }
+
+    .status-timeline .step .step-icon.completed {
+        background: #10b981;
+    }
+
+    .status-timeline .step .step-icon.active {
+        background: #f59e0b;
+        animation: pulse 1.5s infinite;
+    }
+
+    .status-timeline .step .step-icon.pending {
+        background: #94a3b8;
+    }
+
+    .status-timeline .step .step-label {
+        font-size: 0.7rem;
+        color: #64748b;
+        text-align: center;
+        max-width: 80px;
+    }
+
+    .status-timeline .step .step-label.active-label {
+        color: #0f172a;
+        font-weight: 600;
+    }
+
+    .status-timeline .line {
+        flex: 1;
+        height: 3px;
+        background: #e5e7eb;
+        margin: 0 -0.5rem;
+        margin-bottom: 1.5rem;
+        z-index: 1;
+    }
+
+    .status-timeline .line.completed {
+        background: #10b981;
+    }
+
+    .btn-back-login {
+        display: inline-block;
+        padding: 0.75rem 2rem;
+        background: linear-gradient(135deg, #2563eb, #7c3aed);
+        color: white;
+        border: none;
+        border-radius: 12px;
+        font-size: 0.9375rem;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.3s;
+        margin-top: 0.5rem;
+    }
+
+    .btn-back-login:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(37, 99, 235, 0.35);
+        color: white;
+    }
+
+    .btn-back-login i {
+        margin-right: 0.5rem;
+    }
+
+    .resend-link {
+        color: #2563eb;
+        text-decoration: none;
+        font-weight: 500;
+        font-size: 0.875rem;
+    }
+
+    .resend-link:hover {
+        text-decoration: underline;
+    }
+
+    .countdown-timer {
+        font-size: 0.875rem;
+        color: #94a3b8;
+        margin-top: 0.5rem;
+    }
+
+    .countdown-timer span {
+        font-weight: 700;
+        color: #2563eb;
+    }
+
+    @media (max-width: 480px) {
+        .reset-sent-card { padding: 1.5rem; }
+        .status-timeline .step .step-label { font-size: 0.6rem; max-width: 60px; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="reset-sent-wrapper">
+    <div class="reset-sent-card" data-aos="fade-up">
+        <div class="reset-sent-icon">
+        </div>
+
+        <h2>Reset Request Submitted</h2>
+        <p>Your password reset request has been sent to the administrator for approval.</p>
+
+        <div class="alert-box">
+            <div>
+                <strong>Status: Pending Approval</strong>
+                <span class="pending-status">Waiting</span>
+                <p style="margin-top: 0.5rem; font-size: 0.813rem; color: #92400e;">
+                    An administrator will review your request and reset your password.
+                    You will receive a notification once approved.
+                </p>
+            </div>
+        </div>
+
+        <!-- Status Timeline -->
+        <div class="status-timeline">
+            <div class="step">
+                <div class="step-icon completed">
+                </div>
+                <div class="step-label">Requested</div>
+            </div>
+            <div class="line completed"></div>
+            <div class="step">
+                <div class="step-icon active">
+                </div>
+                <div class="step-label active-label">Pending Approval</div>
+            </div>
+            <div class="line"></div>
+            <div class="step">
+                <div class="step-icon pending">
+                </div>
+                <div class="step-label">Reset & Login</div>
+            </div>
+        </div>
+
+        <div class="countdown-timer">
+            <i class="fas fa-icon"></i>
+            Auto-redirecting to login in <span id="countdown">10</span> seconds
+        </div>
+
+        <a href="/login/" class="btn-back-login">
+        </a>
+
+        <div style="margin-top: 1rem;">
+            <small class="text-muted">
+                Didn't get a response? 
+                <a href="/request-reset/" class="resend-link">Resend Request</a>
+            </small>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ============================================
+    // AUTO-REDIRECT COUNTDOWN
+    // ============================================
+    let seconds = 10;
+    const countdownEl = document.getElementById('countdown');
+
+    const timer = setInterval(function() {
+        seconds--;
+        if (countdownEl) {
+            countdownEl.textContent = seconds;
+        }
+        if (seconds <= 0) {
+            clearInterval(timer);
+            window.location.href = '/login/';
+        }
+    }, 1000);
+
+    // ============================================
+    // CHECK FOR STATUS UPDATES (Optional)
+    // ============================================
+    function checkStatus() {
+        fetch('/api/reset-status/')
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'approved') {
+                    window.location.href = '/login/?reset=approved';
+                }
+            })
+            .catch(() => {});
+    }
+
+    // Check every 5 seconds for status change
+    setInterval(checkStatus, 5000);
+</script>
+{% endblock %}

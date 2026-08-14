@@ -744,7 +744,7 @@
     <nav class="navbar-modern navbar navbar-expand-lg">
         <div class="container">
             <!-- Brand -->
-            <a class="navbar-brand" href="{% url 'dashboard' %}">
+            <a class="navbar-brand" href="/dashboard/">
                 <span class="brand-icon"><i class="fas fa-gavel"></i></span>
                 <span class="brand-text">
                     <span class="school-name">{{ school_name|default:"Disciplinary System" }}</span>
@@ -764,7 +764,7 @@
                 <ul class="navbar-nav ms-auto align-items-lg-center">
                     <!-- AI Dashboard -->
                     <li class="nav-item">
-                        <a class="nav-link ai-nav-link" href="{% url 'ai_dashboard' %}">
+                        <a class="nav-link ai-nav-link" href="/ai/dashboard/">
                             <i class="fas fa-brain"></i> AI Dashboard
                         </a>
                     </li>
@@ -801,7 +801,7 @@
                                     
                                     {% if user.is_superuser %}
                                         {% if pending_approvals > 0 %}
-                                        <div class="notification-item" onclick="location.href='{% url 'manage_users' %}?status=pending'">
+                                        <div class="notification-item" onclick="location.href='/manage-users/?status=pending'">
                                             <div class="notif-icon warning"><i class="fas fa-user-check"></i></div>
                                             <div class="notif-content">
                                                 <div class="notif-title">{{ pending_approvals }} Pending Approvals</div>
@@ -812,7 +812,7 @@
                                         {% endif %}
                                         
                                         {% if pending_resets > 0 %}
-                                        <div class="notification-item" onclick="location.href='{% url 'admin_reset_requests' %}'">
+                                        <div class="notification-item" onclick="location.href='/admin-reset-requests/'">
                                             <div class="notif-icon info"><i class="fas fa-key"></i></div>
                                             <div class="notif-content">
                                                 <div class="notif-title">{{ pending_resets }} Password Reset Requests</div>
@@ -856,14 +856,14 @@
                             {% if request.user.teacher_profile and not request.user.teacher_profile.is_approved %}
                             <span class="pending-badge">Pending</span>
                             {% endif %}
-                            <span class="dropdown-arrow"><i class="fas fa-chevron-down"></i></span>
+                            <span class="dropdown-arrow"><svg class="icon-svg icon-chevron"><use href="/static/icons/svg/icons.svg#icon-chevron-down"/></svg></span>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end">
-                            <li><a class="dropdown-item" href="{% url 'user_profile_settings' %}"><i class="fas fa-user-cog text-primary"></i> My Profile</a></li>
-                            <li><a class="dropdown-item" href="{% url 'dashboard' %}"><i class="fas fa-tachometer-alt text-info"></i> Dashboard</a></li>
-                            <li><a class="dropdown-item" href="{% url 'ai_dashboard' %}"><i class="fas fa-brain text-purple" style="color: #7c3aed;"></i> AI Dashboard</a></li>
+                            <li><a class="dropdown-item" href="/profile/"><i class="fas fa-user-cog text-primary"></i> My Profile</a></li>
+                            <li><a class="dropdown-item" href="/dashboard/"><i class="fas fa-tachometer-alt text-info"></i> Dashboard</a></li>
+                            <li><a class="dropdown-item" href="/ai/dashboard/"><i class="fas fa-brain text-purple" style="color: #7c3aed;"></i> AI Dashboard</a></li>
                             <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item text-danger" href="{% url 'logout' %}"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+                            <li><a class="dropdown-item text-danger" href="/logout/"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
                         </ul>
                     </li>
                 </ul>
@@ -877,7 +877,7 @@
             {% for message in messages %}
             <div class="alert-modern alert alert-{{ message.tags }} fade-in-up" role="alert">
                 <span class="alert-icon">
-                    {% if message.tags == 'success' %}<i class="fas fa-check-circle text-success"></i>
+                    {% if message.tags == 'success' %}<svg class="icon-svg icon-check"><use href="/static/icons/svg/icons.svg#icon-check"/></svg>
                     {% elif message.tags == 'error' %}<i class="fas fa-exclamation-circle text-danger"></i>
                     {% elif message.tags == 'warning' %}<i class="fas fa-exclamation-triangle text-warning"></i>
                     {% else %}<i class="fas fa-info-circle text-primary"></i>{% endif %}

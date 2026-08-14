@@ -1,0 +1,50 @@
+<!-- Add Student Section -->
+<div class="card-modern mb-4" data-aos="fade-up">
+    <div class="card-header-modern">
+        Add Student
+        <a href="{% url 'core:add_student' %}" class="btn btn-sm btn-outline-light float-end">
+        </a>
+    </div>
+    <div class="card-body p-4">
+        <form method="post" action="{% url 'core:admin_dashboard' %}">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="add_student">
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <input type="text" name="admission_number" class="form-control-modern" placeholder="Admission Number" required>
+                </div>
+                <div class="col-md-3">
+                    <input type="text" name="name" class="form-control-modern" placeholder="Full Name" required>
+                </div>
+                <div class="col-md-2">
+                    <select name="stream" class="form-control-modern" required>
+                        <option value="">-- Select Stream --</option>
+                        {% for stream in streams %}
+                        <option value="{{ stream.id }}">{{ stream.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <select name="grade_level" class="form-control-modern">
+                        <option value="">-- Select Grade --</option>
+                        {% for grade in grade_levels %}
+                        <option value="{{ grade.id }}">{{ grade.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <select name="form" class="form-control-modern" required>
+                        <option value="">-- Select Form --</option>
+                        {% for form_key, form_name in forms %}
+                        <option value="{{ form_key }}">{{ form_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-12">
+                    <button type="submit" class="btn btn-primary btn-sm">
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

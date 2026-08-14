@@ -1,0 +1,72 @@
+<!-- WORKING PAGINATION -->
+<nav aria-label="Page navigation" class="mt-4">
+    <div class="d-flex flex-column flex-sm-row justify-content-between align-items-center gap-3">
+        <div class="text-muted small">
+            Showing <strong>{{ page_obj.start_index|default:1 }}</strong> to <strong>{{ page_obj.end_index|default:20 }}</strong> of <strong>{{ page_obj.paginator.count|default:23 }}</strong> students
+            {% if page_obj.paginator.num_pages|default:1 > 1 %}
+            <span class="badge bg-primary ms-1">{{ page_obj.number|default:1 }}/{{ page_obj.paginator.num_pages|default:2 }}</span>
+            {% endif %}
+        </div>
+
+        <ul class="pagination pagination-modern mb-0">
+            <!-- First -->
+            <li class="page-item {% if page_obj.number == 1 %}disabled{% endif %}">
+                <a class="page-link" href="?page=1{% if per_page %}&per_page={{ per_page }}{% endif %}">
+                    <i class="fas fa-icon"></i>
+                </a>
+            </li>
+            
+            <!-- Previous -->
+            <li class="page-item {% if page_obj.number == 1 %}disabled{% endif %}">
+                <a class="page-link" href="?page={% if page_obj.has_previous %}{{ page_obj.previous_page_number }}{% else %}1{% endif %}{% if per_page %}&per_page={{ per_page }}{% endif %}">
+                    <i class="fas fa-icon"></i>
+                </a>
+            </li>
+
+            <!-- Page 1 -->
+            <li class="page-item {% if page_obj.number == 1 %}active{% endif %}">
+                <a class="page-link" href="?page=1{% if per_page %}&per_page={{ per_page }}{% endif %}">1</a>
+            </li>
+            
+            <!-- Page 2 (only if there are more than 20 students) -->
+            {% if page_obj.paginator.count > 20 %}
+            <li class="page-item {% if page_obj.number == 2 %}active{% endif %}">
+                <a class="page-link" href="?page=2{% if per_page %}&per_page={{ per_page }}{% endif %}">2</a>
+            </li>
+            {% endif %}
+            
+            <!-- Page 3 (only if there are more than 40 students) -->
+            {% if page_obj.paginator.count > 40 %}
+            <li class="page-item {% if page_obj.number == 3 %}active{% endif %}">
+                <a class="page-link" href="?page=3{% if per_page %}&per_page={{ per_page }}{% endif %}">3</a>
+            </li>
+            {% endif %}
+
+            <!-- Next -->
+            <li class="page-item {% if not page_obj.has_next %}disabled{% endif %}">
+                <a class="page-link" href="?page={% if page_obj.has_next %}{{ page_obj.next_page_number }}{% else %}1{% endif %}{% if per_page %}&per_page={{ per_page }}{% endif %}">
+                    <i class="fas fa-icon"></i>
+                </a>
+            </li>
+            
+            <!-- Last -->
+            <li class="page-item {% if not page_obj.has_next %}disabled{% endif %}">
+                <a class="page-link" href="?page={{ page_obj.paginator.num_pages|default:2 }}{% if per_page %}&per_page={{ per_page }}{% endif %}">
+                    <i class="fas fa-icon"></i>
+                </a>
+            </li>
+        </ul>
+
+        <!-- Per Page -->
+        <div class="d-flex align-items-center gap-2">
+            <label class="text-muted small mb-0">Show:</label>
+            <select class="form-control-modern" style="width: 70px; padding: 0.25rem 0.5rem; font-size: 0.813rem;" 
+                    onchange="window.location.href='?page=1&per_page='+this.value">
+                <option value="10" {% if per_page == 10 %}selected{% endif %}>10</option>
+                <option value="20" {% if per_page == 20 %}selected{% endif %}>20</option>
+                <option value="50" {% if per_page == 50 %}selected{% endif %}>50</option>
+                <option value="100" {% if per_page == 100 %}selected{% endif %}>100</option>
+            </select>
+        </div>
+    </div>
+</nav>

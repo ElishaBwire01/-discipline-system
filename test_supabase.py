@@ -1,34 +1,35 @@
-import psycopg2
 import os
+
+import psycopg2
 
 print("?? Testing Supabase connection...")
 
 try:
     conn = psycopg2.connect(
         host="aws-1-eu-north-1.pooler.supabase.com",
-        user="postgres.murnebrvgejmxdxzxtfe",
+        user="postgres.wlzlngbdgaofbilcymrj",
         password="bwire10.20.",
         dbname="postgres",
         port="5432",
         sslmode="require",
-        connect_timeout=15
+        connect_timeout=15,
     )
     print("? Supabase PostgreSQL connection successful!")
-    
+
     with conn.cursor() as cur:
         cur.execute("SELECT version()")
         version = cur.fetchone()
         print(f"?? PostgreSQL Version: {version[0][:50]}...")
-    
+
     conn.close()
     print("")
     print("?? Connection Details:")
     print(f"   Host: aws-1-eu-north-1.pooler.supabase.com")
     print(f"   Port: 5432")
     print(f"   Database: postgres")
-    print(f"   User: postgres.murnebrvgejmxdxzxtfe")
+    print(f"   User: postgres.wlzlngbdgaofbilcymrj")
     print(f"   Mode: Session Pooler (IPv4)")
-    
+
 except Exception as e:
     print(f"? Connection failed: {e}")
     print("")

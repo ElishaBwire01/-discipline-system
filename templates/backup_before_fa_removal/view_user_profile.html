@@ -1,0 +1,122 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}User Profile - {{ profile_user.get_full_name|default:profile_user.username }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <div class="card-modern">
+                <div class="card-header-modern" style="background: linear-gradient(135deg, #2563eb, #7c3aed); color: white;">
+                    User Profile
+                    {% if is_own_profile %}<span class="ms-2 badge bg-light text-dark">You</span>{% endif %}
+                </div>
+                <div class="card-body p-4">
+                    <div class="text-center mb-4">
+                        {% if profile and profile.profile_picture %}
+                            <img src="{{ profile.profile_picture.url }}" alt="Profile Picture" class="rounded-circle" style="width: 120px; height: 120px; object-fit: cover; border: 4px solid #2563eb;">
+                        {% else %}
+                            <div class="rounded-circle d-flex align-items-center justify-content-center bg-primary text-white" style="width: 120px; height: 120px; font-size: 48px; margin: 0 auto;">
+                                {{ profile_user.get_full_name|default:profile_user.username|first|upper }}
+                            </div>
+                        {% endif %}
+                        <h4 class="mt-3 mb-0">{{ profile_user.get_full_name|default:profile_user.username }}</h4>
+                        <p class="text-muted">@{{ profile_user.username }}</p>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="info-item">
+                                <span class="text-muted">Email:</span>
+                                <span>{{ profile_user.email|default:"Not provided" }}</span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="info-item">
+                                <span class="text-muted">Role:</span>
+                                <span>
+                                    {% if profile_user.is_superuser %}
+                                        <span class="badge-modern badge-critical">Admin</span>
+                                    {% elif profile_user.groups.filter.name == "ClassTeacher" %}
+                                        <span class="badge-modern badge-warning">Class Teacher</span>
+                                    {% elif profile_user.groups.filter.name == "Teacher" %}
+                                        <span class="badge-modern badge-info">Teacher</span>
+                                    {% else %}
+                                        <span class="badge-modern badge-secondary">User</span>
+                                    {% endif %}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="info-item">
+                                <span class="text-muted">Status:</span>
+                                <span>
+                                    {% if profile.is_online %}
+                                        <span class="badge-modern badge-success"><i class="fas fa-icon" style="font-size: 8px;"></i> Online</span>
+                                    {% else %}
+                                        <span class="badge-modern badge-secondary"><i class="fas fa-icon" style="font-size: 8px;"></i> Offline</span>
+                                    {% endif %}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="info-item">
+                                <span class="text-muted">Phone:</span>
+                                <span>{{ profile.phone_number|default:"Not provided" }}</span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="info-item">
+                                <span class="text-muted">Stream:</span>
+                                <span>{{ profile.assigned_stream.name|default:"Not Assigned" }}</span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="info-item">
+                                <span class="text-muted">Form:</span>
+                                <span>{{ profile.assigned_form|default:"Not Assigned" }}</span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="info-item">
+                                <span class="text-muted">Approved:</span>
+                                <span>
+                                    {% if profile.is_approved %}
+                                        <span class="badge-modern badge-success">Yes</span>
+                                    {% else %}
+                                        <span class="badge-modern badge-warning">Pending</span>
+                                    {% endif %}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="info-item">
+                                <span class="text-muted">Last Activity:</span>
+                                <span>{{ profile.last_activity|date:"Y-m-d H:i"|default:"Never" }}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    {% if request.user.is_superuser or is_own_profile %}
+                    <div class="text-center mt-4">
+                        <a href="{% url 'core:user_profile_settings' %}" class="btn-modern btn-modern-primary">
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .info-item {
+        padding: 8px 0;
+        border-bottom: 1px solid #f1f5f9;
+    }
+    .info-item:last-child {
+        border-bottom: none;
+    }
+</style>
+{% endblock %}

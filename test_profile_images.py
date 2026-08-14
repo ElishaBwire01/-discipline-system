@@ -2,11 +2,14 @@
 # Run this to test profile image functionality
 
 import os
+
 import django
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'disciplinary_program.settings')
+
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "disciplinary_program.settings")
 django.setup()
 
 from django.contrib.auth.models import User
+
 from core.models import TeacherProfile
 
 print("Checking profile images...")

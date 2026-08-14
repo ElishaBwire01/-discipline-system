@@ -1,62 +1,392 @@
-﻿{% extends 'base.html' %}
+{% extends 'base.html' %}
+{% load static %}
 
-{% block title %}Password Reset Requests{% endblock %}
+{% block title %}Admin - Password Reset Requests{% endblock %}
 
-{% block content %}
-<div class="card-modern" data-aos="fade-up">
-    <div class="card-header-modern">
-        <span class="header-icon"><i class="fas fa-key"></i></span>
-        Password Reset Requests
-        <span class="badge bg-light text-dark ms-2" id="pendingCount">{{ pending_resets|length }}</span>
-    </div>
-    <div class="card-body">
-        {% if pending_resets %}
-        <div class="table-responsive">
-            <table class="table-modern">
-                <thead><tr><th>Username</th><th>Full Name</th><th>Email</th><th>Requested At</th><th>Actions</th></tr></thead>
-                <tbody>
-                    {% for reset in pending_resets %}
-                    <tr>
-                        <td><strong>{{ reset.user.username }}</strong></td>
-                        <td>{{ reset.user.get_full_name|default:"-" }}</td>
-                        <td>{{ reset.user.email|default:"-" }}</td>
-                        <td>{{ reset.requested_at|date:"Y-m-d H:i" }}</td>
-                        <td>
-                            <div class="d-flex gap-2 flex-wrap">
-                                <form method="post" action="{% url 'approve_reset' reset.id %}">
-                                    {% csrf_token %}
-                                    <button type="submit" class="btn-modern btn-modern-success btn-modern-sm" onclick="return confirm('Reset password for {{ reset.user.username }}?')"><i class="fas fa-check"></i> Approve</button>
-                                </form>
-                                <form method="post" action="{% url 'reject_reset' reset.id %}">
-                                    {% csrf_token %}
-                                    <button type="submit" class="btn-modern btn-modern-danger btn-modern-sm" onclick="return confirm('Reject this request?')"><i class="fas fa-times"></i> Reject</button>
-                                </form>
-                            </div>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-        {% else %}
-        <div class="alert alert-success"><i class="fas fa-check-circle me-2"></i>No pending requests</div>
-        {% endif %}
-    </div>
-</div>
-<div class="mt-3"><a href="{% url 'admin_dashboard' %}" class="btn-modern btn-modern-secondary"><i class="fas fa-arrow-left"></i> Back</a></div>
+{% block extra_css %}
+<style>
+    .reset-requests-wrapper {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 1rem;
+    }
 
-<script>
-setInterval(function() {
-    $.get('/api/admin-notifications/', function(data) {
-        data.notifications.forEach(function(n) {
-            if (n.type === 'reset') {
-                $("#pendingCount").text(n.count || '0');
-            }
-        });
-    });
-}, 30000);
-</script>
+    .reset-request-card {
+        background: white;
+        border-radius: 16px;
+        padding: 1.5rem;
+        border: 1px solid #e5e7eb;
+        margin-bottom: 1rem;
+        transition: all 0.3s ease;
+        border-left: 4px solid #f59e0b;
+    }
+
+    .reset-request-card:hover {
+        box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+    }
+
+    .reset-request-card .request-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    .reset-request-card .request-user {
+        font-weight: 600;
+        color: #0f172a;
+        font-size: 1.125rem;
+    }
+
+    .reset-request-card .request-user small {
+        font-weight: 400;
+        color: #64748b;
+        font-size: 0.875rem;
+        margin-left: 0.5rem;
+    }
+
+    .reset-request-card .request-time {
+        font-size: 0.813rem;
+        color: #94a3b8;
+    }
+
+    .reset-request-card .request-details {
+        margin-top: 0.75rem;
+        padding-top: 0.75rem;
+        border-top: 1px solid #f1f5f9;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .reset-request-card .request-details .detail-item {
+        font-size: 0.813rem;
+        color: #475569;
+    }
+
+    .reset-request-card .request-details .detail-item strong {
+        color: #0f172a;
+    }
+
+    .reset-request-card .request-actions {
+        display: flex;
+        gap: 0.5rem;
+        margin-top: 0.75rem;
+        flex-wrap: wrap;
+    }
+
+    .btn-approve {
+        padding: 0.5rem 1.25rem;
+        background: #10b981;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 0.875rem;
+        transition: all 0.3s;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .btn-approve:hover {
+        background: #059669;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+    }
+
+    .btn-deny {
+        padding: 0.5rem 1.25rem;
+        background: #ef4444;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 0.875rem;
+        transition: all 0.3s;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .btn-deny:hover {
+        background: #dc2626;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+    }
+
+    .badge-status {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        border-radius: 999px;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+
+    .badge-status.pending {
+        background: #fef3c7;
+        color: #92400e;
+    }
+
+    .badge-status.approved {
+        background: #d1fae5;
+        color: #065f46;
+    }
+
+    .badge-status.denied {
+        background: #fef2f2;
+        color: #991b1b;
+    }
+
+    .badge-status.completed {
+        background: #dbeafe;
+        color: #1e40af;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 3rem 1rem;
+        color: #94a3b8;
+    }
+
+    .empty-state i {
+        font-size: 3rem;
+        color: #d1d5db;
+        margin-bottom: 1rem;
+    }
+
+    .empty-state h3 {
+        color: #0f172a;
+        font-weight: 600;
+    }
+
+    .modal-overlay {
+        display: none;
+        position: fixed;
+        top: 0; left: 0;
+        width: 100%; height: 100%;
+        background: rgba(0,0,0,0.5);
+        z-index: 1000;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .modal-overlay.active {
+        display: flex;
+    }
+
+    .modal-content {
+        background: white;
+        border-radius: 16px;
+        padding: 2rem;
+        max-width: 500px;
+        width: 90%;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        animation: slideUp 0.3s ease;
+    }
+
+    @keyframes slideUp {
+        from { transform: translateY(20px); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+    }
+
+    .modal-content h3 {
+        font-size: 1.25rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .modal-content p {
+        color: #64748b;
+        font-size: 0.9375rem;
+    }
+
+    .modal-content .btn-confirm {
+        padding: 0.75rem 1.5rem;
+        background: #10b981;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        margin-right: 0.5rem;
+    }
+
+    .modal-content .btn-cancel {
+        padding: 0.75rem 1.5rem;
+        background: #e5e7eb;
+        color: #0f172a;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+    }
+
+    .alert-modern {
+        border-radius: 12px;
+        border: none;
+        padding: 0.875rem 1rem;
+        font-size: 0.875rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .alert-modern.alert-success {
+        background: #d1fae5;
+        color: #065f46;
+    }
+
+    .alert-modern.alert-warning {
+        background: #fef3c7;
+        color: #92400e;
+    }
+
+    .alert-modern.alert-danger {
+        background: #fef2f2;
+        color: #991b1b;
+    }
+
+    .alert-modern.alert-info {
+        background: #eff6ff;
+        color: #1e40af;
+    }
+
+    .alert-modern i {
+        font-size: 1.125rem;
+    }
+</style>
 {% endblock %}
 
+{% block content %}
+<div class="reset-requests-wrapper">
+    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+        <h2 style="font-size: 1.25rem; font-weight: 700; color: #0f172a;">
+            Password Reset Requests
+            <span class="badge bg-warning text-dark ms-2">{{ pending_resets|length }}</span>
+        </h2>
+        <a href="/admin-dashboard/" class="btn-modern btn-modern-secondary btn-modern-sm">
+        </a>
+    </div>
 
+    {% if messages %}
+        {% for message in messages %}
+        <div class="alert-modern alert-{{ message.tags }}">
+            {{ message }}
+        </div>
+        {% endfor %}
+    {% endif %}
 
+    {% if pending_resets %}
+        {% for reset in pending_resets %}
+        <div class="reset-request-card" id="reset-{{ reset.id }}">
+            <div class="request-header">
+                <div>
+                    <span class="request-user">
+                        {{ reset.user.get_full_name|default:reset.user.username }}
+                        <small>@{{ reset.user.username }}</small>
+                    </span>
+                    <span class="badge-status pending">Pending</span>
+                </div>
+                <span class="request-time">
+                    {{ reset.requested_at|date:"M d, Y H:i" }}
+                </span>
+            </div>
+            <div class="request-details">
+                <span class="detail-item">
+                    <strong>Email:</strong> {{ reset.user.email|default:"Not provided" }}
+                </span>
+                <span class="detail-item">
+                    <strong>Role:</strong> 
+                    {% if reset.user.groups.all %}
+                        {{ reset.user.groups.first.name }}
+                    {% else %}
+                        Teacher
+                    {% endif %}
+                </span>
+                <span class="detail-item">
+                    <strong>Status:</strong> Waiting for approval
+                </span>
+            </div>
+            <div class="request-actions">
+                <button class="btn-approve" onclick="openModal('{{ reset.id }}', '{{ reset.user.username }}', 'approve')">
+                </button>
+                <button class="btn-deny" onclick="openModal('{{ reset.id }}', '{{ reset.user.username }}', 'deny')">
+                </button>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="empty-state">
+            <h3>No Pending Requests</h3>
+            <p>All password reset requests have been processed.</p>
+            <a href="/admin-dashboard/" class="btn-modern btn-modern-primary btn-modern-sm mt-2">
+            </a>
+        </div>
+    {% endif %}
+</div>
+
+<!-- Confirmation Modal -->
+<div class="modal-overlay" id="confirmModal">
+    <div class="modal-content">
+        <h3 id="modalTitle">Confirm Action</h3>
+        <p id="modalMessage">Are you sure you want to perform this action?</p>
+        <form method="post" id="modalForm">
+            {% csrf_token %}
+            <input type="hidden" name="reset_id" id="modalResetId">
+            <div style="margin-top: 1.5rem; display: flex; gap: 0.5rem;">
+                <button type="submit" class="btn-confirm" id="modalConfirmBtn">Confirm</button>
+                <button type="button" class="btn-cancel" onclick="closeModal()">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    function openModal(resetId, username, action) {
+        const modal = document.getElementById('confirmModal');
+        const form = document.getElementById('modalForm');
+        const resetIdInput = document.getElementById('modalResetId');
+        const title = document.getElementById('modalTitle');
+        const message = document.getElementById('modalMessage');
+        const confirmBtn = document.getElementById('modalConfirmBtn');
+
+        resetIdInput.value = resetId;
+
+        if (action === 'approve') {
+            title.textContent = 'Approve Password Reset';
+            message.textContent = `Are you sure you want to approve the password reset for "${username}"? A new temporary password will be generated and sent to the user.`;
+            confirmBtn.style.background = '#10b981';
+            form.action = '/approve-reset/' + resetId + '/';
+        } else {
+            title.textContent = 'Deny Password Reset';
+            message.textContent = `Are you sure you want to deny the password reset request for "${username}"? The user will be notified that their request was denied.`;
+            confirmBtn.style.background = '#ef4444';
+            form.action = '/deny-reset/' + resetId + '/';
+        }
+
+        modal.classList.add('active');
+    }
+
+    function closeModal() {
+        document.getElementById('confirmModal').classList.remove('active');
+    }
+
+    // Close modal on overlay click
+    document.getElementById('confirmModal').addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeModal();
+        }
+    });
+
+    // Close modal on Escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            closeModal();
+        }
+    });
+</script>
+{% endblock %}

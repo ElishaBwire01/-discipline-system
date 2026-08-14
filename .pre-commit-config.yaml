@@ -1,0 +1,20 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
+    hooks:
+      - id: detect-aws-credentials
+      - id: detect-private-key
+
+  - repo: https://github.com/Yelp/detect-secrets
+    rev: v1.3.0
+    hooks:
+      - id: detect-secrets
+        args: [--baseline, .secrets.baseline]
+
+  - repo: local
+    hooks:
+      - id: scan-hardcoded-keys
+        name: Scan for hardcoded API keys
+        entry: python scripts/scan_for_hardcoded_keys.py
+        language: system
+        files: '\\.(py|env|sh|yaml|yml|json|txt)$'

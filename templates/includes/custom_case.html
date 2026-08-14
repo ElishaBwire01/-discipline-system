@@ -1,83 +1,41 @@
-﻿<div class="mb-3">
-    <label class="form-label-modern">Report Type</label>
-    <div class="d-flex gap-3">
-        <div class="form-check">
-            <input class="form-check-input" type="radio" name="report_type" id="standardReport" value="standard" checked onclick="toggleCustomCase(false)">
-            <label class="form-check-label" for="standardReport">Standard Offense</label>
-        </div>
-        <div class="form-check">
-            <input class="form-check-input" type="radio" name="report_type" id="customReport" value="custom" onclick="toggleCustomCase(true)">
-            <label class="form-check-label" for="customReport">Custom Case</label>
-        </div>
-    </div>
-</div>
-
-<!-- Standard Category -->
-<div id="standardCategoryDiv">
-    <div class="mb-3">
-        <label class="form-label-modern">Offense Category</label>
-        <select name="category" class="form-control-modern" id="categorySelect">
-            <option value="">-- Select a category --</option>
-            {% for category in categories %}
-            <option value="{{ category.id }}">{{ category.name }}</option>
-            {% endfor %}
-            <option value="custom">-- Custom Case --</option>
-        </select>
-        {% if not categories %}
-        <small class="text-danger">No categories found. Please run: python manage.py seed_categories</small>
-        {% endif %}
-    </div>
-</div>
-
-<!-- Custom Case -->
-<div id="customCaseDiv" style="display: none;">
-    <div class="mb-3">
-        <label class="form-label-modern">Custom Case Description</label>
-        <input type="text" name="custom_case" class="form-control-modern" placeholder="Describe the custom case..." id="customCaseInput">
-        <small class="text-muted">Example: "Disrespecting school property", "Bullying", etc.</small>
-    </div>
-</div>
-
-<!-- Severity -->
 <div class="mb-3">
-    <label class="form-label-modern">Severity Rating</label>
-    <select name="rating" class="form-control-modern">
-        <option value="VERY_MINOR">Very Minor (5 pts)</option>
-        <option value="MINOR">Minor (10 pts)</option>
-        <option value="MODERATE" selected>Moderate (20 pts)</option>
-        <option value="SERIOUS">Serious (30 pts)</option>
-        <option value="VERY_SERIOUS">Very Serious (40 pts)</option>
+    <label class="form-label-modern">Category</label>
+    <select name="category" class="form-control-modern" id="reportCategory" onchange="toggleCustomCase()">
+        <option value="">-- Select Category --</option>
+        {% for category in categories %}
+        <option value="{{ category.id }}">{{ category.name }}</option>
+        {% endfor %}
+        <option value="custom">Custom Case</option>
     </select>
 </div>
-
-<!-- Comments -->
-<div class="mb-3">
-    <label class="form-label-modern">Additional Comments</label>
-    <textarea name="comments" class="form-control-modern" rows="2" placeholder="Add any additional details..."></textarea>
+<div id="customCaseContainer" style="display: none;">
+    <div class="mb-3">
+        <label class="form-label-modern">Custom Case Description</label>
+        <textarea name="custom_case" class="form-control-modern" rows="3" placeholder="Describe the custom offense..."></textarea>
+    </div>
 </div>
-
+<div class="mb-3">
+    <label class="form-label-modern">Rating</label>
+    <select name="rating" class="form-control-modern">
+        <option value="VERY_MINOR">Very Minor</option>
+        <option value="MINOR">Minor</option>
+        <option value="MODERATE" selected>Moderate</option>
+        <option value="SERIOUS">Serious</option>
+        <option value="VERY_SERIOUS">Very Serious</option>
+    </select>
+</div>
+<div class="mb-3">
+    <label class="form-label-modern">Comments</label>
+    <textarea name="comments" class="form-control-modern" rows="3" placeholder="Additional comments..."></textarea>
+</div>
 <script>
-function toggleCustomCase(isCustom) {
-    var standardDiv = document.getElementById('standardCategoryDiv');
-    var customDiv = document.getElementById('customCaseDiv');
-    var customInput = document.getElementById('customCaseInput');
-    var categorySelect = document.getElementById('categorySelect');
-    
-    if (standardDiv) standardDiv.style.display = isCustom ? 'none' : 'block';
-    if (customDiv) customDiv.style.display = isCustom ? 'block' : 'none';
-    if (customInput) customInput.required = isCustom;
-    if (categorySelect) categorySelect.required = !isCustom;
-    
-    if (isCustom && categorySelect) {
-        categorySelect.value = 'custom';
+function toggleCustomCase() {
+    var category = document.getElementById('reportCategory');
+    var customContainer = document.getElementById('customCaseContainer');
+    if (category.value === 'custom') {
+        customContainer.style.display = 'block';
+    } else {
+        customContainer.style.display = 'none';
     }
 }
-
-document.getElementById('categorySelect')?.addEventListener('change', function() {
-    if (this.value === 'custom') {
-        document.getElementById('customReport').checked = true;
-        toggleCustomCase(true);
-    }
-});
 </script>
-
