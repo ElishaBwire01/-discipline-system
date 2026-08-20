@@ -1,0 +1,1124 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Admin Engineering Agent — {{ school.name|default:"System" }}{% endblock %}
+
+{% block extra_css %}
+<style>
+/* ============================================================
+   ADMIN ENGINEERING AGENT — Full-stack AI agent UI
+   ============================================================ */
+:root {
+    --agent-purple: #7c3aed;
+    --agent-blue:   #2563eb;
+    --agent-green:  #059669;
+    --agent-red:    #dc2626;
+    --agent-orange: #d97706;
+    --agent-bg:     #f0f4ff;
+    --mode-inspect:  #2563eb;
+    --mode-analysis: #7c3aed;
+    --mode-repair:   #d97706;
+    --mode-test:     #059669;
+    --mode-incident: #dc2626;
+}
+
+/* ── Layout ─────────────────────────────────────────────── */
+.agent-layout {
+    display: flex;
+    gap: 1rem;
+    height: calc(100vh - 130px);
+    min-height: 580px;
+}
+
+/* ── Left sidebar ───────────────────────────────────────── */
+.agent-sidebar {
+    width: 248px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.625rem;
+    overflow-y: auto;
+}
+.agent-sidebar-card {
+    background: white;
+    border-radius: 12px;
+    border: 1px solid #e5e7eb;
+    padding: 0.875rem;
+    font-size: 0.82rem;
+    flex-shrink: 0;
+}
+.agent-sidebar-card h6 {
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .07em;
+    color: #9ca3af;
+    margin-bottom: 0.5rem;
+}
+.stat-pill {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 0.28rem 0; border-bottom: 1px solid #f3f4f6; font-size: 0.78rem;
+}
+.stat-pill:last-child { border-bottom: none; }
+.stat-pill .label { color: #6b7280; }
+.stat-pill .value { font-weight: 700; color: #1f2328; }
+
+/* ── Mode selector ──────────────────────────────────────── */
+.mode-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.35rem;
+}
+.mode-btn {
+    padding: 0.4rem 0.4rem;
+    border-radius: 8px;
+    border: 1.5px solid transparent;
+    font-size: 0.7rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+    text-align: center;
+    background: #f9fafb;
+    color: #6b7280;
+    display: flex; align-items: center; gap: 0.3rem; justify-content: center;
+}
+.mode-btn:hover { background: #f3f4f6; }
+.mode-btn.active { color: white; }
+.mode-btn[data-mode="INSPECT"].active  { background: var(--mode-inspect);  border-color: var(--mode-inspect); }
+.mode-btn[data-mode="ANALYSIS"].active { background: var(--mode-analysis); border-color: var(--mode-analysis); }
+.mode-btn[data-mode="REPAIR"].active   { background: var(--mode-repair);   border-color: var(--mode-repair); }
+.mode-btn[data-mode="TEST"].active     { background: var(--mode-test);     border-color: var(--mode-test); }
+.mode-btn[data-mode="INCIDENT"].active { background: var(--mode-incident); border-color: var(--mode-incident); }
+.mode-btn.all-modes { grid-column: span 2; font-size: 0.68rem; }
+
+/* ── Tool palette ───────────────────────────────────────── */
+.tool-btn {
+    display: block; width: 100%; text-align: left;
+    padding: 0.38rem 0.5rem; border-radius: 7px; border: none;
+    background: #f9fafb; color: #374151; font-size: 0.74rem;
+    cursor: pointer; transition: all 0.13s; margin-bottom: 2px;
+    display: flex; align-items: center; gap: 0.4rem;
+}
+.tool-btn:hover { background: #ede9fe; color: var(--agent-purple); }
+.tool-btn .tool-tag {
+    font-size: 0.6rem; padding: 0.08rem 0.35rem; border-radius: 10px;
+    font-weight: 700; margin-left: auto; flex-shrink: 0;
+}
+.tool-tag.read  { background: #d1fae5; color: #065f46; }
+.tool-tag.write { background: #fef3c7; color: #92400e; }
+
+/* ── Quick actions ──────────────────────────────────────── */
+.quick-action {
+    display: block; width: 100%; text-align: left;
+    padding: 0.38rem 0.5rem; border-radius: 7px; border: none;
+    background: #f9fafb; color: #374151; font-size: 0.74rem;
+    cursor: pointer; transition: all 0.13s; margin-bottom: 2px;
+}
+.quick-action:hover { background: #ede9fe; color: var(--agent-purple); }
+.quick-action i { width: 1rem; text-align: center; margin-right: 0.3rem; }
+
+/* ── Chat panel ─────────────────────────────────────────── */
+.agent-chat-panel {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background: white;
+    border-radius: 14px;
+    border: 1px solid #e5e7eb;
+    overflow: hidden;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+}
+.agent-chat-header {
+    padding: 0.75rem 1.125rem;
+    background: linear-gradient(135deg, #1e1b4b, #2563eb);
+    color: white;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-shrink: 0;
+}
+.agent-chat-header .header-icon {
+    width: 36px; height: 36px;
+    background: rgba(255,255,255,0.15);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1rem;
+    flex-shrink: 0;
+}
+.agent-chat-header h5 { font-size: 0.9rem; font-weight: 700; margin: 0; }
+.agent-chat-header small { font-size: 0.7rem; opacity: 0.75; }
+.header-badges { display: flex; gap: 0.35rem; margin-left: auto; align-items: center; }
+.mode-badge {
+    font-size: 0.62rem; font-weight: 700; padding: 0.12rem 0.5rem;
+    border-radius: 10px; background: rgba(255,255,255,0.2); color: white;
+    letter-spacing: .04em;
+}
+.mode-badge.INSPECT  { background: rgba(37,99,235,.7); }
+.mode-badge.ANALYSIS { background: rgba(124,58,237,.7); }
+.mode-badge.REPAIR   { background: rgba(217,119,6,.7); }
+.mode-badge.TEST     { background: rgba(5,150,105,.7); }
+.mode-badge.INCIDENT { background: rgba(220,38,38,.7); }
+
+/* ── Tool activity bar (under header) ──────────────────── */
+.tool-activity-bar {
+    background: #1e1b4b;
+    padding: 0.3rem 1.125rem;
+    display: none;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+.tool-pill {
+    font-size: 0.62rem; padding: 0.1rem 0.5rem; border-radius: 10px;
+    background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.75);
+    display: flex; align-items: center; gap: 0.25rem;
+}
+.tool-pill i { font-size: 0.55rem; }
+
+/* ── Messages ───────────────────────────────────────────── */
+.agent-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.875rem;
+    background: #fafafa;
+}
+.msg { display: flex; gap: 0.625rem; }
+.msg.user  { align-self: flex-end; flex-direction: row-reverse; max-width: 78%; }
+.msg.ai    { align-self: flex-start; max-width: 88%; }
+.msg.local { align-self: flex-start; max-width: 90%; }
+.msg-avatar {
+    width: 30px; height: 30px; border-radius: 50%; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center; font-size: 0.75rem;
+}
+.msg.ai   .msg-avatar { background: linear-gradient(135deg, #1e1b4b, #2563eb); color: white; }
+.msg.user .msg-avatar { background: #0f172a; color: white; font-weight: 700; font-size: 0.7rem; }
+.msg.local .msg-avatar { background: #059669; color: white; }
+.msg-body { display: flex; flex-direction: column; }
+.msg-bubble {
+    padding: 0.7rem 0.9rem;
+    border-radius: 12px;
+    font-size: 0.845rem;
+    line-height: 1.65;
+    word-break: break-word;
+    white-space: pre-wrap;
+}
+.msg.ai   .msg-bubble { background: white; border: 1px solid #e5e7eb; border-radius: 3px 12px 12px 12px; color: #1f2328; }
+.msg.user .msg-bubble { background: #0f172a; color: white; border-radius: 12px 3px 12px 12px; }
+.msg.local .msg-bubble { background: #d1fae5; border: 1px solid #a7f3d0; border-radius: 3px 12px 12px 12px; color: #064e3b; }
+.msg-time { font-size: 0.62rem; color: #9ca3af; margin-top: 0.2rem; }
+.msg.user .msg-time { text-align: right; }
+.msg-source-tag {
+    font-size: 0.6rem; padding: 0.06rem 0.4rem; border-radius: 8px;
+    display: inline-block; margin-bottom: 0.25rem; font-weight: 600;
+}
+.src-local    { background: #d1fae5; color: #065f46; }
+.src-provider { background: #dbeafe; color: #1e40af; }
+
+/* ── Action confirmation card ───────────────────────────── */
+.action-card {
+    margin-top: 0.4rem;
+    background: #fffbeb;
+    border: 1.5px solid #fbbf24;
+    border-radius: 10px;
+    padding: 0.75rem 0.875rem;
+    font-size: 0.8rem;
+}
+.action-card.code-action {
+    background: #eff6ff;
+    border-color: #3b82f6;
+}
+.action-card .action-title {
+    font-weight: 700; color: #92400e; font-size: 0.82rem; margin-bottom: 0.3rem;
+    display: flex; align-items: center; gap: 0.35rem;
+}
+.action-card.code-action .action-title { color: #1e40af; }
+.action-card .action-desc { color: #6b7280; font-size: 0.78rem; margin-bottom: 0.5rem; }
+.action-btns { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+.btn-confirm {
+    padding: 0.32rem 0.75rem; border-radius: 7px; border: none;
+    background: var(--agent-green); color: white; font-weight: 600;
+    font-size: 0.76rem; cursor: pointer; display: flex; align-items: center; gap: 0.3rem;
+    transition: all 0.13s;
+}
+.btn-confirm:hover { background: #047857; transform: translateY(-1px); }
+.btn-confirm:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+.btn-cancel-action {
+    padding: 0.32rem 0.75rem; border-radius: 7px;
+    border: 1px solid #e5e7eb; background: white; color: #6b7280;
+    font-size: 0.76rem; cursor: pointer;
+}
+.btn-cancel-action:hover { background: #f9fafb; }
+.action-result {
+    margin-top: 0.35rem; padding: 0.4rem 0.625rem; border-radius: 7px;
+    font-size: 0.76rem; font-weight: 500;
+}
+.action-result.success { background: #d1fae5; color: #065f46; }
+.action-result.failure { background: #fee2e2; color: #7f1d1d; }
+
+/* ── Typing indicator ───────────────────────────────────── */
+.typing-row { display: flex; gap: 0.625rem; align-self: flex-start; }
+.typing-bubble {
+    background: white; border: 1px solid #e5e7eb; border-radius: 3px 12px 12px 12px;
+    padding: 0.55rem 0.875rem; display: flex; align-items: center; gap: 0.4rem;
+    font-size: 0.76rem; color: #6b7280;
+}
+.typing-dots span {
+    display: inline-block; width: 5px; height: 5px; border-radius: 50%;
+    background: var(--agent-purple); margin: 0 1px;
+    animation: tdot 1.2s infinite;
+}
+.typing-dots span:nth-child(2) { animation-delay: .2s; }
+.typing-dots span:nth-child(3) { animation-delay: .4s; }
+@keyframes tdot { 0%,60%,100%{transform:translateY(0)} 30%{transform:translateY(-5px)} }
+#agentThinkLabel { font-size: 0.7rem; color: #6b7280; }
+
+/* ── Input area ─────────────────────────────────────────── */
+.agent-input-area {
+    padding: 0.75rem 0.875rem;
+    border-top: 1px solid #e5e7eb;
+    background: white;
+    flex-shrink: 0;
+}
+.agent-input-row { display: flex; gap: 0.4rem; align-items: flex-end; }
+#agentInput {
+    flex: 1; padding: 0.55rem 0.875rem; border: 2px solid #e5e7eb; border-radius: 10px;
+    font-size: 0.85rem; resize: none; outline: none; font-family: inherit;
+    min-height: 40px; max-height: 120px; transition: border-color 0.2s;
+}
+#agentInput:focus { border-color: var(--agent-purple); }
+.agent-send-btn {
+    width: 40px; height: 40px; border-radius: 10px; border: none;
+    background: linear-gradient(135deg, #1e1b4b, #2563eb);
+    color: white; display: flex; align-items: center; justify-content: center;
+    cursor: pointer; transition: all 0.2s; flex-shrink: 0; font-size: 0.85rem;
+}
+.agent-send-btn:hover { transform: scale(1.06); box-shadow: 0 4px 14px rgba(37,99,235,.4); }
+.agent-send-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+.agent-hint { font-size: 0.66rem; color: #9ca3af; margin-top: 0.25rem; display: flex; align-items: center; gap: 0.5rem; }
+.agent-hint .current-mode-tag {
+    font-weight: 700; padding: 0.06rem 0.45rem; border-radius: 8px; font-size: 0.63rem;
+}
+
+/* ── Welcome card ───────────────────────────────────────── */
+.welcome-agent {
+    text-align: center; padding: 1.5rem 1.25rem; max-width: 520px; margin: auto;
+}
+.welcome-agent .agent-icon-big {
+    font-size: 2.75rem; margin-bottom: 0.625rem;
+    background: linear-gradient(135deg, #1e1b4b, #2563eb);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+.welcome-agent h5 { font-weight: 800; color: #1f2328; margin-bottom: 0.25rem; font-size: 1rem; }
+.welcome-agent p { font-size: 0.81rem; color: #6b7280; margin-bottom: 0.75rem; }
+.cap-chips { display: flex; flex-wrap: wrap; gap: 0.35rem; justify-content: center; }
+.cap-chip {
+    padding: 0.28rem 0.65rem; border-radius: 16px; font-size: 0.7rem;
+    font-weight: 600; cursor: pointer; transition: all 0.13s;
+}
+.cap-chip.purple { background: #f3e8ff; color: var(--agent-purple); border: 1px solid #ddd6fe; }
+.cap-chip.blue   { background: #dbeafe; color: var(--agent-blue);   border: 1px solid #bfdbfe; }
+.cap-chip.green  { background: #d1fae5; color: var(--agent-green);  border: 1px solid #a7f3d0; }
+.cap-chip.red    { background: #fee2e2; color: var(--agent-red);    border: 1px solid #fecaca; }
+.cap-chip.orange { background: #fef3c7; color: var(--agent-orange); border: 1px solid #fde68a; }
+.cap-chip:hover  { transform: translateY(-1px); opacity: .85; }
+
+/* ── Capability list ────────────────────────────────────── */
+.cap-item {
+    display: flex; align-items: flex-start; gap: 0.4rem;
+    font-size: 0.73rem; color: #374151; padding: 0.15rem 0;
+    line-height: 1.4;
+}
+.cap-item .cap-icon { flex-shrink: 0; margin-top: 0.05rem; }
+
+/* ── Think-trace panel ──────────────────────────────────── */
+.think-trace {
+    margin-top: 0.5rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    overflow: hidden;
+    font-size: 0.76rem;
+}
+.think-trace-header {
+    background: #f0f4ff;
+    padding: 0.35rem 0.75rem;
+    font-weight: 700;
+    font-size: 0.7rem;
+    color: #4338ca;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    cursor: pointer;
+    user-select: none;
+    letter-spacing: .03em;
+}
+.think-trace-header:hover { background: #e0e7ff; }
+.think-trace-body { display: none; }
+.think-trace-body.open { display: block; }
+.think-step {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    padding: 0.32rem 0.75rem;
+    border-top: 1px solid #f3f4f6;
+    line-height: 1.45;
+}
+.think-step:first-child { border-top: none; }
+.think-step .ts-phase {
+    font-size: 0.58rem;
+    font-weight: 700;
+    padding: 0.06rem 0.35rem;
+    border-radius: 6px;
+    min-width: 56px;
+    text-align: center;
+    flex-shrink: 0;
+    margin-top: 0.1rem;
+    letter-spacing: .03em;
+}
+.ts-INTENT   { background: #dbeafe; color: #1e40af; }
+.ts-CONTEXT  { background: #ede9fe; color: #5b21b6; }
+.ts-PLAN     { background: #fef3c7; color: #92400e; }
+.ts-RISK     { background: #fee2e2; color: #7f1d1d; }
+.ts-EXECUTE  { background: #d1fae5; color: #065f46; }
+.ts-VERIFY   { background: #e0f2fe; color: #075985; }
+.ts-AUDIT    { background: #f3f4f6; color: #374151; }
+.ts-RESPONSE { background: #f0fdf4; color: #166534; }
+.think-step .ts-label { color: #1f2328; font-weight: 500; flex: 1; }
+.think-step .ts-detail {
+    color: #6b7280; font-size: 0.7rem; margin-top: 0.08rem;
+    display: block; white-space: pre-wrap; word-break: break-word;
+}
+.think-step .ts-risk {
+    font-size: 0.58rem; font-weight: 700; padding: 0.05rem 0.3rem;
+    border-radius: 6px; flex-shrink: 0; align-self: flex-start; margin-top: 0.12rem;
+}
+.risk-SAFE     { background: #d1fae5; color: #065f46; }
+.risk-LOW      { background: #cffafe; color: #164e63; }
+.risk-MEDIUM   { background: #fef3c7; color: #92400e; }
+.risk-HIGH     { background: #fee2e2; color: #7f1d1d; }
+.risk-CRITICAL { background: #fce7f3; color: #831843; }
+.think-step .ts-ms { color: #9ca3af; font-size: 0.62rem; flex-shrink: 0; }
+
+/* ── Audit trail ────────────────────────────────────────── */
+.audit-trail {
+    margin-top: 0.35rem;
+    border: 1px solid #e0e7ff;
+    border-radius: 8px;
+    overflow: hidden;
+    font-size: 0.73rem;
+}
+.audit-trail-header {
+    background: #e0e7ff;
+    padding: 0.28rem 0.625rem;
+    font-weight: 700;
+    font-size: 0.65rem;
+    color: #3730a3;
+    cursor: pointer;
+    display: flex; align-items: center; gap: 0.35rem;
+}
+.audit-entry {
+    display: flex; gap: 0.5rem; align-items: center;
+    padding: 0.22rem 0.625rem; border-top: 1px solid #f3f4f6;
+    font-size: 0.7rem; color: #374151;
+}
+.audit-entry .ae-tool {
+    font-weight: 600; min-width: 120px; color: #1e40af; font-size: 0.68rem;
+}
+.audit-entry .ae-status-ok   { color: #059669; }
+.audit-entry .ae-status-fail { color: #dc2626; }
+.audit-entry .ae-ms { color: #9ca3af; margin-left: auto; font-size: 0.62rem; }
+
+/* ── Replan badge ───────────────────────────────────────── */
+.replan-badge {
+    display: inline-flex; align-items: center; gap: 0.25rem;
+    background: #fef3c7; color: #92400e;
+    font-size: 0.62rem; font-weight: 700; padding: 0.08rem 0.4rem;
+    border-radius: 8px; margin-left: 0.4rem;
+}
+
+@media (max-width: 768px) {
+    .agent-layout { flex-direction: column; height: auto; }
+    .agent-sidebar { width: 100%; flex-direction: row; flex-wrap: wrap; overflow-x: auto; }
+    .agent-sidebar-card { min-width: 200px; }
+    .agent-chat-panel { min-height: 500px; }
+    .msg.user, .msg.ai, .msg.local { max-width: 95%; }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="agent-layout">
+
+    <!-- ===== SIDEBAR ===== -->
+    <div class="agent-sidebar">
+
+        <!-- Live DB Stats -->
+        <div class="agent-sidebar-card">
+            <h6><i class="fa-solid fa-database me-1"></i>Live DB Stats</h6>
+            <div class="stat-pill"><span class="label">Students</span><span class="value" id="sbStudents">—</span></div>
+            <div class="stat-pill"><span class="label">Critical</span><span class="value text-danger" id="sbCritical">—</span></div>
+            <div class="stat-pill"><span class="label">Streams</span><span class="value" id="sbStreams">{{ streams|length }}</span></div>
+            <div class="stat-pill"><span class="label">Reports</span><span class="value" id="sbReports">—</span></div>
+        </div>
+
+        <!-- Operating Mode -->
+        <div class="agent-sidebar-card">
+            <h6><i class="fa-solid fa-sliders me-1"></i>Operating Mode</h6>
+            <div class="mode-grid">
+                <button class="mode-btn active" data-mode="INSPECT" onclick="setMode('INSPECT')" title="Read everything, modify nothing">
+                    <i class="fa-solid fa-magnifying-glass"></i> Inspect
+                </button>
+                <button class="mode-btn" data-mode="ANALYSIS" onclick="setMode('ANALYSIS')" title="Root-cause analysis and relationship queries">
+                    <i class="fa-solid fa-brain"></i> Analysis
+                </button>
+                <button class="mode-btn" data-mode="REPAIR" onclick="setMode('REPAIR')" title="Propose and apply code/data fixes">
+                    <i class="fa-solid fa-wrench"></i> Repair
+                </button>
+                <button class="mode-btn" data-mode="TEST" onclick="setMode('TEST')" title="Run management commands and health checks">
+                    <i class="fa-solid fa-flask"></i> Test
+                </button>
+                <button class="mode-btn all-modes" data-mode="INCIDENT" onclick="setMode('INCIDENT')" title="Deep triage: errors, 5xx, anomalies">
+                    <i class="fa-solid fa-triangle-exclamation"></i> Incident
+                </button>
+            </div>
+        </div>
+
+        <!-- Tool Palette -->
+        <div class="agent-sidebar-card">
+            <h6><i class="fa-solid fa-toolbox me-1"></i>Run Tool Directly</h6>
+            <button class="tool-btn" onclick="runTool('diagnostics',{})">
+                <i class="fa-solid fa-stethoscope"></i> Diagnostics
+                <span class="tool-tag read">read</span>
+            </button>
+            <button class="tool-btn" onclick="runTool('read_logs',{tail_chars:6000})">
+                <i class="fa-solid fa-file-lines"></i> Error Logs
+                <span class="tool-tag read">read</span>
+            </button>
+            <button class="tool-btn" onclick="runTool('parse_tracebacks',{})">
+                <i class="fa-solid fa-bug"></i> Parse Tracebacks
+                <span class="tool-tag read">read</span>
+            </button>
+            <button class="tool-btn" onclick="runTool('list_routes',{})">
+                <i class="fa-solid fa-sitemap"></i> List Routes
+                <span class="tool-tag read">read</span>
+            </button>
+            <button class="tool-btn" onclick="runTool('db_row_counts',{})">
+                <i class="fa-solid fa-table"></i> DB Row Counts
+                <span class="tool-tag read">read</span>
+            </button>
+            <button class="tool-btn" onclick="promptTool('inspect_route')">
+                <i class="fa-solid fa-route"></i> Inspect Route
+                <span class="tool-tag read">read</span>
+            </button>
+            <button class="tool-btn" onclick="promptTool('inspect_model')">
+                <i class="fa-solid fa-cube"></i> Inspect Model
+                <span class="tool-tag read">read</span>
+            </button>
+            <button class="tool-btn" onclick="promptTool('search_code')">
+                <i class="fa-solid fa-magnifying-glass-code"></i> Search Code
+                <span class="tool-tag read">read</span>
+            </button>
+            <button class="tool-btn" onclick="promptTool('db_query')">
+                <i class="fa-solid fa-database"></i> SQL Query
+                <span class="tool-tag read">read</span>
+            </button>
+            <button class="tool-btn" onclick="runTool('app_manifest',{})">
+                <i class="fa-solid fa-map"></i> App Manifest
+                <span class="tool-tag read">read</span>
+            </button>
+        </div>
+
+        <!-- Quick Commands -->
+        <div class="agent-sidebar-card">
+            <h6><i class="fa-solid fa-bolt me-1"></i>Quick Commands</h6>
+            <button class="quick-action" onclick="sendQuick(this)"><i class="fa-solid fa-users-gear"></i>List all teachers</button>
+            <button class="quick-action" onclick="sendQuick(this)"><i class="fa-solid fa-triangle-exclamation"></i>Show top risk students</button>
+            <button class="quick-action" onclick="sendQuick(this)"><i class="fa-solid fa-chart-bar"></i>School statistics overview</button>
+            <button class="quick-action" onclick="sendQuick(this)"><i class="fa-solid fa-file-lines"></i>Show recent discipline reports</button>
+            <button class="quick-action" onclick="sendQuick(this)"><i class="fa-solid fa-stream"></i>List all streams</button>
+            <button class="quick-action" onclick="sendQuick(this)"><i class="fa-solid fa-heartbeat"></i>Backend health check</button>
+            <button class="quick-action" onclick="sendQuick(this)"><i class="fa-solid fa-calculator"></i>Recalculate all risk scores</button>
+            <button class="quick-action" onclick="sendQuick(this)"><i class="fa-solid fa-clock-rotate-left"></i>Show recent errors</button>
+        </div>
+
+        <!-- Capabilities -->
+        <div class="agent-sidebar-card">
+            <h6><i class="fa-solid fa-gear me-1"></i>Engineering Capabilities</h6>
+            <div class="cap-item"><span class="cap-icon">🔍</span> Full source code search & inspection</div>
+            <div class="cap-item"><span class="cap-icon">🗺️</span> App manifest: models, routes, files</div>
+            <div class="cap-item"><span class="cap-icon">🗄️</span> Live DB schema + SQL queries</div>
+            <div class="cap-item"><span class="cap-icon">🐛</span> Traceback parsing & root-cause analysis</div>
+            <div class="cap-item"><span class="cap-icon">🔎</span> Route → view → source inspection</div>
+            <div class="cap-item"><span class="cap-icon">🛠️</span> Code patching (confirmed)</div>
+            <div class="cap-item"><span class="cap-icon">✅</span> Django management commands</div>
+            <div class="cap-item"><span class="cap-icon">📊</span> Create / edit / delete all DB records</div>
+            <div class="cap-item"><span class="cap-icon">👩‍🏫</span> Approve / suspend teachers</div>
+            <div class="cap-item"><span class="cap-icon">🔐</span> Reset passwords</div>
+        </div>
+    </div>
+
+    <!-- ===== CHAT PANEL ===== -->
+    <div class="agent-chat-panel">
+        <!-- Header -->
+        <div class="agent-chat-header">
+            <div class="header-icon"><i class="fa-solid fa-robot"></i></div>
+            <div style="flex:1;min-width:0;">
+                <h5>Admin Engineering Agent <span style="font-size:.6rem;opacity:.6;font-weight:400;">v2</span></h5>
+                <small id="agentStatus">Full-stack: DB + Source + Logs + Routes &bull; {{ school.name|default:"School" }}</small>
+            </div>
+            <div class="header-badges">
+                <span class="mode-badge INSPECT" id="headerModeBadge">🔍 INSPECT</span>
+                <a href="/ai/dashboard/" class="btn btn-sm" style="background:rgba(255,255,255,0.12);color:white;border-radius:7px;font-size:.7rem;">
+                    <i class="fa-solid fa-chart-line"></i>
+                </a>
+                <a href="/admin-dashboard/" class="btn btn-sm" style="background:rgba(255,255,255,0.12);color:white;border-radius:7px;font-size:.7rem;">
+                    <i class="fa-solid fa-gauge-high"></i>
+                </a>
+            </div>
+        </div>
+
+        <!-- Tool activity bar -->
+        <div class="tool-activity-bar" id="toolActivityBar"></div>
+
+        <!-- Messages -->
+        <div class="agent-messages" id="agentMessages">
+            <div class="welcome-agent" id="agentWelcome">
+                <div class="agent-icon-big"><i class="fa-solid fa-robot"></i></div>
+                <h5>Admin Engineering Agent</h5>
+                <p>I have full read access to your entire application — source code, database, routes, logs — and controlled write access for data and code changes. Tell me what to investigate or fix.</p>
+                <div class="cap-chips" style="margin-bottom:.75rem;">
+                    <span class="cap-chip blue" onclick="sendFromChip(this)">list all teachers</span>
+                    <span class="cap-chip red" onclick="sendFromChip(this)">show top risk students</span>
+                    <span class="cap-chip purple" onclick="sendFromChip(this)">show recent errors</span>
+                    <span class="cap-chip orange" onclick="sendFromChip(this)">backend health check</span>
+                    <span class="cap-chip green" onclick="sendFromChip(this)">show all discipline reports</span>
+                    <span class="cap-chip blue" onclick="sendFromChip(this)">list all routes</span>
+                    <span class="cap-chip red" onclick="sendFromChip(this)">students with discipline cases</span>
+                    <span class="cap-chip purple" onclick="sendFromChip(this)">most reported students</span>
+                    <span class="cap-chip orange" onclick="sendFromChip(this)">database table inventory</span>
+                    <span class="cap-chip green" onclick="sendFromChip(this)">application manifest</span>
+                </div>
+                <p style="font-size:.72rem;color:#9ca3af;">Switch to <strong>Incident</strong> mode to debug 500 errors &bull; <strong>Repair</strong> mode to patch code &bull; <strong>Analysis</strong> mode for deep investigation</p>
+            </div>
+        </div>
+
+        <!-- Input area -->
+        <div class="agent-input-area">
+            <div class="agent-input-row">
+                <textarea id="agentInput" rows="1" placeholder="Ask anything about the application… e.g. 'list teachers', 'why is dashboard returning 500', 'show Form 3 students in STEM'"></textarea>
+                <button class="agent-send-btn" id="agentSendBtn" onclick="agentSend()">
+                    <i class="fa-solid fa-paper-plane"></i>
+                </button>
+            </div>
+            <div class="agent-hint">
+                <i class="fa-solid fa-circle-info"></i>
+                Mode: <span class="current-mode-tag" id="hintModeTag" style="background:#dbeafe;color:#1e40af;">INSPECT</span>
+                &bull; Write actions need confirmation &bull; Enter to send, Shift+Enter new line
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// ─── State ────────────────────────────────────────────────────────────────────
+var agentHistory = [];
+var agentBusy    = false;
+var currentMode  = 'INSPECT';
+var CSRF         = '{{ csrf_token }}';
+var ADMIN_INIT   = '{{ request.user.get_full_name|default:request.user.username|slice:":1"|upper }}';
+var _pendingActions = {};   // safe storage — never embed JSON in HTML
+
+// Mode meta
+var MODES = {
+    INSPECT:  { emoji: '🔍', color: '#1e40af', bg: '#dbeafe' },
+    ANALYSIS: { emoji: '🧠', color: '#5b21b6', bg: '#ede9fe' },
+    REPAIR:   { emoji: '🛠️', color: '#92400e', bg: '#fef3c7' },
+    TEST:     { emoji: '🧪', color: '#065f46', bg: '#d1fae5' },
+    INCIDENT: { emoji: '🚨', color: '#7f1d1d', bg: '#fee2e2' },
+};
+
+// ─── Mode switching ────────────────────────────────────────────────────────────
+function setMode(mode) {
+    currentMode = mode;
+    document.querySelectorAll('.mode-btn').forEach(function(b) {
+        b.classList.toggle('active', b.dataset.mode === mode);
+    });
+    var badge = document.getElementById('headerModeBadge');
+    var meta  = MODES[mode] || MODES.INSPECT;
+    badge.textContent = meta.emoji + ' ' + mode;
+    badge.className   = 'mode-badge ' + mode;
+
+    var hint = document.getElementById('hintModeTag');
+    hint.textContent        = mode;
+    hint.style.background   = meta.bg;
+    hint.style.color        = meta.color;
+
+    // Update input placeholder
+    var placeholders = {
+        INSPECT:  "Ask anything about the application… e.g. 'list teachers', 'show routes', 'db schema'",
+        ANALYSIS: "Investigate a problem… e.g. 'why are students missing from report?', 'analyze student-stream relationship'",
+        REPAIR:   "Propose a fix… e.g. 'fix the error when creating a teacher'",
+        TEST:     "Run a check… e.g. 'run django system check', 'show migrations status'",
+        INCIDENT: "Debug an incident… e.g. 'why is teacher dashboard returning 500?'",
+    };
+    document.getElementById('agentInput').placeholder = placeholders[mode] || placeholders.INSPECT;
+}
+
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+function getTime() {
+    return new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+}
+function escHtml(t) {
+    return (t||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/\n/g,'<br>');
+}
+function removeWelcome() {
+    var w = document.getElementById('agentWelcome');
+    if (w) w.remove();
+}
+
+// ─── Message rendering ────────────────────────────────────────────────────────
+function addMsg(role, text, actionObj, meta) {
+    removeWelcome();
+    var container = document.getElementById('agentMessages');
+    var div = document.createElement('div');
+    div.className = 'msg ' + role;
+
+    var avatarHtml = role === 'user'
+        ? '<div class="msg-avatar">' + escHtml(ADMIN_INIT) + '</div>'
+        : '<div class="msg-avatar"><i class="fa-solid fa-' + (role === 'local' ? 'database' : 'robot') + '"></i></div>';
+
+    // Source tag
+    var sourceTag = '';
+    if (role === 'local') {
+        sourceTag = '<span class="msg-source-tag src-local">⚡ Local DB — instant</span><br>';
+    } else if (meta && meta.provider && role === 'ai') {
+        sourceTag = '<span class="msg-source-tag src-provider">🤖 ' + escHtml(meta.provider) + '</span><br>';
+    }
+
+    // Tool calls badge
+    var toolsBadge = '';
+    if (meta && meta.tool_calls && meta.tool_calls.length > 0) {
+        toolsBadge = '<div style="margin-bottom:.3rem;display:flex;flex-wrap:wrap;gap:.2rem;">';
+        meta.tool_calls.forEach(function(t) {
+            toolsBadge += '<span style="font-size:.6rem;padding:.06rem .4rem;border-radius:8px;background:#e0e7ff;color:#3730a3;font-weight:600;">' + escHtml(t) + '</span>';
+        });
+        toolsBadge += '</div>';
+    }
+
+    // Replan badge
+    var replanBadge = '';
+    if (meta && meta.replan_count > 0) {
+        replanBadge = '<span class="replan-badge"><i class="fa-solid fa-rotate-right"></i> Replanned ' + meta.replan_count + 'x</span>';
+    }
+
+    var bubbleHtml = '<div class="msg-bubble">' + sourceTag + toolsBadge + escHtml(text) + replanBadge + '</div>';
+    var timeHtml   = '<div class="msg-time">' + getTime() + '</div>';
+
+    // Action card
+    var actionHtml = '';
+    if (actionObj && role === 'ai') {
+        var actionId  = 'act_' + Date.now() + '_' + Math.random().toString(36).slice(2,6);
+        _pendingActions[actionId] = actionObj;
+        actionHtml = buildActionCard(actionObj, actionId);
+    }
+
+    // Think trace
+    var traceHtml = '';
+    if (meta && meta.think_steps && meta.think_steps.length > 0 && role !== 'user') {
+        traceHtml = buildThinkTrace(meta.think_steps, meta.audit || []);
+    }
+
+    div.innerHTML = avatarHtml + '<div class="msg-body">' + bubbleHtml + actionHtml + traceHtml + timeHtml + '</div>';
+    container.appendChild(div);
+    container.scrollTop = container.scrollHeight;
+}
+
+// ─── Tool result bubble ───────────────────────────────────────────────────────
+function addToolResult(toolName, result) {
+    removeWelcome();
+    var container = document.getElementById('agentMessages');
+    var div = document.createElement('div');
+    div.className = 'msg local';
+    var ok    = result.ok !== false;
+    var icon  = ok ? 'fa-check-circle' : 'fa-circle-xmark';
+    var color = ok ? '#065f46' : '#7f1d1d';
+    var bg    = ok ? '#d1fae5' : '#fee2e2';
+    var border= ok ? '#a7f3d0' : '#fecaca';
+
+    var dataText = '';
+    if (result.data !== null && result.data !== undefined && result.data !== '') {
+        var raw = typeof result.data === 'string' ? result.data : JSON.stringify(result.data, null, 2);
+        dataText = '<pre style="background:#f9fafb;border-radius:6px;padding:.5rem;overflow:auto;max-height:300px;font-size:.71rem;margin-top:.35rem;white-space:pre-wrap;word-break:break-all;">' + escHtml(raw.slice(0, 8000)) + '</pre>';
+    }
+
+    div.innerHTML =
+        '<div class="msg-avatar" style="background:#1e1b4b;"><i class="fa-solid fa-toolbox" style="font-size:.7rem;color:white;"></i></div>' +
+        '<div class="msg-body"><div class="msg-bubble" style="background:' + bg + ';border:1px solid ' + border + ';border-radius:3px 12px 12px 12px;color:' + color + ';">' +
+        '<div style="font-weight:700;font-size:.78rem;margin-bottom:.25rem;"><i class="fa-solid ' + icon + ' me-1"></i>' + escHtml(toolName) + '</div>' +
+        '<div style="font-size:.78rem;">' + escHtml(result.output || '') + '</div>' +
+        dataText +
+        '</div><div class="msg-time">' + getTime() + '</div></div>';
+    container.appendChild(div);
+    container.scrollTop = container.scrollHeight;
+}
+
+// ─── Action card builder ──────────────────────────────────────────────────────
+function buildActionCard(action, actionId) {
+    var label      = action.description || action.type || 'Pending Action';
+    var typeLabel  = (action.type || '').replace(/_/g,' ').toUpperCase();
+    var isCodeAct  = action.type === 'apply_patch' || action.type === 'create_file';
+    var paramsText = JSON.stringify(action.params || {}, null, 2);
+    var cardClass  = 'action-card' + (isCodeAct ? ' code-action' : '');
+    var iconClass  = isCodeAct ? 'fa-code' : 'fa-triangle-exclamation';
+
+    return '<div class="' + cardClass + '" id="card_' + actionId + '">' +
+        '<div class="action-title"><i class="fa-solid ' + iconClass + '"></i> Confirm: ' + escHtml(typeLabel) + '</div>' +
+        '<div class="action-desc">' + escHtml(label) + '</div>' +
+        '<details style="margin-bottom:.4rem;font-size:.73rem;">' +
+          '<summary style="cursor:pointer;color:#6b7280;">Show parameters</summary>' +
+          '<pre style="background:#f9fafb;border-radius:5px;padding:.4rem;overflow:auto;max-height:150px;font-size:.7rem;margin-top:.25rem;">' + escHtml(paramsText) + '</pre>' +
+        '</details>' +
+        '<div class="action-btns">' +
+          '<button class="btn-confirm" id="confirm_' + actionId + '" data-action-id="' + actionId + '" onclick="confirmAction(this.dataset.actionId)">' +
+            '<i class="fa-solid fa-check me-1"></i>Execute Now' +
+          '</button>' +
+          '<button class="btn-cancel-action" data-action-id="' + actionId + '" onclick="cancelAction(this.dataset.actionId)">' +
+            '<i class="fa-solid fa-xmark me-1"></i>Cancel' +
+          '</button>' +
+        '</div>' +
+        '<div class="action-result" id="result_' + actionId + '" style="display:none;"></div>' +
+    '</div>';
+}
+
+// ─── Confirm action ───────────────────────────────────────────────────────────
+function confirmAction(actionId) {
+    var action = _pendingActions[actionId];
+    if (!action) { alert('Action data not found. Please re-send the request.'); return; }
+    var btn = document.getElementById('confirm_' + actionId);
+    if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-1"></i>Executing…'; }
+
+    fetch('/admin-agent/execute/', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json', 'X-CSRFToken': CSRF},
+        body: JSON.stringify({action_type: action.type, params: action.params || {}})
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+        var resultEl = document.getElementById('result_' + actionId);
+        if (data.success) {
+            if (resultEl) {
+                resultEl.className = 'action-result success';
+                resultEl.innerHTML = '<i class="fa-solid fa-circle-check me-1"></i>' + escHtml(data.message || 'Done!');
+                resultEl.style.display = 'block';
+            }
+            if (btn) btn.style.display = 'none';
+            delete _pendingActions[actionId];
+            loadSidebarStats();
+        } else {
+            var errorMsg = data.message || 'Action failed.';
+            if (resultEl) {
+                resultEl.className = 'action-result failure';
+                resultEl.innerHTML = '<i class="fa-solid fa-circle-xmark me-1"></i>' + escHtml(errorMsg);
+                resultEl.style.display = 'block';
+            }
+            if (btn) btn.style.display = 'none';
+            // Feed error back to AI for self-correction
+            var feedback = '[EXECUTION ERROR for action "' + (action.type || '') + '"]: ' + errorMsg +
+                '\nDecide the correct next step. If already exists, skip and continue. If ambiguous, ask.';
+            agentHistory.push({role: 'user', content: feedback});
+            delete _pendingActions[actionId];
+            agentBusy = true;
+            document.getElementById('agentSendBtn').disabled = true;
+            addTyping('Recovering from error…');
+            fetch('/admin-agent/chat/', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json', 'X-CSRFToken': CSRF},
+                body: JSON.stringify({message: feedback, history: agentHistory.slice(-8), mode: currentMode})
+            })
+            .then(function(r) { return r.json(); })
+            .then(function(aiResp) {
+                removeTyping();
+                if (aiResp.success) {
+                    addMsg('ai', aiResp.response || '(no response)', aiResp.action || null, {provider: aiResp.provider, tool_calls: aiResp.tool_calls});
+                    agentHistory.push({role: 'assistant', content: aiResp.response || ''});
+                } else {
+                    addMsg('ai', '⚠️ ' + (aiResp.error || 'Could not recover from error.'), null, {});
+                }
+            })
+            .catch(function(err) {
+                removeTyping();
+                addMsg('ai', '⚠️ Network error during recovery: ' + err.message, null, {});
+            })
+            .finally(function() {
+                agentBusy = false;
+                document.getElementById('agentSendBtn').disabled = false;
+            });
+        }
+    })
+    .catch(function(err) {
+        if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-check me-1"></i>Execute Now'; }
+        addMsg('ai', '⚠️ Network error: ' + err.message, null, {});
+    });
+}
+
+function cancelAction(actionId) {
+    delete _pendingActions[actionId];
+    var card = document.getElementById('card_' + actionId);
+    if (card) {
+        card.style.background = '#f9fafb'; card.style.borderColor = '#e5e7eb';
+        card.innerHTML = '<div style="color:#9ca3af;font-size:.76rem;"><i class="fa-solid fa-ban me-1"></i>Action cancelled.</div>';
+    }
+}
+
+// ─── Typing indicator ─────────────────────────────────────────────────────────
+function addTyping(label) {
+    removeWelcome();
+    var container = document.getElementById('agentMessages');
+    var div = document.createElement('div');
+    div.className = 'typing-row'; div.id = 'agentTyping';
+    var lb = label || 'Agent is thinking…';
+    div.innerHTML =
+        '<div class="msg-avatar" style="background:linear-gradient(135deg,#1e1b4b,#2563eb);color:white;width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;"><i class="fa-solid fa-robot" style="font-size:.7rem;"></i></div>' +
+        '<div class="typing-bubble"><div class="typing-dots"><span></span><span></span><span></span></div><span id="agentThinkLabel">' + escHtml(lb) + '</span></div>';
+    container.appendChild(div);
+    container.scrollTop = container.scrollHeight;
+}
+function removeTyping() {
+    var t = document.getElementById('agentTyping');
+    if (t) t.remove();
+}
+
+// ─── Tool activity bar ────────────────────────────────────────────────────────
+function showToolActivity(tools) {
+    var bar = document.getElementById('toolActivityBar');
+    if (!tools || !tools.length) { bar.style.display = 'none'; return; }
+    bar.style.display = 'flex';
+    bar.innerHTML = '<span style="font-size:.62rem;color:rgba(255,255,255,.4);margin-right:.25rem;">Tools used:</span>' +
+        tools.map(function(t) {
+            return '<span class="tool-pill"><i class="fa-solid fa-circle-check"></i>' + escHtml(t) + '</span>';
+        }).join('');
+}
+function hideToolActivity() {
+    var bar = document.getElementById('toolActivityBar');
+    bar.style.display = 'none';
+    bar.innerHTML = '';
+}
+
+// ─── Direct tool runner ───────────────────────────────────────────────────────
+function runTool(toolName, params) {
+    if (agentBusy) return;
+    agentBusy = true;
+    document.getElementById('agentSendBtn').disabled = true;
+    removeWelcome();
+    addTyping('Running tool: ' + toolName + '…');
+
+    fetch('/admin-agent/tool/', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json', 'X-CSRFToken': CSRF},
+        body: JSON.stringify({tool: toolName, params: params || {}})
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+        removeTyping();
+        addToolResult(toolName, data);
+    })
+    .catch(function(err) {
+        removeTyping();
+        addMsg('ai', '⚠️ Tool error: ' + err.message, null, {});
+    })
+    .finally(function() {
+        agentBusy = false;
+        document.getElementById('agentSendBtn').disabled = false;
+    });
+}
+
+function promptTool(toolName) {
+    var prompts = {
+        inspect_route: 'Enter URL path to inspect (e.g. /admin-dashboard/):',
+        inspect_model: 'Enter model name (e.g. Student, TeacherProfile):',
+        search_code:   'Enter regex pattern to search:',
+        db_query:      'Enter SELECT SQL query:',
+    };
+    var label = prompts[toolName] || 'Enter parameter:';
+    var val   = prompt(label);
+    if (!val) return;
+    var params = {};
+    if (toolName === 'inspect_route')   params = {url: val};
+    else if (toolName === 'inspect_model') params = {model_name: val};
+    else if (toolName === 'search_code')   params = {pattern: val};
+    else if (toolName === 'db_query')      params = {query: val};
+    runTool(toolName, params);
+}
+
+// ─── Send ──────────────────────────────────────────────────────────────────────
+function agentSend() {
+    if (agentBusy) return;
+    var input = document.getElementById('agentInput');
+    var text  = input.value.trim();
+    if (!text) return;
+    input.value = '';
+    input.style.height = 'auto';
+    doSend(text);
+}
+function sendQuick(el) {
+    if (agentBusy) return;
+    doSend((el.textContent || el.innerText).trim());
+}
+function sendFromChip(el) {
+    if (agentBusy) return;
+    doSend((el.textContent || el.innerText).trim());
+}
+
+// ─── Think-trace builder ──────────────────────────────────────────────────────
+function buildThinkTrace(steps, audit) {
+    var PHASE_LABELS = {
+        INTENT: 'INTENT', CONTEXT: 'CONTEXT', PLAN: 'PLAN', RISK: 'RISK',
+        EXECUTE: 'EXEC', VERIFY: 'VERIFY', AUDIT: 'AUDIT', RESPONSE: 'DONE',
+    };
+    var traceId = 'trace_' + Date.now();
+    var stepsHtml = '';
+    steps.forEach(function(s) {
+        var phaseClass = 'ts-' + (s.phase || 'PLAN');
+        var phaseLabel = PHASE_LABELS[s.phase] || s.phase;
+        var statusIcon = s.status === 'error' ? '❌' : s.status === 'warning' ? '⚠️' : '';
+        var riskHtml = s.risk ? '<span class="ts-risk risk-' + escHtml(s.risk) + '">' + escHtml(s.risk) + '</span>' : '';
+        var detailHtml = s.detail ? '<span class="ts-detail">' + escHtml(s.detail.slice(0, 300)) + '</span>' : '';
+        stepsHtml +=
+            '<div class="think-step">' +
+            '<span class="ts-phase ' + phaseClass + '">' + escHtml(phaseLabel) + '</span>' +
+            '<div style="flex:1;min-width:0;">' +
+            '<span class="ts-label">' + statusIcon + ' ' + escHtml(s.label || '') + '</span>' +
+            detailHtml +
+            '</div>' +
+            riskHtml +
+            '<span class="ts-ms">' + (s.ms || 0) + 'ms</span>' +
+            '</div>';
+    });
+
+    // Audit sub-section
+    var auditHtml = '';
+    if (audit && audit.length > 0) {
+        var auditBodyId = 'audit_' + traceId;
+        var entries = audit.map(function(e) {
+            if (!e.tool && !e.step_id) return '';
+            var statusClass = e.status === 'done' ? 'ae-status-ok' : 'ae-status-fail';
+            var statusIcon  = e.status === 'done' ? '✅' : e.status === 'failed' ? '❌' : '⏸️';
+            return '<div class="audit-entry">' +
+                '<span class="ae-tool">' + escHtml(e.tool || '') + '</span>' +
+                '<span class="' + statusClass + '">' + statusIcon + ' ' + escHtml(e.status || '') + '</span>' +
+                '<span style="color:#6b7280;font-size:.67rem;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + escHtml((e.output || '').slice(0, 80)) + '</span>' +
+                '<span class="ae-ms">' + (e.ms || 0) + 'ms</span>' +
+                '</div>';
+        }).join('');
+        auditHtml =
+            '<div class="audit-trail" style="margin:.3rem .75rem .5rem;">' +
+            '<div class="audit-trail-header" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display===\'none\'?\'block\':\'none\'">' +
+            '<i class="fa-solid fa-list-check"></i> Audit trail (' + audit.length + ' entries)' +
+            '</div>' +
+            '<div style="display:none;">' + entries + '</div>' +
+            '</div>';
+    }
+
+    var bodyId = 'tbody_' + traceId;
+    return '<div class="think-trace">' +
+        '<div class="think-trace-header" onclick="var b=document.getElementById(\'' + bodyId + '\');b.classList.toggle(\'open\');">' +
+        '<i class="fa-solid fa-brain"></i>' +
+        ' Thinking trace (' + steps.length + ' step' + (steps.length !== 1 ? 's' : '') + ')' +
+        '<span style="margin-left:auto;font-size:.6rem;color:#818cf8;">click to expand</span>' +
+        '</div>' +
+        '<div class="think-trace-body" id="' + bodyId + '">' +
+        stepsHtml + auditHtml +
+        '</div>' +
+        '</div>';
+}
+
+function doSend(text) {
+    agentBusy = true;
+    document.getElementById('agentSendBtn').disabled = true;
+    hideToolActivity();
+    addMsg('user', text, null, {});
+    agentHistory.push({role: 'user', content: text});
+
+    var thinkLabel = {
+        INSPECT:  'Classifying intent → building context…',
+        ANALYSIS: 'Planning investigation → executing tools…',
+        REPAIR:   'Analysing code → planning fix…',
+        TEST:     'Running diagnostics → verifying…',
+        INCIDENT: 'Reading logs → tracing root cause…',
+    }[currentMode] || 'Running agent pipeline…';
+    addTyping(thinkLabel);
+
+    fetch('/admin-agent/chat/', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json', 'X-CSRFToken': CSRF},
+        body: JSON.stringify({message: text, history: agentHistory.slice(-8), mode: currentMode})
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+        removeTyping();
+        if (data.success) {
+            var role = data.provider === 'local' ? 'local' : 'ai';
+            addMsg(role, data.response || '(no response)', data.action || null, {
+                provider:     data.provider,
+                tool_calls:   data.tool_calls || [],
+                think_steps:  data.think_steps || [],
+                audit:        data.audit || [],
+                replan_count: data.replan_count || 0,
+                intent:       data.intent || '',
+            });
+            agentHistory.push({role: 'assistant', content: data.response || ''});
+            if (data.tool_calls && data.tool_calls.length > 0) {
+                showToolActivity(data.tool_calls);
+            }
+            // Update header status
+            var intentLabel = data.intent ? (' · ' + data.intent) : '';
+            var replanLabel = data.replan_count > 0 ? (' · Replanned ' + data.replan_count + 'x') : '';
+            if (data.provider && data.provider !== 'local') {
+                document.getElementById('agentStatus').textContent =
+                    'Provider: ' + data.provider + ' · Mode: ' + (data.mode || currentMode) +
+                    intentLabel + replanLabel +
+                    ' · {{ school.name|default:"School" }}';
+            }
+        } else {
+            addMsg('ai', '⚠️ ' + (data.error || data.response || 'The agent encountered an error.'), null, {});
+        }
+        loadSidebarStats();
+    })
+    .catch(function(err) {
+        removeTyping();
+        addMsg('ai', '⚠️ Network error: ' + err.message, null, {});
+    })
+    .finally(function() {
+        agentBusy = false;
+        document.getElementById('agentSendBtn').disabled = false;
+        document.getElementById('agentInput').focus();
+    });
+}
+
+// ─── Input helpers ────────────────────────────────────────────────────────────
+document.getElementById('agentInput').addEventListener('input', function() {
+    this.style.height = 'auto';
+    this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+});
+document.getElementById('agentInput').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); agentSend(); }
+});
+
+// ─── Sidebar stats ────────────────────────────────────────────────────────────
+function loadSidebarStats() {
+    fetch('/ai/api/global-recommendations/', {credentials:'include', headers:{'X-Requested-With':'XMLHttpRequest'}})
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+        if (data.global_stats) {
+            var s = data.global_stats;
+            document.getElementById('sbStudents').textContent = s.total_students || 0;
+            document.getElementById('sbReports').textContent  = s.total_reports  || 0;
+            document.getElementById('sbCritical').textContent = s.critical_count  || 0;
+        }
+    }).catch(function(){});
+}
+loadSidebarStats();
+</script>
+{% endblock %}
