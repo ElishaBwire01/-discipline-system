@@ -78,6 +78,14 @@ class PollinationAIChat:
         # The system prompt provides guidance but avoids unsafe "FULL ACCESS" claims.
         base_prompt = """You are an AI Education Assistant with authorized access to the school's discipline management system. You may reference summarized, authorized student and report data when answering. Do not request or reveal secrets such as system keys or credentials.
 
+STRICT FACTUALITY RULES:
+1. For any school-data question about students, admissions, discipline statistics, stream statistics, incident histories, risk scores, reports, or database records, you must use only data retrieved from the Django database for this request.
+2. Never estimate, infer, guess, or fabricate student records, discipline statistics, stream statistics, incident histories, or any other database facts.
+3. If the required data is missing, unavailable, or not found in the database, return a short explicit response starting with "DATA UNAVAILABLE" and explain that the requested factual record could not be retrieved.
+4. You may summarize, explain, classify, or analyze only data that has actually been retrieved and included in the ground-truth context below.
+5. Do not invent totals, counts, averages, per-student values, or stream-level numbers.
+6. If the database does not contain the requested fact, do not provide a plausible substitute.
+
 CAPABILITIES:
 1. Query student records by name, admission number, stream, or form
 2. Retrieve discipline reports with dates, categories, and ratings
@@ -92,8 +100,8 @@ RESPONSE FORMAT:
 - Be conversational and helpful
 - Use bullet points for lists
 - Bold important information
-- Provide specific numbers and dates when available
-- If data is not found, suggest alternatives
+- Provide specific numbers and dates only from retrieved data
+- If data is not found, say "DATA UNAVAILABLE" and nothing more factual than that
 
 PERSONALITY:
 - Professional but friendly
@@ -115,11 +123,11 @@ RESPONSE GUIDELINES:
 3. Offer to drill down deeper
 4. Suggest related information they might need
 5. Reference Kenyan laws when relevant
+6. Use ground-truth data from the database; never invent values
 
 You are the ultimate assistant for this school's discipline management - use your database access to provide comprehensive, accurate, and helpful responses."""
 
         if context:
-            # Only include non-sensitive context fields (do not dump raw env values)
             safe_context = dict(context)
             safe_context.pop("raw_env", None)
             return base_prompt + f"\n\nCURRENT CONTEXT:\n{json.dumps(safe_context, indent=2)}"
@@ -237,6 +245,31 @@ You are the ultimate assistant for this school's discipline management - use you
             return None
         except Exception as e:
             return {"error": str(e)}
+
+    def get_school_info(self):
+        """Get school name, motto and basic info from the School model."""
+        cache_key = "school_info"
+        cached = self._get_cached(cache_key)
+        if cached:
+            return cached
+        try:
+            from .models import School
+            school = School.objects.first()
+            if school:
+                info = {
+                    "name": school.name,
+                    "motto": school.motto or "",
+                    "short_name": school.short_name or "",
+                    "address": school.address or "",
+                    "phone": school.phone or "",
+                    "email": school.email or "",
+                    "current_year": school.current_year,
+                }
+                self._set_cache(cache_key, info)
+                return info
+        except Exception:
+            pass
+        return {}
 
     def get_school_stats(self):
         """Get comprehensive school statistics"""
@@ -582,101 +615,79 @@ You are the ultimate assistant for this school's discipline management - use you
                 return {"success": True, "response": text, "usage": data.get("usage", {}) if isinstance(data, dict) else {}, "model_used": model_name}
 
             if provider == "gemini":
-                # Google Generative Language: try multiple payload shapes to maximize compatibility
+                # Google Generative Language API (v1beta generateContent)
                 model = model_name
                 base_url = os.environ.get("GEMINI_URL") or f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent"
-                params = {"key": api_key} if api_key and not api_key.startswith("ya29") else {}
+                params = {"key": api_key}
 
-                text_input = messages[-1]["content"]
                 temperature = float(os.environ.get("AI_TEMPERATURE", "0.7"))
-                max_output_tokens = int(os.environ.get("AI_MAX_TOKENS", "512"))
+                max_output_tokens = int(os.environ.get("AI_MAX_TOKENS", "1024"))
 
-                # Define a set of payload variants (newer and older shapes)
-                payload_variants = [
-                    # try newer generateText-like shape
-                    {"prompt": {"text": text_input}, "temperature": temperature, "maxOutputTokens": max_output_tokens},
-                    # alternative top-level input
-                    {"input": text_input, "temperature": temperature, "maxOutputTokens": max_output_tokens},
-                    # older 'contents' shape (fallback)
-                    {"contents": [{"parts": [{"text": text_input}]}], "temperature": temperature, "maxOutputTokens": max_output_tokens},
-                ]
+                # Build contents array from messages
+                # system message → prepend as first user turn (Gemini has no system role)
+                contents = []
+                system_text = None
+                for msg in messages:
+                    role = msg.get("role", "user")
+                    content = msg.get("content", "")
+                    if role == "system":
+                        system_text = content
+                    elif role == "assistant":
+                        contents.append({"role": "model", "parts": [{"text": content}]})
+                    else:
+                        contents.append({"role": "user", "parts": [{"text": content}]})
+
+                # Inject system prompt as a leading user turn if present
+                if system_text and contents:
+                    contents[0]["parts"][0]["text"] = system_text + "\n\n" + contents[0]["parts"][0]["text"]
+                elif system_text:
+                    contents = [{"role": "user", "parts": [{"text": system_text}]}]
+
+                payload = {
+                    "contents": contents,
+                    "generationConfig": {
+                        "temperature": temperature,
+                        "maxOutputTokens": max_output_tokens,
+                    },
+                }
 
                 last_body = None
                 last_retry_after = 0
-                for payload in payload_variants:
+                try:
+                    resp = requests.post(base_url, params=params, json=payload, timeout=30)
+                except Exception as e:
+                    self.logger.warning("Gemini request exception: %s", e)
+                    return {"success": False, "error": f"gemini_request_error: {e}"}
+
+                if resp.status_code == 200:
                     try:
-                        resp = requests.post(base_url, params=params or None, json=payload, timeout=30)
-                    except Exception as e:
-                        self.logger.debug("Gemini request error for payload variant: %s", e)
-                        resp = None
-
-                    if not resp:
-                        continue
-
-                    if resp.status_code == 200:
+                        data = resp.json()
+                    except Exception:
+                        data = None
+                    text = None
+                    if isinstance(data, dict) and "candidates" in data:
                         try:
-                            data = resp.json()
+                            text = data["candidates"][0]["content"]["parts"][0]["text"]
                         except Exception:
-                            data = None
-                        # Try a few likely locations for generated text
-                        text = None
-                        if isinstance(data, dict):
-                            # common shapes
-                            if "candidates" in data:
-                                try:
-                                    text = data["candidates"][0]["content"]["parts"][0]["text"]
-                                except Exception:
-                                    pass
-                            if not text and "output" in data:
-                                text = data.get("output")
-                            if not text and "choices" in data:
-                                try:
-                                    text = data["choices"][0].get("message", {}).get("content")
-                                except Exception:
-                                    pass
-                        if not text:
-                            # last resort stringify
-                            text = json.dumps(data)
-                        return {"success": True, "response": text, "usage": {}, "model_used": model}
+                            pass
+                    if not text:
+                        text = json.dumps(data)
+                    return {"success": True, "response": text, "usage": {}, "model_used": model}
 
-                    # On 400, check for schema complaints like unknown 'temperature' and retry without temperature for this shape
-                    try:
-                        body = resp.text
-                    except Exception:
-                        body = "<unreadable>"
-                    last_body = body
-                    try:
-                        last_retry_after = int(resp.headers.get("Retry-After") or resp.headers.get("retry-after") or 0)
-                    except Exception:
-                        last_retry_after = 0
+                try:
+                    body = resp.text
+                except Exception:
+                    body = "<unreadable>"
+                last_body = body
+                try:
+                    last_retry_after = int(resp.headers.get("Retry-After") or resp.headers.get("retry-after") or 0)
+                except Exception:
+                    last_retry_after = 0
 
-                    if resp.status_code == 400 and "temperature" in (body or ""):
-                        self.logger.info("Gemini rejected 'temperature' field for variant; retrying payload without it")
-                        payload_no_temp = {k: v for k, v in payload.items() if k != "temperature"}
-                        try:
-                            resp2 = requests.post(base_url, params=params or None, json=payload_no_temp, timeout=30)
-                        except Exception as e:
-                            self.logger.debug("Gemini retry error: %s", e)
-                            resp2 = None
-
-                        if resp2 and resp2.status_code == 200:
-                            try:
-                                data = resp2.json()
-                            except Exception:
-                                data = None
-                            text = None
-                            if isinstance(data, dict) and "candidates" in data:
-                                try:
-                                    text = data["candidates"][0]["content"]["parts"][0]["text"]
-                                except Exception:
-                                    pass
-                            if not text:
-                                text = json.dumps(data)
-                            return {"success": True, "response": text, "usage": {}, "model_used": model}
-
+                if True:  # keep indentation consistent with old code below
                     safe_headers = {k: v for k, v in resp.headers.items() if k.lower() != "authorization"}
                     self.logger.warning(
-                        "Provider %s returned %s for %s (model=%s) while trying Gemini variant: %s headers=%s",
+                        "Provider %s returned %s for %s (model=%s): %s headers=%s",
                         provider,
                         resp.status_code,
                         base_url,
@@ -740,6 +751,15 @@ You are the ultimate assistant for this school's discipline management - use you
 
         intent = {"type": "general", "entities": {}, "action": None}
 
+        # School-level queries → stats (must check BEFORE student_names to avoid collision)
+        school_keywords = [
+            "school name", "name of this school", "name of the school",
+            "school motto", "school address", "what school", "which school",
+        ]
+        if any(kw in message_lower for kw in school_keywords):
+            intent["type"] = "stats"
+            return intent
+
         # Check for student queries
         student_patterns = [
             r"student\s+(\w+)",
@@ -769,6 +789,16 @@ You are the ultimate assistant for this school's discipline management - use you
         ):
             intent["type"] = "stats"
 
+        # Check for name/list queries — only when explicitly listing STUDENTS
+        # not when asking about the school name
+        student_list_phrases = [
+            "list students", "list all students", "show students",
+            "what are their names", "names of students", "students names",
+            "list names", "all students",
+        ]
+        if any(phrase in message_lower for phrase in student_list_phrases):
+            intent["type"] = "student_names"
+
         # Check for stream queries
         stream_match = re.search(r"stream\s+(\w+)", message_lower)
         if stream_match:
@@ -783,8 +813,66 @@ You are the ultimate assistant for this school's discipline management - use you
 
         return intent
 
+    def _is_factual_school_data_request(self, intent, user_message=None):
+        """Return True when the request is asking for real school facts from the database."""
+        if not intent:
+            return False
+
+        if intent.get("type") in {"student", "stats", "stream", "student_names"}:
+            return True
+
+        message = (user_message or "").lower()
+        factual_keywords = [
+            "student", "admission", "stream", "form", "report", "incident",
+            "discipline", "statistics", "stats", "count", "total", "average",
+            "risk", "offense", "case", "history", "records"
+        ]
+        return any(keyword in message for keyword in factual_keywords)
+
+    def _data_unavailable_response(self, intent):
+        """Return the required explicit 'data unavailable' message for factual DB requests."""
+        if intent.get("type") == "student":
+            return (
+                "DATA UNAVAILABLE: I could not retrieve the requested student record from the Django database. "
+                "I do not invent student admissions, names, risk data, or discipline histories."
+            )
+        if intent.get("type") == "stats":
+            return (
+                "DATA UNAVAILABLE: I could not retrieve the requested school statistics from the Django database. "
+                "I do not invent totals, counts, averages, or discipline numbers."
+            )
+        if intent.get("type") == "stream":
+            return (
+                "DATA UNAVAILABLE: I could not retrieve the requested stream statistics from the Django database. "
+                "I do not invent stream totals, incident counts, or risk values."
+            )
+        return (
+            "DATA UNAVAILABLE: The requested school-data fact could not be retrieved from the Django database. "
+            "I do not fabricate student records, discipline statistics, stream statistics, or incident histories."
+        )
+
+    def _has_real_data(self, payload):
+        """Return True only when the DB payload is an actual fact object, not an error placeholder."""
+        if payload is None:
+            return False
+        if isinstance(payload, dict):
+            if "error" in payload:
+                return False
+            if not payload:
+                return False
+            # Only reject stats if ALL counts are zero AND no breakdowns exist
+            if (payload.get("total_students") == 0
+                    and payload.get("total_reports") == 0
+                    and not payload.get("stream_breakdown")
+                    and not payload.get("top_categories")
+                    and not payload.get("name")):  # school_info has "name"
+                return False
+        if isinstance(payload, list) and len(payload) == 0:
+            return False
+        return True
+
     def _generate_fallback_response(self, intent, data):
-        """Generate intelligent fallback response based on intent and data"""
+        """Generate only non-factual helper output when no DB-backed fact is available."""
         response = ""
 
         if intent["type"] == "student" and data:
@@ -865,6 +953,24 @@ You are the ultimate assistant for this school's discipline management - use you
                 for name, count in stats["stream_breakdown"].items():
                     response += f"• {name}: {count} students\n"
 
+        elif intent["type"] == "student_names":
+            # `data` may be the direct list or a context dict containing 'student_names'
+            try:
+                if isinstance(data, dict):
+                    student_payload = data.get("student_names")
+                else:
+                    student_payload = data
+
+                names_list = [s.get("name") for s in student_payload if isinstance(s, dict) and s.get("name")] if student_payload else []
+                total = len(names_list)
+                response = f"📋 **Student Names ({total})**\n\n"
+                for name in names_list[:100]:
+                    response += f"• {name}\n"
+                if total > 100:
+                    response += f"\n...and {total - 100} more names."
+            except Exception:
+                response = "I couldn't retrieve the student names list."
+
         elif intent["type"] == "stream" and data:
             stream_data = data
             response = (
@@ -924,6 +1030,14 @@ You are the ultimate assistant for this school's discipline management - use you
         if intent["type"] == "stats":
             school_stats = self.get_school_stats()
 
+        # Get student names/list if needed
+        student_names_list = None
+        if intent["type"] == "student_names":
+            try:
+                student_names_list = self.get_all_students_summary()
+            except Exception:
+                student_names_list = None
+
         # Get stream analysis if needed
         stream_data = None
         if intent["type"] == "stream":
@@ -938,42 +1052,64 @@ You are the ultimate assistant for this school's discipline management - use you
                 except Exception:
                     stream_data = None
 
-        # Build context
+        # Always load school info — it is cheap (cached) and needed for school-level questions
+        school_info = self.get_school_info()
+
+        # For stats intent, always load stats regardless of whether they were loaded above
+        if intent["type"] == "stats" and school_stats is None:
+            school_stats = self.get_school_stats()
+
+        # Build context — always include school_info so AI knows the school name/motto
         context = {
             "intent": intent,
+            "school_info": school_info,
             "student": student_data,
             "stats": school_stats,
+            "student_names": student_names_list,
             "stream_analysis": stream_data,
             "timestamp": self._now().isoformat(),
         }
 
-        # If student data is not found by AI, fallback to data-driven response
-        if not student_data and intent["type"] == "student":
-            fallback_response = self._generate_fallback_response(intent, None)
+        factual_request = self._is_factual_school_data_request(intent, user_message)
+
+        has_student_data = self._has_real_data(student_data)
+        has_stats_data   = self._has_real_data(school_stats)
+        has_names_data   = self._has_real_data(student_names_list)
+        has_stream_data  = self._has_real_data(stream_data)
+        has_school_info  = bool(school_info.get("name"))
+
+        # For student lookups: if name not found → DATA UNAVAILABLE
+        if factual_request and intent["type"] == "student" and not has_student_data:
             return {
                 "success": True,
-                "response": fallback_response,
-                "mode": "data_fallback",
+                "response": self._data_unavailable_response(intent),
+                "mode": "data_unavailable",
                 "context": context,
             }
 
-        # If stats requested and we have data
-        if intent["type"] == "stats" and school_stats:
-            fallback_response = self._generate_fallback_response(intent, context)
+        # For student list: if no students in DB → DATA UNAVAILABLE
+        if factual_request and intent["type"] == "student_names" and not has_names_data:
             return {
                 "success": True,
-                "response": fallback_response,
-                "mode": "data_fallback",
+                "response": self._data_unavailable_response(intent),
+                "mode": "data_unavailable",
                 "context": context,
             }
 
-        # If stream data requested
-        if intent["type"] == "stream" and stream_data:
-            fallback_response = self._generate_fallback_response(intent, context)
+        # For stats: only block if stats truly failed (error) AND we have no school_info fallback
+        if factual_request and intent["type"] == "stats" and not has_stats_data and not has_school_info:
             return {
                 "success": True,
-                "response": fallback_response,
-                "mode": "data_fallback",
+                "response": self._data_unavailable_response(intent),
+                "mode": "data_unavailable",
+                "context": context,
+            }
+
+        if factual_request and intent["type"] == "stream" and not has_stream_data:
+            return {
+                "success": True,
+                "response": self._data_unavailable_response(intent),
+                "mode": "data_unavailable",
                 "context": context,
             }
 
@@ -1018,8 +1154,17 @@ You are the ultimate assistant for this school's discipline management - use you
                 "context": context,
             }
 
-        # If all providers failed, fall back to data-driven response
+        # If all providers failed, do not invent school facts. If we have DB-backed facts,
+        # return a DB-derived fallback; otherwise return explicit data availability failure.
         self.logger.warning("All AI providers failed: %s", provider_result.get("error"))
+        if factual_request and not (has_student_data or has_stats_data or has_stream_data or has_names_data):
+            return {
+                "success": True,
+                "response": self._data_unavailable_response(intent),
+                "mode": "data_unavailable",
+                "context": context,
+            }
+
         fallback_response = self._generate_fallback_response(intent, context)
         return {
             "success": True,

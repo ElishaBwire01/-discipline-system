@@ -374,7 +374,7 @@
     }
     
     .ai-recommendation .rec-steps li::before {
-        content: 'ÃƒÂ‚Ã¢Â€Âº';
+        content: '\203A';
         position: absolute;
         left: 0;
         color: #7c3aed;
@@ -591,17 +591,31 @@
         <div class="header-content d-flex flex-wrap align-items-center justify-content-between">
             <div>
                 <h1>
-                    <span class="highlight">v3.0</span>
+                    <i class="fa-solid fa-brain me-2" style="font-size:1.6rem;"></i>
+                    AI Discipline Intelligence
+                    <span class="highlight ms-2">v3.0</span>
                 </h1>
+                <p class="mb-0 mt-1" style="opacity:.75;font-size:.9rem;">
+                    {{ school_name|default:"School" }} &bull; {{ total_students }} students monitored
+                </p>
             </div>
-            <div class="d-flex gap-3 mt-3 mt-md-0 flex-wrap">
+            <div class="d-flex gap-2 mt-3 mt-md-0 flex-wrap align-items-center">
                 <span class="ai-status-badge">
                     <span class="dot online" id="statusDot"></span>
                     <span id="statusText">System Online</span>
                 </span>
                 <span class="ai-status-badge">
+                    <i class="fa-solid fa-clock me-1" style="font-size:.7rem;opacity:.7;"></i>
                     <span id="lastUpdate">Just now</span>
                 </span>
+                <button onclick="refreshData()" class="ai-status-badge" style="cursor:pointer;background:rgba(255,255,255,.15);border:none;color:white;" title="Refresh data">
+                    <i class="fa-solid fa-rotate" id="refreshIcon"></i> Refresh
+                </button>
+                {% if user.is_superuser %}
+                <a href="/admin-agent/" class="ai-status-badge" style="background:rgba(255,255,255,.18);color:white;text-decoration:none;">
+                    <i class="fa-solid fa-robot me-1"></i>Admin Agent
+                </a>
+                {% endif %}
             </div>
         </div>
     </div>
@@ -610,44 +624,52 @@
     <div class="ai-stat-grid" id="statsGrid">
         <div class="ai-stat-card">
             <div class="stat-top">
-                <span class="stat-trend">Active</span>
+                <div class="stat-icon purple"><i class="fa-solid fa-users"></i></div>
+                <span class="stat-trend up">Active</span>
             </div>
-            <div class="stat-value" id="totalStudents">-</div>
+            <div class="stat-value" id="totalStudents">{{ total_students|default:"-" }}</div>
             <div class="stat-label">Total Students</div>
         </div>
         <div class="ai-stat-card">
             <div class="stat-top">
+                <div class="stat-icon red"><i class="fa-solid fa-triangle-exclamation"></i></div>
                 <span class="stat-trend down">Alert</span>
             </div>
-            <div class="stat-value" id="criticalCount">-</div>
+            <div class="stat-value" id="criticalCount">{{ critical_students|default:"-" }}</div>
             <div class="stat-label">Critical Risk</div>
         </div>
         <div class="ai-stat-card">
             <div class="stat-top">
+                <div class="stat-icon blue"><i class="fa-solid fa-flag"></i></div>
                 <span class="stat-trend">Total</span>
             </div>
-            <div class="stat-value" id="totalReports">-</div>
+            <div class="stat-value" id="totalReports">{{ total_reports|default:"-" }}</div>
             <div class="stat-label">Total Reports</div>
         </div>
         <div class="ai-stat-card">
             <div class="stat-top">
+                <div class="stat-icon orange"><i class="fa-solid fa-gauge-high"></i></div>
                 <span class="stat-trend">Current</span>
             </div>
-            <div class="stat-value" id="avgRisk">-</div>
+            <div class="stat-value" id="avgRisk">{{ avg_risk_score|default:"0"|floatformat:1 }}%</div>
             <div class="stat-label">Average Risk</div>
-            <div class="stat-change">Overall</div>
+            <div class="stat-change">School-wide</div>
         </div>
     </div>
 
     <!-- AI Tabs -->
     <div class="ai-tabs">
         <button class="ai-tab-btn active" onclick="switchTab('recommendations')">
+            <i class="fa-solid fa-lightbulb me-1"></i>Recommendations
         </button>
         <button class="ai-tab-btn" onclick="switchTab('predictive')">
+            <i class="fa-solid fa-chart-line me-1"></i>Predictive
         </button>
         <button class="ai-tab-btn" onclick="switchTab('patterns')">
+            <i class="fa-solid fa-diagram-project me-1"></i>Patterns
         </button>
         <button class="ai-tab-btn" onclick="switchTab('effectiveness')">
+            <i class="fa-solid fa-bullseye me-1"></i>Effectiveness
         </button>
     </div>
 
@@ -656,10 +678,11 @@
         <!-- Global Recommendations -->
         <div class="ai-card">
             <div class="ai-card-header">
-                Global Recommendations
+                <i class="fa-solid fa-lightbulb me-2"></i>Global Recommendations
                 <span class="badge bg-light text-dark ms-2" id="recCount">0</span>
-                <span class="ms-auto badge bg-light text-dark" style="background: rgba(255,255,255,0.2) !important; color: white !important;">
-                </span>
+                <button onclick="refreshData()" class="ms-auto btn btn-sm" style="background:rgba(255,255,255,.15);color:white;border:none;font-size:.72rem;border-radius:6px;">
+                    <i class="fa-solid fa-rotate me-1"></i>Refresh
+                </button>
             </div>
             <div class="ai-card-body" id="globalRecommendations">
                 <div class="text-center py-4">
@@ -684,6 +707,7 @@
                            placeholder="Search by name or admission number..." 
                            autocomplete="off">
                     <button class="btn-ai-search" id="searchStudentBtn">
+                        <i class="fa-solid fa-magnifying-glass me-1"></i> Analyze
                     </button>
                 </div>
                 <div id="studentAnalysisResult" class="mt-3"></div>
@@ -703,6 +727,7 @@
                         {% endfor %}
                     </select>
                     <button class="btn-ai-search" id="analyzeClassBtn">
+                        <i class="fa-solid fa-chart-bar me-1"></i> Analyze Class
                     </button>
                 </div>
                 <div id="classAnalysisResult" class="mt-3"></div>
@@ -714,9 +739,8 @@
     <div id="tab-predictive" class="ai-tab-content">
         <div class="ai-card">
             <div class="ai-card-header">
-                Predictive Risk Analysis
-                <span class="ms-auto badge bg-light text-dark" style="background: rgba(255,255,255,0.2) !important; color: white !important;">
-                </span>
+                <i class="fa-solid fa-chart-line me-2"></i>Predictive Risk Analysis
+                <span class="ms-auto badge" style="background:rgba(255,255,255,.18);color:white;font-size:.68rem;">AI Powered</span>
             </div>
             <div class="ai-card-body" id="predictiveAnalysis">
                 <div class="text-center py-4">
@@ -733,9 +757,8 @@
     <div id="tab-patterns" class="ai-tab-content">
         <div class="ai-card">
             <div class="ai-card-header">
-                Behavior Pattern Analysis
-                <span class="ms-auto badge bg-light text-dark" style="background: rgba(255,255,255,0.2) !important; color: white !important;">
-                </span>
+                <i class="fa-solid fa-diagram-project me-2"></i>Behavior Pattern Analysis
+                <span class="ms-auto badge" style="background:rgba(255,255,255,.18);color:white;font-size:.68rem;">AI Powered</span>
             </div>
             <div class="ai-card-body" id="behaviorPatterns">
                 <div class="text-center py-4">
@@ -752,9 +775,8 @@
     <div id="tab-effectiveness" class="ai-tab-content">
         <div class="ai-card">
             <div class="ai-card-header">
-                Intervention Effectiveness
-                <span class="ms-auto badge bg-light text-dark" style="background: rgba(255,255,255,0.2) !important; color: white !important;">
-                </span>
+                <i class="fa-solid fa-bullseye me-2"></i>Intervention Effectiveness
+                <span class="ms-auto badge" style="background:rgba(255,255,255,.18);color:white;font-size:.68rem;">AI Powered</span>
             </div>
             <div class="ai-card-body" id="interventionEffectiveness">
                 <div class="text-center py-4">
@@ -775,24 +797,28 @@
         </div>
         <div class="guideline-grid">
             <div class="guideline-item" onclick="showGuideline('Basic Education Act 2013')">
+                <div class="g-icon"><i class="fa-solid fa-scale-balanced"></i></div>
                 <div class="g-content">
                     <div class="g-title">Basic Education Act 2013</div>
                     <div class="g-desc">Every child's right to education</div>
                 </div>
             </div>
             <div class="guideline-item" onclick="showGuideline('Positive Discipline')">
+                <div class="g-icon"><i class="fa-solid fa-hand-holding-heart"></i></div>
                 <div class="g-content">
                     <div class="g-title">Positive Discipline</div>
                     <div class="g-desc">Non-violent, restorative approaches</div>
                 </div>
             </div>
             <div class="guideline-item" onclick="showGuideline('Escalation Protocol')">
+                <div class="g-icon"><i class="fa-solid fa-stairs"></i></div>
                 <div class="g-content">
                     <div class="g-title">Escalation Protocol</div>
-                    <div class="g-desc">Warning ? Suspension ? Committee ? Expulsion</div>
+                    <div class="g-desc">Warning &rarr; Suspension &rarr; Committee &rarr; Expulsion</div>
                 </div>
             </div>
             <div class="guideline-item" onclick="showGuideline('Child Protection')">
+                <div class="g-icon"><i class="fa-solid fa-shield-halved"></i></div>
                 <div class="g-content">
                     <div class="g-title">Child Protection</div>
                     <div class="g-desc">Children's Act 2001 compliance</div>
@@ -1412,8 +1438,8 @@ function displayStudentResult(container, studentData) {
             <div class="card border-${riskColor}">
                 <div class="card-header bg-${riskColor} bg-opacity-10 d-flex justify-content-between align-items-center">
                     <div>
-                        <strong>?? ${s.name}</strong>
-                        <br><small class="text-muted">${s.admission_number} ÃƒÂ‚Ã‚Â· ${s.stream} ÃƒÂ‚Ã‚Â· Form ${s.form}</small>
+                        <strong>${s.name}</strong>
+                        <br><small class="text-muted">${s.admission_number} &middot; ${s.stream} &middot; Form ${s.form}</small>
                     </div>
                     <span class="badge bg-${riskColor}">${s.risk_level}</span>
                 </div>
@@ -1434,7 +1460,7 @@ function displayStudentResult(container, studentData) {
                                     <div class="alert alert-${rec.type === 'critical' ? 'danger' : rec.type === 'warning' ? 'warning' : rec.type === 'pattern' ? 'info' : 'success'} alert-sm mt-1" style="padding:0.4rem;font-size:0.8rem;">
                                         <strong>${rec.title}</strong>
                                         <div style="font-size:0.75rem;white-space:pre-line;">${rec.description}</div>
-                                        ${rec.steps ? `<div class="mt-1"><small>${rec.steps.map(function(step) { return 'ÃƒÂ‚Ã¢Â€Â¢ ' + step; }).join('<br>')}</small></div>` : ''}
+                                        ${rec.steps ? `<div class="mt-1"><small>${rec.steps.map(function(step) { return '&bull; ' + step; }).join('<br>')}</small></div>` : ''}
                                     </div>
                                 `;
                             }).join('')}
@@ -1445,6 +1471,7 @@ function displayStudentResult(container, studentData) {
                     `}
                     
                     <a href="/student/${s.id}/?ai=true" class="btn btn-sm btn-primary w-100 mt-2">
+                        <i class="fa-solid fa-brain me-1"></i>AI Analysis
                     </a>
                 </div>
             </div>
@@ -1493,7 +1520,7 @@ document.getElementById('analyzeClassBtn').addEventListener('click', function() 
             <div class="ai-result-card">
                 <div class="card">
                     <div class="card-header bg-primary bg-opacity-10 d-flex justify-content-between align-items-center">
-                        <strong>?? ${data.stream} Analysis</strong>
+                        <strong>${data.stream} Analysis</strong>
                         <span class="badge bg-primary">${stats.total_students || 0} students</span>
                     </div>
                     <div class="card-body">
@@ -1510,16 +1537,16 @@ document.getElementById('analyzeClassBtn').addEventListener('click', function() 
                         
                         ${data.recommendations && data.recommendations.length > 0 ? `
                             <div class="mt-2">
-                                <small><strong>?? Recommendations:</strong></small>
+                                <small><strong>Recommendations:</strong></small>
                                 ${data.recommendations.map(function(rec) {
-                                    var color = rec.type === 'URGENT' ? 'danger' : 
-                                               rec.type === 'WARNING' ? 'warning' : 
+                                    var color = rec.type === 'URGENT' ? 'danger' :
+                                               rec.type === 'WARNING' ? 'warning' :
                                                rec.type === 'SUCCESS' ? 'success' : 'info';
                                     return `
                                         <div class="alert alert-${color} alert-sm mt-1" style="padding:0.4rem;font-size:0.8rem;">
                                             <strong>${rec.action}</strong>
                                             <div class="small">${rec.details}</div>
-                                            ${rec.steps ? `<div class="mt-1"><small>${rec.steps.map(function(step) { return 'ÃƒÂ‚Ã¢Â€Â¢ ' + step; }).join('<br>')}</small></div>` : ''}
+                                            ${rec.steps ? `<div class="mt-1"><small>${rec.steps.map(function(step) { return '&bull; ' + step; }).join('<br>')}</small></div>` : ''}
                                         </div>
                                     `;
                                 }).join('')}
@@ -1528,7 +1555,7 @@ document.getElementById('analyzeClassBtn').addEventListener('click', function() 
                         
                         ${data.top_offenders && data.top_offenders.length > 0 ? `
                             <div class="mt-2">
-                                <small><strong>?? Top offenders:</strong></small>
+                                <small><strong>Top offenders:</strong></small>
                                 <div class="d-flex flex-wrap gap-1 mt-1">
                                     ${data.top_offenders.map(function(o) {
                                         return `<span class="badge bg-warning text-dark">${o.name} (${o.reports} reports)</span>`;
@@ -1649,6 +1676,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-console.log('?? AI Dashboard v3 loaded with advanced AI features!');
+console.log('AI Dashboard v3 loaded with advanced AI features!');
 </script>
 {% endblock %}
