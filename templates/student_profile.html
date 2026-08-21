@@ -238,7 +238,7 @@
 
 {% block content %}
 <div class="row g-4">
-    <div class="col-lg-4" data-aos="fade-right">
+    <div class="col-lg-4">
         <!-- AI Insights Panel -->
         <div class="card-modern ai-insights-panel mt-4" id="aiInsightsPanel" style="display: none;">
             <div class="card-header-modern" style="background: linear-gradient(135deg, #7c3aed, #2563eb);">
@@ -264,9 +264,11 @@
                              class="student-avatar"
                              onerror="this.style.display='none'; this.parentElement.querySelector('.student-avatar-fallback').style.display='flex';">
                         <div class="student-avatar-fallback">
+                            <i class="fa-solid fa-user" style="font-size:3rem; color:white;"></i>
                         </div>
                     {% else %}
                         <div class="student-avatar-placeholder">
+                            <i class="fa-solid fa-user"></i>
                         </div>
                     {% endif %}
                 </div>
@@ -276,6 +278,7 @@
                     {% if user.is_superuser or user.teacher_profile.assigned_stream == student.stream %}
                     {% endif %}
                     <button class="btn btn-sm" id="aiInsightsBtn" style="background: linear-gradient(135deg, #7c3aed, #2563eb); color: white; border: none; padding: 6px 16px;">
+                        <i class="fa-solid fa-brain me-1"></i>AI Insights
                         <span class="spinner-border spinner-border-sm ms-1" id="aiSpinner" style="display: none; width: 14px; height: 14px;" role="status"></span>
                     </button>
                 </div>
@@ -309,8 +312,9 @@
         </div>
         
         <!-- Category Breakdown -->
-        <div class="card-modern mt-4" data-aos="fade-right">
+        <div class="card-modern mt-4">
             <div class="card-header-modern">
+                <span class="header-icon"><i class="fa-solid fa-chart-pie"></i></span>
                 Offense Categories
             </div>
             <div class="card-body p-4">
@@ -331,10 +335,11 @@
         </div>
     </div>
     
-    <div class="col-lg-8" data-aos="fade-left">
+    <div class="col-lg-8">
         <!-- Timeline -->
         <div class="card-modern mb-4">
             <div class="card-header-modern">
+                <span class="header-icon"><i class="fa-solid fa-chart-line"></i></span>
                 Risk Timeline
             </div>
             <div class="card-body p-4">
@@ -345,6 +350,7 @@
         <!-- Reports -->
         <div class="card-modern">
             <div class="card-header-modern">
+                <span class="header-icon"><i class="fa-solid fa-file-lines"></i></span>
                 Report History <span class="badge bg-light text-dark ms-2">{{ total_reports }}</span>
             </div>
             <div class="card-body p-0">
@@ -396,7 +402,7 @@
                 </div>
                 {% else %}
                 <div class="text-center py-4 text-muted">
-                    No reports found for this student.
+                    <i class="fa-solid fa-inbox me-2"></i>No reports found for this student.
                 </div>
                 {% endif %}
             </div>
@@ -423,8 +429,11 @@
                 </div>
             </div>
             <div class="modal-footer border-0">
-                <button type="button" class="btn-modern btn-modern-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn-modern btn-modern-secondary" data-bs-dismiss="modal">
+                    <i class="fa-solid fa-xmark me-1"></i>Close
+                </button>
                 <a href="#" id="teacherFullProfileLink" class="btn-modern btn-modern-primary">
+                    <i class="fa-solid fa-user me-1"></i>View Full Profile
                 </a>
             </div>
         </div>

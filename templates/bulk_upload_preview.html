@@ -1,0 +1,291 @@
+{% extends 'base.html' %}
+
+{% block title %}Review Import — {{ school_name|default:"Disciplinary System" }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .ai-panel {
+        background: linear-gradient(135deg, #eff6ff 0%, #f5f3ff 100%);
+        border: 1px solid #c7d2fe;
+        border-radius: 16px;
+        padding: 1.25rem 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+    .ai-panel-header {
+        display: flex; align-items: center; gap: 0.625rem;
+        font-weight: 700; font-size: 1rem; color: #1e40af; margin-bottom: 0.875rem;
+    }
+    .ai-panel-header .ai-icon {
+        width: 36px; height: 36px; border-radius: 10px;
+        background: linear-gradient(135deg, #2563eb, #7c3aed);
+        display: flex; align-items: center; justify-content: center;
+        color: white; font-size: 1rem; flex-shrink: 0;
+    }
+    .ai-summary { font-size: 0.9375rem; color: #1e3a8a; font-weight: 500; margin-bottom: 0.875rem; line-height: 1.6; }
+
+    .issue-list, .warn-list, .suggest-list { list-style: none; padding: 0; margin: 0 0 0.75rem; }
+    .issue-list li, .warn-list li, .suggest-list li {
+        padding: 0.5rem 0.75rem; border-radius: 8px; font-size: 0.875rem;
+        display: flex; gap: 0.5rem; align-items: flex-start; margin-bottom: 4px;
+    }
+    .issue-list li { background: #fef2f2; color: #991b1b; }
+    .warn-list  li { background: #fffbeb; color: #92400e; }
+    .suggest-list li { background: #ecfdf5; color: #065f46; }
+    .issue-list li i, .warn-list li i, .suggest-list li i { flex-shrink: 0; margin-top: 2px; }
+
+    .stream-grid {
+        display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.5rem;
+    }
+    .stream-pill {
+        padding: 0.25rem 0.75rem; border-radius: 999px; font-size: 0.8rem; font-weight: 600;
+        display: inline-flex; align-items: center; gap: 0.35rem;
+    }
+    .stream-pill.new  { background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; }
+    .stream-pill.exists { background: #f0fdf4; color: #166534; border: 1px solid #bbf7d0; }
+
+    .stat-row {
+        display: flex; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 1rem;
+    }
+    .stat-chip {
+        background: white; border: 1px solid #e2e8f0; border-radius: 10px;
+        padding: 0.625rem 1rem; display: flex; flex-direction: column; align-items: center;
+        min-width: 90px; flex: 1;
+    }
+    .stat-chip .num { font-size: 1.5rem; font-weight: 700; color: #0f172a; line-height: 1; }
+    .stat-chip .lbl { font-size: 0.7rem; color: #64748b; font-weight: 500; text-transform: uppercase; letter-spacing: .04em; margin-top: 2px; text-align: center; }
+
+    .preview-table-wrap { max-height: 380px; overflow-y: auto; border-radius: 10px; border: 1px solid #e2e8f0; }
+
+    .action-bar {
+        position: sticky; bottom: 0; background: white;
+        border-top: 1px solid #e2e8f0; padding: 1rem 0 0;
+        display: flex; gap: 0.75rem; flex-wrap: wrap; align-items: center;
+        margin-top: 1.5rem;
+    }
+
+    @media (max-width: 576px) {
+        .stat-chip .num { font-size: 1.25rem; }
+        .ai-panel { padding: 1rem; }
+        .action-bar { position: static; border-top: none; padding-top: 0; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+{% with ai=pending.ai_analysis %}
+
+<!-- Page header -->
+<div class="d-flex align-items-center gap-3 mb-3">
+    <div style="width:44px;height:44px;background:linear-gradient(135deg,#2563eb,#7c3aed);border-radius:12px;display:flex;align-items:center;justify-content:center;color:white;font-size:1.2rem;flex-shrink:0;">
+        <i class="fa-solid fa-file-arrow-up"></i>
+    </div>
+    <div>
+        <h4 class="mb-0 fw-700" style="font-size:1.1rem;">Review Import</h4>
+        <small class="text-muted">
+            <i class="fa-solid fa-file me-1"></i>{{ pending.file_name }}
+            &nbsp;&bull;&nbsp;
+            <i class="fa-solid fa-clock me-1"></i>Parsed just now
+        </small>
+    </div>
+</div>
+
+<!-- Stats row -->
+<div class="stat-row">
+    <div class="stat-chip">
+        <span class="num">{{ pending.rows|length }}</span>
+        <span class="lbl">Total rows</span>
+    </div>
+    <div class="stat-chip" style="border-color:#bbf7d0">
+        <span class="num text-success">{{ ai.total_new }}</span>
+        <span class="lbl">New students</span>
+    </div>
+    <div class="stat-chip" style="border-color:#fde68a">
+        <span class="num" style="color:#b45309">{{ ai.total_skip }}</span>
+        <span class="lbl">Already exist</span>
+    </div>
+    <div class="stat-chip" style="border-color:#fde68a">
+        <span class="num" style="color:#b45309">{{ pending.batch_duplicates }}</span>
+        <span class="lbl">Dupes in file</span>
+    </div>
+    <div class="stat-chip" style="border-color:#c7d2fe">
+        <span class="num" style="color:#1d4ed8">{{ pending.new_streams|length }}</span>
+        <span class="lbl">New streams</span>
+    </div>
+    <div class="stat-chip" style="border-color:#c7d2fe">
+        <span class="num" style="color:#1d4ed8">{{ pending.new_grades|length }}</span>
+        <span class="lbl">New grades</span>
+    </div>
+</div>
+
+<!-- AI Analysis panel -->
+<div class="ai-panel">
+    <div class="ai-panel-header">
+        <span class="ai-icon"><i class="fa-solid fa-robot"></i></span>
+        AI Import Analysis
+    </div>
+    <p class="ai-summary">{{ ai.summary }}</p>
+
+    {% if ai.issues %}
+    <p class="fw-600 mb-1" style="font-size:.8rem;color:#b91c1c;text-transform:uppercase;letter-spacing:.05em;">
+        <i class="fa-solid fa-circle-xmark me-1"></i>Issues to review
+    </p>
+    <ul class="issue-list">
+        {% for item in ai.issues %}
+        <li><i class="fa-solid fa-triangle-exclamation"></i><span>{{ item }}</span></li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+
+    {% if ai.warnings %}
+    <p class="fw-600 mb-1" style="font-size:.8rem;color:#92400e;text-transform:uppercase;letter-spacing:.05em;">
+        <i class="fa-solid fa-exclamation-circle me-1"></i>Warnings
+    </p>
+    <ul class="warn-list">
+        {% for item in ai.warnings %}
+        <li><i class="fa-solid fa-circle-exclamation"></i><span>{{ item }}</span></li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+
+    {% if ai.suggestions %}
+    <p class="fw-600 mb-1" style="font-size:.8rem;color:#065f46;text-transform:uppercase;letter-spacing:.05em;">
+        <i class="fa-solid fa-lightbulb me-1"></i>Suggestions
+    </p>
+    <ul class="suggest-list">
+        {% for item in ai.suggestions %}
+        <li><i class="fa-solid fa-circle-check"></i><span>{{ item }}</span></li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+
+    <!-- Stream breakdown -->
+    {% if ai.stream_breakdown %}
+    <p class="fw-600 mb-1 mt-2" style="font-size:.8rem;color:#1e3a8a;text-transform:uppercase;letter-spacing:.05em;">
+        <i class="fa-solid fa-layer-group me-1"></i>Streams detected in file
+    </p>
+    <div class="stream-grid">
+        {% for stream_name, count in ai.stream_breakdown %}
+        <span class="stream-pill {% if stream_name in pending.new_streams %}new{% else %}exists{% endif %}">
+            {% if stream_name in pending.new_streams %}
+                <i class="fa-solid fa-plus"></i>
+            {% else %}
+                <i class="fa-solid fa-check"></i>
+            {% endif %}
+            {{ stream_name }} ({{ count }})
+        </span>
+        {% endfor %}
+    </div>
+    <p class="mt-2 mb-0" style="font-size:.75rem;color:#64748b;">
+        <span style="background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe;padding:1px 8px;border-radius:999px;font-weight:600;font-size:.7rem;">
+            <i class="fa-solid fa-plus me-1"></i>new
+        </span>
+        = will be created automatically &nbsp;
+        <span style="background:#f0fdf4;color:#166534;border:1px solid #bbf7d0;padding:1px 8px;border-radius:999px;font-weight:600;font-size:.7rem;">
+            <i class="fa-solid fa-check me-1"></i>exists
+        </span>
+        = already in database
+    </p>
+    {% endif %}
+</div>
+
+<!-- Data preview table -->
+<div class="card-modern mb-0">
+    <div class="card-header-modern" style="padding:.875rem 1.25rem;font-size:.875rem;">
+        <span class="header-icon" style="width:28px;height:28px;font-size:.8rem;"><i class="fa-solid fa-table"></i></span>
+        Preview (first {{ pending.rows|length|default:0 }} rows
+        {% if pending.rows|length > 20 %} — showing first 20{% endif %})
+    </div>
+    <div class="preview-table-wrap">
+        <table class="table-modern">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Admission No.</th>
+                    <th>Name</th>
+                    <th>Stream</th>
+                    <th>Form / Grade</th>
+                    <th>Year</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in pending.rows %}
+                {% if forloop.counter <= 20 %}
+                <tr>
+                    <td class="text-muted" style="width:36px;">{{ forloop.counter }}</td>
+                    <td><code style="font-size:.8rem;">{{ row.admission }}</code></td>
+                    <td>{{ row.name }}</td>
+                    <td>
+                        {% if row.stream and row.stream != "Unassigned" %}
+                            {% if row.stream in pending.new_streams %}
+                                <span class="badge-modern badge-info" style="font-size:.7rem;">
+                                    <i class="fa-solid fa-plus me-1"></i>{{ row.stream }}
+                                </span>
+                            {% else %}
+                                {{ row.stream }}
+                            {% endif %}
+                        {% else %}
+                            <span class="text-muted" style="font-size:.8rem;">Unassigned</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ row.grade|default:"Form 1" }}</td>
+                    <td>{{ row.year|default:"—" }}</td>
+                    <td>
+                        {% if row.admission in pending.already_existed %}
+                            <span class="badge-modern badge-warning" style="font-size:.7rem;">
+                                <i class="fa-solid fa-skip-forward me-1"></i>Skip
+                            </span>
+                        {% else %}
+                            <span class="badge-modern badge-success" style="font-size:.7rem;">
+                                <i class="fa-solid fa-plus me-1"></i>Import
+                            </span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endif %}
+                {% empty %}
+                <tr><td colspan="7" class="text-center text-muted py-3">No rows parsed</td></tr>
+                {% endfor %}
+                {% if pending.rows|length > 20 %}
+                <tr>
+                    <td colspan="7" class="text-center text-muted py-2" style="font-size:.8rem;">
+                        <i class="fa-solid fa-ellipsis me-1"></i>
+                        … and {{ pending.rows|length|add:"-20" }} more rows not shown
+                    </td>
+                </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Action bar -->
+<div class="action-bar">
+    <!-- Confirm -->
+    <form method="post" action="{% url 'core:bulk_upload_confirm' %}" style="display:inline">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="confirm">
+        <button type="submit" class="btn-modern btn-modern-primary"
+                {% if ai.total_new == 0 %}disabled title="Nothing new to import"{% endif %}>
+            <i class="fa-solid fa-cloud-arrow-up me-1"></i>
+            Confirm &amp; Import {{ ai.total_new }} Student{{ ai.total_new|pluralize }}
+        </button>
+    </form>
+
+    <!-- Cancel -->
+    <form method="post" action="{% url 'core:bulk_upload_confirm' %}" style="display:inline">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="cancel">
+        <button type="submit" class="btn-modern btn-modern-secondary">
+            <i class="fa-solid fa-xmark me-1"></i>Cancel Upload
+        </button>
+    </form>
+
+    <span class="text-muted ms-auto" style="font-size:.8rem;">
+        <i class="fa-solid fa-shield-halved me-1 text-success"></i>
+        Nothing is saved until you click <strong>Confirm &amp; Import</strong>.
+    </span>
+</div>
+
+{% endwith %}
+{% endblock %}

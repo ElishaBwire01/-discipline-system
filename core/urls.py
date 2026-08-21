@@ -16,6 +16,7 @@ urlpatterns = [
     path("choose-stream/", views.choose_stream, name="choose_stream"),
     path("school-setup/", views.school_setup, name="school_setup"),
     path("bulk-upload-students/", views.bulk_upload_students, name="bulk_upload_students"),
+    path("bulk-upload-confirm/", views.bulk_upload_confirm, name="bulk_upload_confirm"),
     path("download-template/", views.generate_excel_template, name="download_template"),
     path("download-text-template/", views.download_text_template, name="download_text_template"),
     path("student/<int:student_id>/", views.student_profile, name="student_profile"),
@@ -74,4 +75,8 @@ urlpatterns = [
     path("test-streams/", views.test_streams, name="test_streams"),
     path("debug-streams/", views.debug_streams, name="debug_streams"),
     path("test-ai/", views.test_ai, name="test_ai"),
+    path("admin-agent/", views.admin_agent_page, name="admin_agent"),
+    path("admin-agent/chat/", views.admin_agent_chat_api, name="admin_agent_chat"),
+    path("admin-agent/execute/", views.admin_agent_execute_api, name="admin_agent_execute"),
+    path("admin-agent/tool/", views.admin_agent_tool_api, name="admin_agent_tool"),
 ]

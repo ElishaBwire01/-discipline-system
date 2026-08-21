@@ -2,33 +2,24 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <!-- Font Awesome 6 Free -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Bootstrap Icons -->
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <meta name="theme-color" content="#2563eb">
     <title>{% block title %}Disciplinary Management System{% endblock %}</title>
-    
-    <!-- Bootstrap 5 -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    
 
-    <!-- Font Awesome 6 -->
-    <link rel='stylesheet' href='{% static 'css/profile-fixes.css' %}'>
-    
-    <!-- Google Fonts - Inter -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-    
+    <!-- Bootstrap 5.3 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome 6 Free -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    
     <!-- jQuery -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    
-    <!-- AOS Animation Library -->
-    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
-    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-    
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <!-- Profile fixes -->
+    <link rel='stylesheet' href='{% static "css/profile-fixes.css" %}'>
+
     <style>
         :root {
             --primary: #2563eb;
@@ -55,41 +46,54 @@
             --radius: 12px;
             --radius-lg: 20px;
             --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --navbar-h: 60px;
         }
-        
+
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        
+
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             background: var(--gray-50);
             min-height: 100vh;
             color: var(--dark);
+            /* prevent horizontal scroll on mobile */
+            overflow-x: hidden;
         }
-        
+
         /* ===== NAVBAR ===== */
         .navbar-modern {
-            background: rgba(255, 255, 255, 0.95);
+            background: rgba(255,255,255,0.97);
             backdrop-filter: blur(16px) saturate(180%);
             -webkit-backdrop-filter: blur(16px) saturate(180%);
-            border-bottom: 1px solid rgba(226, 232, 240, 0.6);
-            padding: 0.5rem 0;
+            border-bottom: 1px solid rgba(226,232,240,0.8);
+            padding: 0;
+            height: var(--navbar-h);
             position: sticky;
             top: 0;
             z-index: 1050;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.06);
         }
-        
+
+        .navbar-modern .container {
+            height: 100%;
+            display: flex;
+            align-items: center;
+        }
+
+        /* Brand */
         .navbar-brand {
             font-weight: 800;
-            font-size: 1.1rem;
+            font-size: 1rem;
             color: var(--dark) !important;
             display: flex;
             align-items: center;
             gap: 0.5rem;
-            padding: 0.25rem 0;
+            padding: 0;
+            text-decoration: none;
+            flex-shrink: 0;
         }
-        
-        .navbar-brand .brand-icon {
+
+        .brand-icon {
             width: 36px;
             height: 36px;
             background: linear-gradient(135deg, var(--primary), var(--secondary));
@@ -101,907 +105,606 @@
             font-size: 1rem;
             flex-shrink: 0;
         }
-        
-        .navbar-brand .brand-text {
-            display: flex;
-            flex-direction: column;
-            line-height: 1.2;
-        }
-        
-        .navbar-brand .brand-text .school-name {
-            font-size: 0.9rem;
-            font-weight: 800;
-            color: var(--dark);
-        }
-        
-        .navbar-brand .brand-text .school-motto {
-            font-size: 0.55rem;
-            font-weight: 400;
-            color: var(--gray-500);
-            letter-spacing: 0.05em;
-            text-transform: uppercase;
-        }
-        
-        /* Navbar Toggle */
+
+        .brand-text { display: flex; flex-direction: column; line-height: 1.2; }
+        .school-name { font-size: 0.9rem; font-weight: 800; color: var(--dark); }
+        .school-motto { font-size: 0.55rem; font-weight: 400; color: var(--gray-500); letter-spacing: 0.05em; text-transform: uppercase; }
+
+        /* Toggler */
         .navbar-toggler {
             border: none;
             padding: 0.5rem;
             border-radius: var(--radius);
-            transition: var(--transition);
             background: transparent;
+            transition: var(--transition);
+            margin-left: auto;
         }
-        
-        .navbar-toggler:hover {
-            background: var(--gray-100);
-        }
-        
-        .navbar-toggler:focus {
-            box-shadow: none;
-        }
-        
+        .navbar-toggler:hover { background: var(--gray-100); }
+        .navbar-toggler:focus { box-shadow: none; outline: none; }
         .navbar-toggler-icon {
-            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(15, 23, 42, 0.8)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
-            width: 28px;
-            height: 28px;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(15,23,42,0.8)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+            width: 24px; height: 24px;
         }
-        
-        /* Navbar Links */
-        .navbar-nav {
-            gap: 0.25rem;
-            padding: 0.5rem 0;
-        }
-        
+
+        /* Nav items */
+        .navbar-nav { gap: 0.2rem; }
+
         .nav-link {
             font-weight: 500;
             color: var(--gray-600) !important;
             transition: var(--transition);
-            padding: 0.5rem 1rem !important;
+            padding: 0.45rem 0.9rem !important;
             border-radius: var(--radius);
             display: flex;
             align-items: center;
-            gap: 0.5rem;
+            gap: 0.45rem;
             font-size: 0.875rem;
+            white-space: nowrap;
         }
-        
         .nav-link:hover, .nav-link.active {
             color: var(--primary) !important;
-            background: rgba(37, 99, 235, 0.08);
+            background: rgba(37,99,235,0.08);
         }
-        
-        .nav-link i {
-            width: 1.25rem;
-            text-align: center;
-            font-size: 0.9rem;
-        }
-        
-        /* AI Dashboard Nav Link */
+        .nav-link i { width: 1.1rem; text-align: center; font-size: 0.9rem; flex-shrink: 0; }
+
+        /* AI pill links */
         .nav-link.ai-nav-link {
             background: linear-gradient(135deg, var(--primary), var(--secondary));
             color: white !important;
-            padding: 0.4rem 1.25rem !important;
+            padding: 0.4rem 1rem !important;
             border-radius: 999px;
             font-weight: 600;
         }
-        
         .nav-link.ai-nav-link:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(37, 99, 235, 0.35);
-            color: white !important;
-            background: linear-gradient(135deg, var(--primary-dark), var(--secondary));
-        }
-        
-        .nav-link.ai-nav-link i {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(37,99,235,0.35);
             color: white !important;
         }
-        
-        /* AI Chat Nav Link */
         .nav-link.ai-chat-link {
             background: linear-gradient(135deg, #10b981, #059669);
             color: white !important;
-            padding: 0.4rem 1.25rem !important;
+            padding: 0.4rem 1rem !important;
             border-radius: 999px;
             font-weight: 600;
         }
-        
         .nav-link.ai-chat-link:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.35);
-            color: white !important;
-            background: linear-gradient(135deg, #059669, #047857);
-        }
-        
-        .nav-link.ai-chat-link i {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(16,185,129,0.35);
             color: white !important;
         }
-        
-        /* ===== USER AVATAR ===== */
-        .user-avatar-container {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            cursor: pointer;
-            padding: 0.25rem 0.75rem;
-            border-radius: 999px;
-            transition: var(--transition);
-            text-decoration: none;
-            color: var(--dark);
-        }
-        
-        .user-avatar-container:hover {
-            background: var(--gray-100);
-        }
-        
-        .user-avatar-wrapper {
+
+        /* Notification bell */
+        .notif-btn {
             position: relative;
-            width: 32px;
-            height: 32px;
-            flex-shrink: 0;
-        }
-        
-        .user-avatar {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 2px solid var(--primary);
-            background: #f1f5f9;
-            display: block;
-        }
-        
-        .user-avatar-fallback {
-            display: none;
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 0.75rem;
-            font-weight: 700;
-            flex-shrink: 0;
-        }
-        
-        .user-avatar-placeholder {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 0.75rem;
-            font-weight: 700;
-            flex-shrink: 0;
-        }
-        
-        .user-name {
-            font-weight: 500;
-            font-size: 0.875rem;
-            color: var(--dark);
-            white-space: nowrap;
-        }
-        
-        .pending-badge {
-            font-size: 0.6rem;
-            padding: 0.125rem 0.5rem;
-            background: var(--warning);
-            color: var(--dark);
-            border-radius: 999px;
-            font-weight: 600;
-        }
-        
-        .dropdown-arrow {
-            color: var(--gray-400);
-            font-size: 0.65rem;
-            margin-left: 0.25rem;
-        }
-        
-        /* Dropdown Menu */
-        .dropdown-menu {
+            background: none;
             border: none;
-            border-radius: var(--radius-lg);
-            box-shadow: var(--shadow-xl);
-            padding: 0.5rem;
-            min-width: 200px;
-            margin-top: 0.5rem;
-        }
-        
-        .dropdown-item {
-            padding: 0.5rem 1rem;
+            padding: 0.45rem;
             border-radius: var(--radius);
-            transition: var(--transition);
-            font-size: 0.875rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-        
-        .dropdown-item:hover {
-            background: var(--gray-100);
-        }
-        
-        .dropdown-item i {
-            width: 1.25rem;
-            text-align: center;
-        }
-        
-        .dropdown-divider {
-            margin: 0.25rem 0;
-        }
-        
-        /* ===== NOTIFICATIONS ===== */
-        .notification-icon {
-            position: relative;
             cursor: pointer;
-            padding: 0.5rem;
-            border-radius: var(--radius);
-            transition: var(--transition);
-        }
-        
-        .notification-icon:hover {
-            background: rgba(37, 99, 235, 0.08);
-        }
-        
-        .notification-icon .bell-icon {
-            font-size: 1.25rem;
             color: var(--gray-600);
+            font-size: 1.2rem;
+            transition: var(--transition);
+            display: flex; align-items: center; justify-content: center;
         }
-        
-        .notification-badge {
+        .notif-btn:hover { background: rgba(37,99,235,0.08); color: var(--primary); }
+        .notif-badge {
             position: absolute;
-            top: 0;
-            right: 0;
+            top: 2px; right: 2px;
             background: var(--danger);
             color: white;
             border-radius: 50%;
-            padding: 2px 6px;
-            font-size: 10px;
-            font-weight: 700;
-            min-width: 20px;
-            text-align: center;
+            width: 18px; height: 18px;
+            font-size: 10px; font-weight: 700;
+            display: flex; align-items: center; justify-content: center;
             border: 2px solid white;
-            animation: pulse-badge 2s infinite;
         }
-        
-        @keyframes pulse-badge {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-        }
-        
-        .notification-dropdown {
+
+        /* Notification dropdown */
+        .notif-dropdown {
             position: absolute;
-            right: 0;
-            top: calc(100% + 8px);
-            min-width: 380px;
-            max-width: 420px;
+            right: 0; top: calc(100% + 8px);
+            min-width: 340px; max-width: 380px;
             background: white;
             border-radius: var(--radius-lg);
             box-shadow: var(--shadow-xl);
             border: 1px solid var(--gray-200);
             display: none;
-            max-height: 480px;
+            max-height: 460px;
             overflow-y: auto;
             z-index: 1060;
         }
-        
-        .notification-dropdown.show { display: block; }
-        
-        .notification-dropdown-header {
-            padding: 1rem 1.25rem;
+        .notif-dropdown.show { display: block; }
+        .notif-header {
+            padding: 0.875rem 1.125rem;
             border-bottom: 1px solid var(--gray-200);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-weight: 600;
+            display: flex; justify-content: space-between; align-items: center;
+            font-weight: 600; font-size: 0.875rem;
+            position: sticky; top: 0; background: white; z-index: 1;
         }
-        
-        .notification-item {
-            padding: 0.75rem 1.25rem;
+        .notif-item {
+            padding: 0.75rem 1.125rem;
             border-bottom: 1px solid var(--gray-100);
-            transition: var(--transition);
             cursor: pointer;
-            display: flex;
-            gap: 0.75rem;
-            align-items: flex-start;
-        }
-        
-        .notification-item:hover {
-            background: var(--gray-50);
-        }
-        
-        .notification-item .notif-icon {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            flex-shrink: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.875rem;
-            margin-top: 0.125rem;
-        }
-        
-        .notification-item .notif-icon.critical { background: #fef2f2; color: var(--danger); }
-        .notification-item .notif-icon.warning { background: #fffbeb; color: var(--warning); }
-        .notification-item .notif-icon.info { background: #eff6ff; color: var(--primary); }
-        .notification-item .notif-icon.success { background: #ecfdf5; color: var(--success); }
-        
-        .notification-item .notif-content { flex: 1; min-width: 0; }
-        .notification-item .notif-content .notif-title { font-weight: 600; font-size: 0.875rem; }
-        .notification-item .notif-content .notif-message { font-size: 0.813rem; color: var(--gray-500); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-        .notification-item .notif-content .notif-time { font-size: 0.75rem; color: var(--gray-400); margin-top: 0.25rem; }
-        
-        /* ===== RESPONSIVE ===== */
-        @media (max-width: 992px) {
-            .navbar-nav {
-                padding: 1rem 0;
-                gap: 0.5rem;
-            }
-            
-            .nav-link {
-                padding: 0.625rem 1rem !important;
-                justify-content: flex-start;
-            }
-            
-            .nav-link.ai-nav-link,
-            .nav-link.ai-chat-link {
-                width: 100%;
-                justify-content: center;
-                border-radius: var(--radius);
-                padding: 0.625rem 1rem !important;
-            }
-            
-            .navbar-nav .nav-item.dropdown {
-                width: 100%;
-            }
-            
-            .navbar-nav .nav-item.dropdown .dropdown-menu {
-                position: static !important;
-                transform: none !important;
-                box-shadow: none;
-                border: 1px solid var(--gray-200);
-                margin-top: 0.25rem;
-                width: 100%;
-                border-radius: var(--radius);
-            }
-            
-            .notification-dropdown {
-                position: static !important;
-                min-width: 100% !important;
-                max-width: 100% !important;
-                box-shadow: none;
-                border: 1px solid var(--gray-200);
-                margin-top: 0.25rem;
-                border-radius: var(--radius);
-            }
-            
-            .user-avatar-container {
-                padding: 0.5rem 0.75rem;
-            }
-        }
-        
-        @media (max-width: 768px) {
-            .navbar-brand .brand-text .school-motto {
-                display: none;
-            }
-            
-            .user-name {
-                font-size: 0.8rem;
-            }
-            
-            .user-avatar-wrapper {
-                width: 28px;
-                height: 28px;
-            }
-            
-            .user-avatar {
-                width: 28px;
-                height: 28px;
-            }
-            
-            .user-avatar-fallback,
-            .user-avatar-placeholder {
-                width: 28px;
-                height: 28px;
-                font-size: 0.65rem;
-            }
-        }
-        
-        /* ===== OTHER STYLES ===== */
-        .card-modern {
-            background: white;
-            border-radius: var(--radius-lg);
-            border: 1px solid var(--gray-200);
-            box-shadow: var(--shadow);
+            display: flex; gap: 0.75rem; align-items: flex-start;
             transition: var(--transition);
-            overflow: hidden;
-            margin-bottom: 1.5rem;
         }
-        
-        .card-modern:hover {
-            box-shadow: var(--shadow-lg);
-            transform: translateY(-2px);
+        .notif-item:hover { background: var(--gray-50); }
+        .notif-icon-dot {
+            width: 34px; height: 34px; border-radius: 50%; flex-shrink: 0;
+            display: flex; align-items: center; justify-content: center; font-size: 0.875rem;
         }
-        
-        .card-header-modern {
-            padding: 1rem 1.5rem;
+        .notif-icon-dot.critical { background: #fef2f2; color: var(--danger); }
+        .notif-icon-dot.warning  { background: #fffbeb; color: var(--warning); }
+        .notif-icon-dot.info     { background: #eff6ff; color: var(--primary); }
+        .notif-icon-dot.success  { background: #ecfdf5; color: var(--success); }
+        .notif-title  { font-weight: 600; font-size: 0.8125rem; }
+        .notif-msg    { font-size: 0.75rem; color: var(--gray-500); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        .notif-time   { font-size: 0.7rem; color: var(--gray-400); margin-top: 0.2rem; }
+
+        /* User avatar */
+        .user-menu-btn {
+            display: flex; align-items: center; gap: 0.45rem;
+            cursor: pointer; padding: 0.3rem 0.7rem;
+            border-radius: 999px; transition: var(--transition);
+            text-decoration: none; color: var(--dark);
+            background: none; border: none;
+        }
+        .user-menu-btn:hover { background: var(--gray-100); }
+        .user-avatar-wrap { position: relative; width: 32px; height: 32px; flex-shrink: 0; }
+        .user-avatar {
+            width: 32px; height: 32px; border-radius: 50%; object-fit: cover;
+            border: 2px solid var(--primary); display: block;
+        }
+        .user-avatar-fallback {
+            width: 32px; height: 32px; border-radius: 50%;
             background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: white;
-            border: none;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
+            display: flex; align-items: center; justify-content: center;
+            color: white; font-size: 0.75rem; font-weight: 700;
         }
-        
-        .card-header-modern .header-icon {
-            width: 32px;
-            height: 32px;
-            background: rgba(255,255,255,0.2);
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.875rem;
+        .user-name { font-weight: 500; font-size: 0.875rem; color: var(--dark); max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .pending-badge { font-size: 0.6rem; padding: 0.1rem 0.45rem; background: var(--warning); color: var(--dark); border-radius: 999px; font-weight: 600; }
+
+        /* Dropdown */
+        .dropdown-menu {
+            border: none; border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-xl); padding: 0.5rem; min-width: 210px; margin-top: 0.5rem !important;
         }
-        
-        .stat-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-            margin-bottom: 1.5rem;
+        .dropdown-item {
+            padding: 0.5rem 0.875rem; border-radius: var(--radius); transition: var(--transition);
+            font-size: 0.875rem; display: flex; align-items: center; gap: 0.6rem; color: var(--gray-700);
         }
-        
+        .dropdown-item:hover { background: var(--gray-100); color: var(--primary); }
+        .dropdown-item i { width: 1.1rem; text-align: center; font-size: 0.875rem; color: var(--gray-500); }
+        .dropdown-item:hover i { color: var(--primary); }
+        .dropdown-divider { margin: 0.3rem 0; border-color: var(--gray-200); }
+        .dropdown-header { font-size: 0.7rem; text-transform: uppercase; letter-spacing: .06em; color: var(--gray-400); padding: 0.5rem 0.875rem 0.25rem; font-weight: 600; }
+
+        /* ===== OFFCANVAS (mobile) ===== */
+        .offcanvas-header { border-bottom: 1px solid var(--gray-200); padding: 1rem 1.25rem; }
+        .offcanvas-title { font-weight: 700; font-size: 1rem; }
+        .offcanvas-body { padding: 0.75rem; }
+        .offcanvas-nav-link {
+            display: flex; align-items: center; gap: 0.75rem;
+            padding: 0.75rem 1rem; border-radius: var(--radius);
+            font-size: 0.9rem; font-weight: 500; color: var(--gray-700);
+            text-decoration: none; transition: var(--transition);
+            margin-bottom: 2px;
+        }
+        .offcanvas-nav-link:hover, .offcanvas-nav-link.active { background: rgba(37,99,235,0.08); color: var(--primary); }
+        .offcanvas-nav-link i { width: 1.25rem; text-align: center; color: var(--gray-500); font-size: 0.95rem; }
+        .offcanvas-nav-link:hover i { color: var(--primary); }
+        .offcanvas-nav-link.pill-blue {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white; justify-content: center; border-radius: 999px; font-weight: 600;
+        }
+        .offcanvas-nav-link.pill-blue:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(37,99,235,0.3); color: white; }
+        .offcanvas-nav-link.pill-green {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white; justify-content: center; border-radius: 999px; font-weight: 600;
+        }
+        .offcanvas-nav-link.pill-green:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(16,185,129,0.3); color: white; }
+        .offcanvas-section-label {
+            font-size: 0.68rem; text-transform: uppercase; letter-spacing: .07em;
+            color: var(--gray-400); font-weight: 700; padding: 0.75rem 1rem 0.25rem;
+        }
+        .offcanvas-user-card {
+            display: flex; align-items: center; gap: 0.75rem;
+            padding: 0.75rem 1rem; background: var(--gray-50);
+            border-radius: var(--radius); margin-bottom: 0.75rem;
+        }
+        .offcanvas-user-card .oc-name { font-weight: 600; font-size: 0.875rem; }
+        .offcanvas-user-card .oc-role { font-size: 0.75rem; color: var(--gray-500); }
+
+        /* ===== CONTENT ===== */
+        .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
         .stat-card {
-            background: white;
-            border-radius: var(--radius-lg);
-            padding: 1.25rem;
-            border: 1px solid var(--gray-200);
-            box-shadow: var(--shadow-sm);
-            transition: var(--transition);
-            position: relative;
-            overflow: hidden;
+            background: white; border-radius: var(--radius-lg); padding: 1.25rem;
+            border: 1px solid var(--gray-200); box-shadow: var(--shadow-sm);
+            transition: var(--transition); position: relative; overflow: hidden;
         }
-        
-        .stat-card:hover {
-            transform: translateY(-4px);
-            box-shadow: var(--shadow-lg);
-        }
-        
-        .stat-card .stat-bg-icon {
-            position: absolute;
-            right: -10px;
-            bottom: -10px;
-            font-size: 4rem;
-            opacity: 0.06;
-            color: var(--primary);
-        }
-        
-        .stat-card .stat-icon {
-            width: 44px;
-            height: 44px;
-            border-radius: var(--radius);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.25rem;
-            margin-bottom: 0.75rem;
-        }
-        
+        .stat-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg); }
+        .stat-card .stat-bg-icon { position: absolute; right: -8px; bottom: -8px; font-size: 3.5rem; opacity: 0.06; color: var(--primary); }
+        .stat-card .stat-icon { width: 44px; height: 44px; border-radius: var(--radius); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; margin-bottom: 0.75rem; }
         .stat-card .stat-icon.primary { background: #eff6ff; color: var(--primary); }
-        .stat-card .stat-icon.danger { background: #fef2f2; color: var(--danger); }
-        .stat-card .stat-icon.success { background: #ecfdf5; color: var(--success); }
-        .stat-card .stat-icon.warning { background: #fffbeb; color: var(--warning); }
-        .stat-card .stat-icon.info { background: #f0fdf4; color: var(--accent); }
-        
-        .stat-card .stat-value {
-            font-size: 1.75rem;
-            font-weight: 700;
-            color: var(--dark);
-            line-height: 1.2;
-        }
-        
-        .stat-card .stat-label {
-            font-size: 0.875rem;
-            color: var(--gray-500);
-            font-weight: 500;
-        }
-        
-        .stat-card .stat-change {
-            font-size: 0.75rem;
-            font-weight: 600;
-            padding: 0.125rem 0.5rem;
-            border-radius: 20px;
-            display: inline-block;
-            margin-top: 0.25rem;
-        }
-        
-        .stat-card .stat-change.up { background: #ecfdf5; color: var(--success); }
-        .stat-card .stat-change.down { background: #fef2f2; color: var(--danger); }
-        
-        .table-modern {
-            width: 100%;
-            border-collapse: separate;
-            border-spacing: 0;
-        }
-        
-        .table-modern thead th {
-            background: var(--gray-50);
-            color: var(--gray-600);
-            font-weight: 600;
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            padding: 0.75rem 1rem;
-            border-bottom: 2px solid var(--gray-200);
-            position: sticky;
-            top: 0;
-            z-index: 10;
-        }
-        
-        .table-modern tbody td {
-            padding: 0.75rem 1rem;
-            border-bottom: 1px solid var(--gray-100);
-            vertical-align: middle;
-            font-size: 0.875rem;
-        }
-        
-        .table-modern tbody tr:hover {
-            background: var(--gray-50);
-        }
-        
-        .progress-modern {
-            height: 8px;
-            border-radius: 999px;
-            background: var(--gray-200);
-            overflow: hidden;
-            min-width: 80px;
-        }
-        
-        .progress-bar-modern {
-            height: 100%;
-            border-radius: 999px;
-            transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-        }
-        
-        .badge-modern {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.25rem;
-            padding: 0.25rem 0.75rem;
-            border-radius: 999px;
-            font-weight: 600;
-            font-size: 0.75rem;
-        }
-        
+        .stat-card .stat-icon.danger   { background: #fef2f2; color: var(--danger); }
+        .stat-card .stat-icon.success  { background: #ecfdf5; color: var(--success); }
+        .stat-card .stat-icon.warning  { background: #fffbeb; color: var(--warning); }
+        .stat-card .stat-icon.info     { background: #f0fdf4; color: var(--accent); }
+        .stat-card .stat-value { font-size: 1.75rem; font-weight: 700; color: var(--dark); line-height: 1.2; }
+        .stat-card .stat-label { font-size: 0.875rem; color: var(--gray-500); font-weight: 500; }
+
+        .card-modern { background: white; border-radius: var(--radius-lg); border: 1px solid var(--gray-200); box-shadow: var(--shadow); transition: var(--transition); overflow: hidden; margin-bottom: 1.5rem; }
+        .card-modern:hover { box-shadow: var(--shadow-lg); transform: translateY(-1px); }
+        .card-header-modern { padding: 1rem 1.5rem; background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; border: none; font-weight: 600; display: flex; align-items: center; gap: 0.75rem; }
+        .card-header-modern .header-icon { width: 30px; height: 30px; background: rgba(255,255,255,0.2); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 0.875rem; }
+
+        .table-modern { width: 100%; border-collapse: separate; border-spacing: 0; }
+        .table-modern thead th { background: var(--gray-50); color: var(--gray-600); font-weight: 600; font-size: 0.73rem; text-transform: uppercase; letter-spacing: 0.05em; padding: 0.75rem 1rem; border-bottom: 2px solid var(--gray-200); }
+        .table-modern tbody td { padding: 0.75rem 1rem; border-bottom: 1px solid var(--gray-100); vertical-align: middle; font-size: 0.875rem; }
+        .table-modern tbody tr:hover { background: var(--gray-50); }
+
+        .badge-modern { display: inline-flex; align-items: center; gap: 0.25rem; padding: 0.25rem 0.75rem; border-radius: 999px; font-weight: 600; font-size: 0.73rem; }
         .badge-modern.badge-critical { background: #fef2f2; color: var(--danger); }
-        .badge-modern.badge-warning { background: #fffbeb; color: var(--warning); }
-        .badge-modern.badge-success { background: #ecfdf5; color: var(--success); }
-        .badge-modern.badge-info { background: #eff6ff; color: var(--primary); }
-        
-        .btn-modern {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-            padding: 0.5rem 1.25rem;
-            border-radius: var(--radius);
-            font-weight: 600;
-            font-size: 0.875rem;
-            transition: var(--transition);
-            border: none;
-            cursor: pointer;
-            text-decoration: none;
-        }
-        
-        .btn-modern-primary {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: white;
-        }
-        
-        .btn-modern-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(37, 99, 235, 0.35);
-            color: white;
-        }
-        
+        .badge-modern.badge-warning  { background: #fffbeb; color: var(--warning); }
+        .badge-modern.badge-success  { background: #ecfdf5; color: var(--success); }
+        .badge-modern.badge-info     { background: #eff6ff; color: var(--primary); }
+
+        .btn-modern { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.5rem 1.25rem; border-radius: var(--radius); font-weight: 600; font-size: 0.875rem; transition: var(--transition); border: none; cursor: pointer; text-decoration: none; }
+        .btn-modern-primary { background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; }
+        .btn-modern-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(37,99,235,0.35); color: white; }
         .btn-modern-secondary { background: var(--gray-200); color: var(--gray-700); }
         .btn-modern-secondary:hover { background: var(--gray-300); color: var(--gray-700); }
-        .btn-modern-success { background: var(--success); color: white; }
-        .btn-modern-danger { background: var(--danger); color: white; }
-        .btn-modern-warning { background: var(--warning); color: white; }
+        .btn-modern-success  { background: var(--success); color: white; }
+        .btn-modern-danger   { background: var(--danger); color: white; }
+        .btn-modern-warning  { background: var(--warning); color: white; }
         .btn-modern-sm { padding: 0.25rem 0.75rem; font-size: 0.75rem; }
-        
-        /* AI Buttons */
-        .btn-ai {
-            background: linear-gradient(135deg, #7c3aed, #2563eb);
-            color: white;
-            border: none;
-            padding: 0.5rem 1.25rem;
-            border-radius: 999px;
-            font-weight: 600;
-            font-size: 0.875rem;
-            transition: var(--transition);
-            cursor: pointer;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-        
-        .btn-ai:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(124, 58, 237, 0.35);
-            color: white;
-        }
-        
-        .btn-ai-chat {
-            background: linear-gradient(135deg, #10b981, #059669);
-            color: white;
-            border: none;
-            padding: 0.5rem 1.25rem;
-            border-radius: 999px;
-            font-weight: 600;
-            font-size: 0.875rem;
-            transition: var(--transition);
-            cursor: pointer;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-        
-        .btn-ai-chat:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.35);
-            color: white;
-        }
-        
-        .form-control-modern {
-            width: 100%;
-            padding: 0.625rem 1rem;
-            border: 2px solid var(--gray-200);
-            border-radius: var(--radius);
-            font-size: 0.875rem;
-            transition: var(--transition);
-            background: white;
-            color: #000000 !important;
-        }
-        
-        .form-control-modern:focus {
-            border-color: var(--primary);
-            outline: none;
-            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
-        }
-        
-        .alert-modern {
-            border: none;
-            border-radius: var(--radius-lg);
-            padding: 1rem 1.25rem;
-            box-shadow: var(--shadow);
-            display: flex;
-            align-items: flex-start;
-            gap: 0.75rem;
-        }
-        
-        .alert-modern .alert-icon {
-            font-size: 1.25rem;
-            margin-top: 0.125rem;
-        }
-        
-        .fade-in-up {
-            animation: fadeInUp 0.5s ease-out forwards;
-        }
-        
-        @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
+
+        .btn-ai      { background: linear-gradient(135deg, #7c3aed, #2563eb); color: white; border: none; padding: 0.5rem 1.25rem; border-radius: 999px; font-weight: 600; font-size: 0.875rem; transition: var(--transition); cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem; }
+        .btn-ai:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(124,58,237,0.35); color: white; }
+        .btn-ai-chat { background: linear-gradient(135deg, #10b981, #059669); color: white; border: none; padding: 0.5rem 1.25rem; border-radius: 999px; font-weight: 600; font-size: 0.875rem; transition: var(--transition); cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem; }
+        .btn-ai-chat:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(16,185,129,0.35); color: white; }
+
+        .form-control-modern { width: 100%; padding: 0.625rem 1rem; border: 2px solid var(--gray-200); border-radius: var(--radius); font-size: 0.875rem; transition: var(--transition); background: white; color: #000 !important; }
+        .form-control-modern:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 0 4px rgba(37,99,235,0.1); }
+
+        .alert-modern { border: none; border-radius: var(--radius-lg); padding: 1rem 1.25rem; box-shadow: var(--shadow); display: flex; align-items: flex-start; gap: 0.75rem; }
+        .alert-modern .alert-icon { font-size: 1.1rem; margin-top: 0.1rem; }
+
+        .progress-modern { height: 8px; border-radius: 999px; background: var(--gray-200); overflow: hidden; }
+        .progress-bar-modern { height: 100%; border-radius: 999px; background: linear-gradient(135deg, var(--primary), var(--secondary)); transition: width 1s cubic-bezier(0.4,0,0.2,1); }
+
+        .fade-in-up { animation: fadeInUp 0.5s ease-out forwards; }
+        @keyframes fadeInUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+
+        ::-webkit-scrollbar { width: 5px; height: 5px; }
         ::-webkit-scrollbar-track { background: var(--gray-100); }
         ::-webkit-scrollbar-thumb { background: var(--gray-300); border-radius: 999px; }
         ::-webkit-scrollbar-thumb:hover { background: var(--gray-400); }
+
+        /* ===== MOBILE / ANDROID ===== */
+        @media (max-width: 991px) {
+            .navbar-nav { display: none; } /* hidden on mobile – offcanvas handles it */
+            /* Touch-friendly tap targets */
+            .btn-modern, .btn-modern-sm { min-height: 44px; min-width: 44px; }
+        }
+        @media (max-width: 576px) {
+            .container { padding-left: 0.875rem; padding-right: 0.875rem; }
+            .stat-grid { grid-template-columns: repeat(2, 1fr); gap: 0.625rem; }
+            .stat-card { padding: 1rem; }
+            .stat-card .stat-value { font-size: 1.4rem; }
+            .card-header-modern { padding: 0.875rem 1rem; font-size: 0.9rem; }
+            .table-modern thead th, .table-modern tbody td { padding: 0.625rem 0.75rem; font-size: 0.8rem; }
+            .brand-text .school-motto { display: none; }
+            .user-name { display: none; }
+            .notif-dropdown { min-width: calc(100vw - 1.75rem); right: -0.875rem; }
+        }
+        select.form-control-modern,
+        select.form-control-modern option,
+        select option { color: #000 !important; background-color: #fff !important; }
     </style>
     {% block extra_css %}{% endblock %}
 </head>
 <body>
-    {% if user.is_authenticated %}
-    <nav class="navbar-modern navbar navbar-expand-lg">
-        <div class="container">
-            <!-- Brand -->
-            <a class="navbar-brand" href="/dashboard/">
-                <span class="brand-text">
-                    <span class="school-name">{{ school_name|default:"Disciplinary System" }}</span>
-                    {% if school_motto %}
-                    <span class="school-motto">{{ school_motto }}</span>
-                    {% endif %}
-                </span>
-            </a>
-            
-            <!-- Toggle Button -->
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            
-            <!-- Navbar Links -->
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto align-items-lg-center">
-                    <!-- AI Dashboard -->
-                    <li class="nav-item">
-                        <a class="nav-link ai-nav-link" href="/ai/dashboard/">
-                        </a>
-                    </li>
-                    
-                    <!-- AI Chat -->
-                    <li class="nav-item">
-                        <a class="nav-link ai-chat-link" href="/ai/chat/">
-                        </a>
-                    </li>
-                    
-                    <!-- Notifications -->
-                    <li class="nav-item position-relative">
-                        <div class="notification-icon" id="notificationIcon">
-                            {% if notification_count > 0 %}
-                            <span class="notification-badge" id="notificationBadge">
-                                {{ notification_count }}
-                            </span>
-                            {% endif %}
-                            <div class="notification-dropdown" id="notificationDropdown">
-                                <div class="notification-dropdown-header">
-                                    <span class="badge bg-primary" id="notificationCount">{{ notification_count }}</span>
+
+{% if user.is_authenticated %}
+<!-- ===== TOP NAVBAR ===== -->
+<nav class="navbar-modern navbar navbar-expand-lg">
+    <div class="container">
+        <!-- Brand -->
+        <a class="navbar-brand" href="/dashboard/">
+            <span class="brand-icon"><i class="fa-solid fa-scale-balanced"></i></span>
+            <span class="brand-text">
+                <span class="school-name">{{ school_name|default:"Disciplinary System" }}</span>
+                {% if school_motto %}<span class="school-motto">{{ school_motto }}</span>{% endif %}
+            </span>
+        </a>
+
+        <!-- Desktop nav (hidden on mobile) -->
+        <div class="navbar-nav ms-auto d-none d-lg-flex align-items-center flex-row" id="desktopNav">
+            {% if user.is_superuser %}
+            <a class="nav-link" href="/admin-dashboard/"><i class="fa-solid fa-gauge-high"></i> Dashboard</a>
+            <a class="nav-link" href="/manage-users/"><i class="fa-solid fa-users-gear"></i> Users</a>
+            <a class="nav-link" href="/add-student/"><i class="fa-solid fa-user-plus"></i> Add Student</a>
+            <a class="nav-link" href="/school-setup/"><i class="fa-solid fa-gear"></i> Setup</a>
+            <a class="nav-link" href="/admin-agent/" style="background:linear-gradient(135deg,#7c3aed,#2563eb);color:white!important;border-radius:8px;padding:.35rem .7rem;font-weight:700;font-size:.75rem;"><i class="fa-solid fa-robot me-1"></i>Agent</a>
+            {% elif user.groups.all.0.name == "ClassTeacher" %}
+            <a class="nav-link" href="/class-teacher-dashboard/"><i class="fa-solid fa-chalkboard-user"></i> My Class</a>
+            <a class="nav-link" href="/add-student/"><i class="fa-solid fa-user-plus"></i> Add Student</a>
+            {% else %}
+            <a class="nav-link" href="/teacher-dashboard/"><i class="fa-solid fa-gauge"></i> Dashboard</a>
+            {% endif %}
+            <a class="nav-link ai-nav-link ms-1" href="/ai/dashboard/"><i class="fa-solid fa-robot"></i> AI Dashboard</a>
+            <a class="nav-link ai-chat-link ms-1" href="/ai/chat/"><i class="fa-solid fa-comments"></i> AI Chat</a>
+
+            <!-- Notification bell -->
+            <div class="position-relative ms-1">
+                <button class="notif-btn" id="notifBtn" aria-label="Notifications">
+                    <i class="fa-solid fa-bell"></i>
+                    {% if notification_count > 0 %}<span class="notif-badge">{{ notification_count }}</span>{% endif %}
+                </button>
+                <div class="notif-dropdown" id="notifDropdown">
+                    <div class="notif-header">
+                        <span><i class="fa-solid fa-bell me-1"></i> Notifications</span>
+                        {% if notification_count > 0 %}<span class="badge bg-danger">{{ notification_count }}</span>{% endif %}
+                    </div>
+                    <div id="notifList">
+                        {% if unread_notifications %}
+                            {% for notif in unread_notifications %}
+                            <div class="notif-item" onclick="markNotifRead({{ notif.id }})">
+                                <div class="notif-icon-dot {{ notif.notification_type }}">
+                                    {% if notif.notification_type == 'critical' %}<i class="fa-solid fa-triangle-exclamation"></i>
+                                    {% elif notif.notification_type == 'warning' %}<i class="fa-solid fa-circle-exclamation"></i>
+                                    {% elif notif.notification_type == 'success' %}<i class="fa-solid fa-circle-check"></i>
+                                    {% else %}<i class="fa-solid fa-circle-info"></i>{% endif %}
                                 </div>
-                                <div id="notificationList">
-                                    {% if unread_notifications %}
-                                        {% for notif in unread_notifications %}
-                                        <div class="notification-item" onclick="markNotificationRead({{ notif.id }})">
-                                            <div class="notif-icon {{ notif.notification_type }}">
-                                            </div>
-                                            <div class="notif-content">
-                                                <div class="notif-title">{{ notif.title }}</div>
-                                                <div class="notif-message">{{ notif.message|truncatechars:80 }}</div>
-                                            </div>
-                                        </div>
-                                        {% endfor %}
-                                    {% endif %}
-                                    
-                                    {% if user.is_superuser %}
-                                        {% if pending_approvals > 0 %}
-                                        <div class="notification-item" onclick="location.href='/manage-users/?status=pending'">
-                                            <div class="notif-content">
-                                                <div class="notif-title">{{ pending_approvals }} Pending Approvals</div>
-                                                <div class="notif-message">Teachers waiting for account approval</div>
-                                                <div class="notif-time">Click to review</div>
-                                            </div>
-                                        </div>
-                                        {% endif %}
-                                        
-                                        {% if pending_resets > 0 %}
-                                        <div class="notification-item" onclick="location.href='/admin-reset-requests/'">
-                                            <div class="notif-content">
-                                                <div class="notif-title">{{ pending_resets }} Password Reset Requests</div>
-                                                <div class="notif-message">Teachers requesting password reset</div>
-                                                <div class="notif-time">Click to review</div>
-                                            </div>
-                                        </div>
-                                        {% endif %}
-                                    {% endif %}
-                                    
-                                    {% if not unread_notifications and not pending_approvals and not pending_resets %}
-                                    <div class="text-center py-4">
-                                        <p class="text-muted mt-2 mb-0">All caught up!</p>
-                                    </div>
-                                    {% endif %}
+                                <div class="flex-1">
+                                    <div class="notif-title">{{ notif.title }}</div>
+                                    <div class="notif-msg">{{ notif.message|truncatechars:75 }}</div>
                                 </div>
                             </div>
-                        </div>
-                    </li>
-                    
-                    <!-- User Menu -->
-                    <li class="nav-item dropdown">
-                        <a class="user-avatar-container" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            <span class="user-avatar-wrapper">
-                                {% if request.user.teacher_profile.profile_picture %}
-                                    <img src="{{ request.user.teacher_profile.profile_picture.url }}" 
-                                         alt="{{ request.user.get_full_name|default:request.user.username }}" 
-                                         class="user-avatar"
-                                         onerror="this.style.display='none'; this.parentElement.querySelector('.user-avatar-fallback').style.display='flex';">
-                                    <span class="user-avatar-fallback">
-                                        {{ request.user.get_full_name|default:request.user.username|slice:":1"|upper }}
-                                    </span>
-                                {% else %}
-                                    <span class="user-avatar-placeholder">
-                                        {{ request.user.get_full_name|default:request.user.username|slice:":1"|upper }}
-                                    </span>
-                                {% endif %}
-                            </span>
-                            <span class="user-name">{{ request.user.get_full_name|default:request.user.username }}</span>
-                            {% if request.user.teacher_profile and not request.user.teacher_profile.is_approved %}
-                            <span class="pending-badge">Pending</span>
+                            {% endfor %}
+                        {% endif %}
+                        {% if user.is_superuser %}
+                            {% if pending_approvals > 0 %}
+                            <div class="notif-item" onclick="location.href='/manage-users/?status=pending'">
+                                <div class="notif-icon-dot warning"><i class="fa-solid fa-user-clock"></i></div>
+                                <div class="flex-1">
+                                    <div class="notif-title">{{ pending_approvals }} Pending Approval{{ pending_approvals|pluralize }}</div>
+                                    <div class="notif-msg">Teachers awaiting account approval</div>
+                                    <div class="notif-time">Tap to review</div>
+                                </div>
+                            </div>
                             {% endif %}
-                        </a>
-                        <ul class="dropdown-menu dropdown-menu-end">
-                            <li><hr class="dropdown-divider"></li>
-                        </ul>
-                    </li>
+                            {% if pending_resets > 0 %}
+                            <div class="notif-item" onclick="location.href='/admin-reset-requests/'">
+                                <div class="notif-icon-dot info"><i class="fa-solid fa-key"></i></div>
+                                <div class="flex-1">
+                                    <div class="notif-title">{{ pending_resets }} Password Reset{{ pending_resets|pluralize }}</div>
+                                    <div class="notif-msg">Teachers requesting password reset</div>
+                                    <div class="notif-time">Tap to review</div>
+                                </div>
+                            </div>
+                            {% endif %}
+                        {% endif %}
+                        {% if not unread_notifications and not pending_approvals and not pending_resets %}
+                        <div class="text-center py-4 text-muted">
+                            <i class="fa-solid fa-check-circle fa-2x mb-2 d-block text-success"></i>
+                            All caught up!
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% if notification_count > 0 %}
+                    <div class="p-2 border-top">
+                        <button class="btn btn-sm btn-outline-secondary w-100" onclick="markAllRead()">
+                            <i class="fa-solid fa-check-double me-1"></i> Mark all as read
+                        </button>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- User dropdown -->
+            <div class="dropdown ms-1">
+                <button class="user-menu-btn dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                    <span class="user-avatar-wrap">
+                        {% if request.user.teacher_profile.profile_picture %}
+                            <img src="{{ request.user.teacher_profile.profile_picture.url }}"
+                                 alt="{{ request.user.get_full_name|default:request.user.username }}"
+                                 class="user-avatar"
+                                 onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+                            <span class="user-avatar-fallback" style="display:none">{{ request.user.get_full_name|default:request.user.username|slice:":1"|upper }}</span>
+                        {% else %}
+                            <span class="user-avatar-fallback">{{ request.user.get_full_name|default:request.user.username|slice:":1"|upper }}</span>
+                        {% endif %}
+                    </span>
+                    <span class="user-name">{{ request.user.get_full_name|default:request.user.username }}</span>
+                    {% if request.user.teacher_profile and not request.user.teacher_profile.is_approved %}
+                    <span class="pending-badge">Pending</span>
+                    {% endif %}
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end">
+                    <li><span class="dropdown-header">{{ request.user.get_full_name|default:request.user.username }}</span></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item" href="/profile/"><i class="fa-solid fa-user"></i> My Profile</a></li>
+                    {% if user.is_superuser %}
+                    <li><a class="dropdown-item" href="/admin-dashboard/"><i class="fa-solid fa-gauge-high"></i> Admin Dashboard</a></li>
+                    <li><a class="dropdown-item" href="/manage-users/"><i class="fa-solid fa-users-gear"></i> Manage Users</a></li>
+                    <li><a class="dropdown-item" href="/school-setup/"><i class="fa-solid fa-gear"></i> School Setup</a></li>
+                    <li><a class="dropdown-item" href="/admin-reset-requests/"><i class="fa-solid fa-key"></i> Password Resets
+                        {% if pending_resets > 0 %}<span class="badge bg-danger ms-auto">{{ pending_resets }}</span>{% endif %}
+                    </a></li>
+                    {% endif %}
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item text-danger" href="/logout/"><i class="fa-solid fa-right-from-bracket"></i> Log Out</a></li>
                 </ul>
             </div>
         </div>
-    </nav>
-    {% endif %}
-    
-    <div class="container py-4">
-        {% if messages %}
-            {% for message in messages %}
-            <div class="alert-modern alert alert-{{ message.tags }} fade-in-up" role="alert">
-                <span class="alert-icon">
-                </span>
-                <div>{{ message }}</div>
-                <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>
+
+        <!-- Mobile toggler -->
+        <button class="navbar-toggler d-lg-none" type="button"
+                data-bs-toggle="offcanvas" data-bs-target="#mobileOffcanvas"
+                aria-controls="mobileOffcanvas" aria-label="Open menu">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+    </div>
+</nav>
+
+<!-- ===== MOBILE OFFCANVAS ===== -->
+<div class="offcanvas offcanvas-end" tabindex="-1" id="mobileOffcanvas" aria-labelledby="mobileOffcanvasLabel">
+    <div class="offcanvas-header">
+        <h5 class="offcanvas-title" id="mobileOffcanvasLabel">
+            <i class="fa-solid fa-scale-balanced me-2 text-primary"></i>{{ school_name|default:"Menu" }}
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+        <!-- User card -->
+        <div class="offcanvas-user-card">
+            <span class="user-avatar-fallback" style="width:42px;height:42px;font-size:1rem;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--secondary));display:flex;align-items:center;justify-content:center;color:white;font-weight:700;flex-shrink:0;">
+                {{ request.user.get_full_name|default:request.user.username|slice:":1"|upper }}
+            </span>
+            <div>
+                <div class="oc-name">{{ request.user.get_full_name|default:request.user.username }}</div>
+                <div class="oc-role">
+                    {% if user.is_superuser %}Administrator
+                    {% elif user.groups.filter.name == "ClassTeacher" %}Class Teacher
+                    {% else %}Teacher{% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigation links -->
+        <div class="offcanvas-section-label">Navigation</div>
+
+        {% if user.is_superuser %}
+        <a class="offcanvas-nav-link" href="/admin-dashboard/"><i class="fa-solid fa-gauge-high"></i> Admin Dashboard</a>
+        <a class="offcanvas-nav-link" href="/manage-users/"><i class="fa-solid fa-users-gear"></i> Manage Users</a>
+        <a class="offcanvas-nav-link" href="/add-student/"><i class="fa-solid fa-user-plus"></i> Add Student</a>
+        <a class="offcanvas-nav-link" href="/bulk-upload-students/"><i class="fa-solid fa-file-arrow-up"></i> Bulk Upload</a>
+        <a class="offcanvas-nav-link" href="/school-setup/"><i class="fa-solid fa-gear"></i> School Setup</a>
+        <a class="offcanvas-nav-link" href="/admin-reset-requests/">
+            <i class="fa-solid fa-key"></i> Password Resets
+            {% if pending_resets > 0 %}<span class="badge bg-danger ms-auto">{{ pending_resets }}</span>{% endif %}
+        </a>
+        {% elif user.groups.all.0.name == "ClassTeacher" %}
+        <a class="offcanvas-nav-link" href="/class-teacher-dashboard/"><i class="fa-solid fa-chalkboard-user"></i> My Class</a>
+        <a class="offcanvas-nav-link" href="/add-student/"><i class="fa-solid fa-user-plus"></i> Add Student</a>
+        <a class="offcanvas-nav-link" href="/student/search/"><i class="fa-solid fa-magnifying-glass"></i> Search Students</a>
+        {% else %}
+        <a class="offcanvas-nav-link" href="/teacher-dashboard/"><i class="fa-solid fa-gauge"></i> Dashboard</a>
+        <a class="offcanvas-nav-link" href="/student/search/"><i class="fa-solid fa-magnifying-glass"></i> Search Students</a>
+        {% endif %}
+
+        <div class="offcanvas-section-label mt-1">AI Tools</div>
+        {% if user.is_superuser %}
+        <a class="offcanvas-nav-link" href="/admin-agent/" style="background:linear-gradient(135deg,#7c3aed,#2563eb);color:white;border-radius:999px;justify-content:center;font-weight:700;margin-bottom:4px;"><i class="fa-solid fa-robot me-1"></i> Admin Agent</a>
+        {% endif %}
+        <a class="offcanvas-nav-link pill-blue mt-1" href="/ai/dashboard/"><i class="fa-solid fa-robot"></i> AI Dashboard</a>
+        <a class="offcanvas-nav-link pill-green mt-1" href="/ai/chat/"><i class="fa-solid fa-comments"></i> AI Chat</a>
+
+        <!-- Notifications in offcanvas -->
+        <div class="offcanvas-section-label mt-2">
+            Notifications {% if notification_count > 0 %}<span class="badge bg-danger">{{ notification_count }}</span>{% endif %}
+        </div>
+        {% if unread_notifications %}
+            {% for notif in unread_notifications %}
+            <div class="offcanvas-nav-link" style="cursor:pointer" onclick="markNotifRead({{ notif.id }})">
+                <i class="fa-solid {% if notif.notification_type == 'critical' %}fa-triangle-exclamation text-danger{% elif notif.notification_type == 'warning' %}fa-circle-exclamation text-warning{% elif notif.notification_type == 'success' %}fa-circle-check text-success{% else %}fa-circle-info text-primary{% endif %}"></i>
+                <span style="font-size:.8rem">{{ notif.title|truncatechars:40 }}</span>
             </div>
             {% endfor %}
+        {% else %}
+        <div class="text-center text-muted py-2" style="font-size:.8rem"><i class="fa-solid fa-check me-1 text-success"></i>All caught up!</div>
         {% endif %}
-        
-        {% block content %}{% endblock %}
+
+        <!-- Account links -->
+        <div class="offcanvas-section-label mt-2">Account</div>
+        <a class="offcanvas-nav-link" href="/profile/"><i class="fa-solid fa-user"></i> My Profile</a>
+        <a class="offcanvas-nav-link" href="/request-reset/"><i class="fa-solid fa-lock-open"></i> Request Password Reset</a>
+        <a class="offcanvas-nav-link text-danger" href="/logout/"><i class="fa-solid fa-right-from-bracket text-danger"></i> Log Out</a>
     </div>
-    
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        AOS.init({ duration: 600, once: true });
-        
-        setTimeout(function() { 
-            document.querySelectorAll('.alert').forEach(function(el) {
-                el.style.transition = 'opacity 0.5s';
-                el.style.opacity = '0';
-                setTimeout(function() { el.remove(); }, 500);
-            });
-        }, 5000);
-        
-        document.getElementById('notificationIcon')?.addEventListener('click', function(e) {
-            e.stopPropagation();
-            document.getElementById('notificationDropdown').classList.toggle('show');
-        });
-        
-        document.addEventListener('click', function() {
-            document.getElementById('notificationDropdown')?.classList.remove('show');
-        });
-        
-        function markNotificationRead(id) {
-            fetch('/api/notifications/read/' + id + '/', { 
-                method: 'POST', 
-                headers: { 'X-CSRFToken': '{{ csrf_token }}' } 
-            })
-            .then(response => response.json())
-            .then(data => { 
-                if (data.status === 'success') location.reload(); 
-            })
-            .catch(error => console.error('Error marking notification as read:', error));
+</div>
+{% endif %}
+
+<!-- ===== MAIN CONTENT ===== -->
+<div class="container py-3 py-md-4">
+    {% if messages %}
+        {% for message in messages %}
+        <div class="alert-modern alert alert-{{ message.tags }} fade-in-up mb-3" role="alert">
+            <span class="alert-icon">
+                {% if message.tags == 'success' %}<i class="fa-solid fa-circle-check text-success"></i>
+                {% elif message.tags == 'danger' or message.tags == 'error' %}<i class="fa-solid fa-circle-xmark text-danger"></i>
+                {% elif message.tags == 'warning' %}<i class="fa-solid fa-triangle-exclamation text-warning"></i>
+                {% else %}<i class="fa-solid fa-circle-info text-primary"></i>{% endif %}
+            </span>
+            <div class="flex-1">{{ message }}</div>
+            <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %}
+    {% endif %}
+
+    {% block content %}{% endblock %}
+</div>
+
+<!-- Bootstrap 5.3 JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // ── Notification dropdown (desktop) ──
+    const notifBtn = document.getElementById('notifBtn');
+    const notifDrop = document.getElementById('notifDropdown');
+    notifBtn?.addEventListener('click', function(e) {
+        e.stopPropagation();
+        notifDrop.classList.toggle('show');
+    });
+    document.addEventListener('click', function(e) {
+        if (!notifDrop?.contains(e.target) && e.target !== notifBtn) {
+            notifDrop?.classList.remove('show');
         }
-        window.markNotificationRead = markNotificationRead;
-    </script>
-    {% block extra_js %}{% endblock %}
+    });
+
+    function markNotifRead(id) {
+        fetch('/api/notifications/read/' + id + '/', {
+            method: 'POST',
+            headers: { 'X-CSRFToken': '{{ csrf_token }}' }
+        }).then(r => r.json()).then(d => { if (d.status === 'success') location.reload(); });
+    }
+    function markAllRead() {
+        fetch('/api/notifications/read-all/', {
+            method: 'POST',
+            headers: { 'X-CSRFToken': '{{ csrf_token }}' }
+        }).then(() => location.reload());
+    }
+    window.markNotifRead = markNotifRead;
+    window.markAllRead = markAllRead;
+
+    // ── Auto-dismiss alerts ──
+    setTimeout(function() {
+        document.querySelectorAll('.alert').forEach(function(el) {
+            el.style.transition = 'opacity 0.5s';
+            el.style.opacity = '0';
+            setTimeout(function() { el.remove(); }, 500);
+        });
+    }, 6000);
+
+    // ── Offcanvas nav: close panel then navigate ──
+    (function() {
+        var oc = document.getElementById('mobileOffcanvas');
+        if (!oc) return;
+        oc.addEventListener('click', function(e) {
+            var link = e.target.closest('a.offcanvas-nav-link');
+            if (!link || !link.href || link.href === '#') return;
+            e.preventDefault();
+            var dest = link.href;
+            // Close via Bootstrap API, then navigate after hide animation
+            var bsOc = bootstrap.Offcanvas.getOrCreateInstance(oc);
+            oc.addEventListener('hidden.bs.offcanvas', function goNav() {
+                oc.removeEventListener('hidden.bs.offcanvas', goNav);
+                window.location.href = dest;
+            });
+            bsOc.hide();
+        });
+    })();
+</script>
+{% block extra_js %}{% endblock %}
 </body>
 </html>
-
-<style>
-    width: 1.2em;
-    height: 1.2em;
-    display: inline-block;
-    vertical-align: middle;
-    fill: currentColor;
-    flex-shrink: 0;
-    transition: all 0.2s ease;
-}
-.icon-label {
-    vertical-align: middle;
-    margin-left: 0.25rem;
-}
-    width: 1em;
-    height: 1em;
-}
-    transform: scale(1.1);
-}
-</style>

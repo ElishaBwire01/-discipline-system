@@ -1,9 +1,14 @@
 # ============================================================
+<<<<<<< Updated upstream
 # Python
+=======
+# PYTHON
+>>>>>>> Stashed changes
 # ============================================================
 *.py[cod]
 __pycache__/
 *.pyo
+<<<<<<< Updated upstream
 
 # Virtual environments
 venv/
@@ -33,8 +38,46 @@ db.sqlite3-journal
 
 # User-uploaded / generated files
 media/
-staticfiles/
+=======
+*.pyd
 
+# Virtual environments
+venv/
+.venv/
+env/
+ENV/
+
+# ============================================================
+# ENVIRONMENT & SECRETS
+# ============================================================
+.env
+.env.*
+!.env.example
+
+# Environment helper scripts containing secrets
+env.ps1
+
+# ============================================================
+# DJANGO
+# ============================================================
+*.log
+*.pot
+local_settings.py
+
+# SQLite databases and backups
+*.sqlite3
+*.sqlite3-*
+*.db
+*.db-*
+*.sqlite
+*.sqlite-*
+
+# Django generated files
+>>>>>>> Stashed changes
+staticfiles/
+media/
+
+<<<<<<< Updated upstream
 
 # ============================================================
 # Secret / backup environment files
@@ -64,6 +107,37 @@ backups_*/
 
 # ============================================================
 # IDE / Editors
+=======
+# ============================================================
+# BACKUPS
+# ============================================================
+# Backup directories
+.fix_backup/
+backup*/
+backups*/
+*_backup*/
+*_backups*/
+template_backup*/
+views_backup*/
+
+# Backup files
+*.bak
+*.backup
+*.backup_*
+*.bak_*
+
+# ============================================================
+# TEST / DEBUG OUTPUT
+# ============================================================
+error_logs.txt
+smoke_upload.csv
+
+# Temporary/debug scripts
+Untitled-*.ps1
+
+# ============================================================
+# IDE / EDITORS
+>>>>>>> Stashed changes
 # ============================================================
 .vscode/
 .idea/
@@ -71,14 +145,20 @@ backups_*/
 *.swo
 *.swn
 
+<<<<<<< Updated upstream
 
 # ============================================================
 # Operating System
+=======
+# ============================================================
+# OPERATING SYSTEM
+>>>>>>> Stashed changes
 # ============================================================
 .DS_Store
 Thumbs.db
 Desktop.ini
 
+<<<<<<< Updated upstream
 
 # ============================================================
 # Temporary files
@@ -95,3 +175,38 @@ Desktop.ini
 # ============================================================
 smoke_upload.csv
 test_connections.py
+=======
+# ============================================================
+# BUILD / CACHE
+# ============================================================
+*.egg-info/
+dist/
+build/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# ============================================================
+# COVERAGE
+# ============================================================
+.coverage
+.coverage.*
+htmlcov/
+.pytest_cache/
+
+# ============================================================
+# NODE / FRONTEND (if used later)
+# ============================================================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ============================================================
+# TEMPORARY FILES
+# ============================================================
+*.tmp
+*.temp
+*.orig
+*~
+>>>>>>> Stashed changes

@@ -1,4 +1,5 @@
 from django.contrib.auth.decorators import user_passes_test
+from django.shortcuts import redirect
 from functools import wraps
 
 from django.core.exceptions import PermissionDenied
@@ -9,7 +10,7 @@ def admin_only(view_func):
     @wraps(view_func)
     def wrapper(request, *args, **kwargs):
         if not request.user.is_authenticated:
-            return redirect('login')
+            return redirect('/login/')
         if not request.user.is_superuser:
             raise PermissionDenied("Admin access required")
         return view_func(request, *args, **kwargs)
@@ -20,7 +21,7 @@ def class_teacher_only(view_func):
     @wraps(view_func)
     def wrapper(request, *args, **kwargs):
         if not request.user.is_authenticated:
-            return redirect('login')
+            return redirect('/login/')
         if not (request.user.is_superuser or request.user.groups.filter(name='ClassTeacher').exists()):
             raise PermissionDenied("Class Teacher access required")
         return view_func(request, *args, **kwargs)
@@ -31,7 +32,7 @@ def teacher_only(view_func):
     @wraps(view_func)
     def wrapper(request, *args, **kwargs):
         if not request.user.is_authenticated:
-            return redirect('login')
+            return redirect('/login/')
         if not (request.user.is_superuser or
                 request.user.groups.filter(name='ClassTeacher').exists() or
                 request.user.groups.filter(name='Teacher').exists()):
