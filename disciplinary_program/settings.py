@@ -16,10 +16,10 @@ load_dotenv()
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get("SECRET_KEY", "django-insecure-your-secret-key-here")
+SECRET_KEY = os.environ.get("SECRET_KEY") or "django-insecure-dev-key"
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get("DEBUG", "True") == "True"
+DEBUG = os.environ.get("DEBUG", "True").lower() in {"1", "true", "yes", "on"}
 
 # ============================================
 # ALLOWED_HOSTS - Read from environment
@@ -79,9 +79,10 @@ WSGI_APPLICATION = "disciplinary_program.wsgi.application"
 # ============================================
 # DATABASE CONFIGURATION - Read from .env
 # ============================================
+DATABASE_URL = os.environ.get("DATABASE_URL") or "sqlite:///db.sqlite3"
 DATABASES = {
     "default": dj_database_url.config(
-        default=os.environ.get("DATABASE_URL", "sqlite:///db.sqlite3"),
+        default=DATABASE_URL,
         conn_max_age=600,
         conn_health_checks=True,
     )

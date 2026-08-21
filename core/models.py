@@ -142,6 +142,7 @@ class UserSession(models.Model):
     user_agent = models.TextField(blank=True)
     login_time = models.DateTimeField(auto_now_add=True)
     last_activity = models.DateTimeField(auto_now=True)
+    logged_out_at = models.DateTimeField(null=True, blank=True)
     is_active = models.BooleanField(default=True)
 
     class Meta:
@@ -175,6 +176,7 @@ class DisciplineCategory(models.Model):
         ('TRANSPORT', 'Transport & Travel Offenses'),
         ('ENVIRONMENT', 'Environmental & Sanitation Offenses'),
         ('CRIMINAL', 'Criminal & Legal Offenses'),
+        ('CUSTOM', 'Custom Case'),
     ]
 
     key = models.CharField(max_length=30, choices=CATEGORY_KEYS, unique=True)
@@ -329,11 +331,12 @@ class Student(models.Model):
         if recent_reports.count() < 2:
             return 'stable'
 
+        # Newest report is first. Higher newest points vs oldest = worsening.
         points = [r.points for r in recent_reports]
         if points[0] > points[-1]:
-            return 'improving'
-        elif points[0] < points[-1]:
             return 'worsening'
+        elif points[0] < points[-1]:
+            return 'improving'
         return 'stable'
 
 
@@ -368,7 +371,12 @@ class DisciplineReport(models.Model):
         return f"{self.student.name} - {self.category_name} by {self.reported_by.username}"
 
     def save(self, *args, **kwargs):
-        self.category_name = self.category.name
+        is_create = self.pk is None
+        custom_label = (self.category_name or "").strip()
+        if getattr(self.category, "key", None) == "CUSTOM" and custom_label:
+            self.category_name = custom_label
+        else:
+            self.category_name = self.category.name
         rating_points = {
             'VERY_MINOR': 5,
             'MINOR': 10,
@@ -379,6 +387,8 @@ class DisciplineReport(models.Model):
         base_points = rating_points.get(self.rating, 10)
         self.points = base_points * self.category.risk_weight
         super().save(*args, **kwargs)
+        if not is_create:
+            return
         self.student.update_risk_score()
         self.student.update_last_incident()
         self._notify_class_teacher()
@@ -390,6 +400,7 @@ class DisciplineReport(models.Model):
         from .models import Notification
         class_teachers = User.objects.filter(
             teacher_profile__assigned_stream=self.student.stream,
+            teacher_profile__assigned_form=self.student.form,
             groups__name='ClassTeacher'
         )
         if class_teachers.exists():
@@ -571,7 +582,7 @@ def calculate_risk_trend(student):
 
     points = [r.points for r in recent_reports]
     if points[0] > points[-1]:
-        return 'improving'
-    elif points[0] < points[-1]:
         return 'worsening'
+    elif points[0] < points[-1]:
+        return 'improving'
     return 'stable'

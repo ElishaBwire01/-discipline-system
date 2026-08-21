@@ -1,34 +1,40 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Login - {{ school_name|default:"Disciplinary System" }}{% endblock %}
+{% block title %}Login — {{ school_name|default:"Disciplinary System" }}{% endblock %}
 
 {% block extra_css %}
 <style>
+    body { background: linear-gradient(135deg, #eff6ff 0%, #f5f3ff 100%); }
+
     .login-wrapper {
-        max-width: 420px;
-        margin: 0 auto;
-        padding: 1rem;
+        min-height: calc(100vh - 20px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 1.5rem 1rem;
     }
 
     .login-card {
         background: white;
         border-radius: 24px;
-        padding: 2.5rem;
-        box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+        padding: 2.25rem;
+        box-shadow: 0 20px 60px rgba(37, 99, 235, 0.12);
         border: 1px solid #e5e7eb;
+        width: 100%;
+        max-width: 420px;
     }
 
     .login-brand {
         text-align: center;
-        margin-bottom: 2rem;
+        margin-bottom: 1.75rem;
     }
 
     .login-brand .brand-icon {
         width: 64px;
         height: 64px;
         background: linear-gradient(135deg, #2563eb, #7c3aed);
-        border-radius: 16px;
+        border-radius: 18px;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -39,14 +45,16 @@
     }
 
     .login-brand h1 {
-        font-size: 1.5rem;
+        font-size: 1.4rem;
         font-weight: 800;
         color: #0f172a;
+        margin: 0 0 0.25rem;
     }
 
     .login-brand p {
         color: #64748b;
         font-size: 0.875rem;
+        margin: 0;
     }
 
     .form-group-modern {
@@ -65,14 +73,15 @@
         position: relative;
     }
 
-    .input-wrapper .input-icon {
+    .input-icon {
         position: absolute;
         left: 0.875rem;
         top: 50%;
         transform: translateY(-50%);
         color: #94a3b8;
-        font-size: 1rem;
+        font-size: 0.95rem;
         z-index: 2;
+        pointer-events: none;
     }
 
     .input-wrapper input {
@@ -83,6 +92,8 @@
         font-size: 0.9375rem;
         transition: all 0.3s;
         background: #f8fafc;
+        color: #0f172a;
+        -webkit-appearance: none;
     }
 
     .input-wrapper input:focus {
@@ -101,14 +112,18 @@
         border: none;
         color: #94a3b8;
         cursor: pointer;
-        padding: 0.25rem;
+        padding: 0.375rem;
         z-index: 3;
         transition: color 0.3s;
+        line-height: 1;
+        min-width: 36px;
+        min-height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 
-    .password-toggle:hover {
-        color: #2563eb;
-    }
+    .password-toggle:hover { color: #2563eb; }
 
     .btn-login {
         width: 100%;
@@ -125,6 +140,8 @@
         align-items: center;
         justify-content: center;
         gap: 0.5rem;
+        min-height: 50px;
+        margin-top: 0.25rem;
     }
 
     .btn-login:hover {
@@ -132,11 +149,18 @@
         box-shadow: 0 8px 25px rgba(37, 99, 235, 0.35);
     }
 
+    .btn-login:active { transform: translateY(0); }
+
     .login-footer {
         text-align: center;
-        margin-top: 1.5rem;
-        padding-top: 1.5rem;
+        margin-top: 1.25rem;
+        padding-top: 1.25rem;
         border-top: 1px solid #e5e7eb;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: center;
+        gap: 0.375rem;
     }
 
     .login-footer a {
@@ -146,230 +170,186 @@
         font-size: 0.875rem;
     }
 
-    .login-footer a:hover {
-        text-decoration: underline;
-    }
+    .login-footer a:hover { text-decoration: underline; }
+    .login-footer .divider { color: #cbd5e1; }
 
-    .login-footer .divider {
-        color: #94a3b8;
-        margin: 0 0.5rem;
-    }
-
-    .alert-modern {
+    .alert-banner {
         border-radius: 12px;
         border: none;
         padding: 0.875rem 1rem;
         font-size: 0.875rem;
         display: flex;
-        align-items: center;
-        gap: 0.5rem;
+        align-items: flex-start;
+        gap: 0.625rem;
         margin-bottom: 1rem;
-        animation: slideDown 0.5s ease;
+        animation: slideDown 0.4s ease;
     }
 
     @keyframes slideDown {
-        from { opacity: 0; transform: translateY(-10px); }
+        from { opacity: 0; transform: translateY(-8px); }
         to { opacity: 1; transform: translateY(0); }
     }
 
-    .alert-modern.alert-success {
-        background: #d1fae5;
-        color: #065f46;
-    }
+    .alert-banner.success { background: #d1fae5; color: #065f46; }
+    .alert-banner.warning { background: #fef3c7; color: #92400e; }
+    .alert-banner.danger  { background: #fef2f2; color: #991b1b; }
+    .alert-banner.info    { background: #eff6ff; color: #1e40af; }
+    .alert-banner i       { margin-top: 1px; flex-shrink: 0; }
 
-    .alert-modern.alert-success i {
-        color: #10b981;
-    }
-
-    .alert-modern.alert-warning {
-        background: #fef3c7;
-        color: #92400e;
-    }
-
-    .alert-modern.alert-warning i {
-        color: #f59e0b;
-    }
-
-    .alert-modern.alert-danger {
-        background: #fef2f2;
-        color: #991b1b;
-    }
-
-    .alert-modern.alert-danger i {
-        color: #ef4444;
-    }
-
-    .alert-modern.alert-info {
-        background: #eff6ff;
-        color: #1e40af;
-    }
-
-    .alert-modern.alert-info i {
-        color: #2563eb;
-    }
-
-    .reset-success-banner {
+    .reset-banner {
         background: linear-gradient(135deg, #10b981, #059669);
         color: white;
         border-radius: 12px;
-        padding: 1rem 1.25rem;
-        margin-bottom: 1.5rem;
+        padding: 0.875rem 1rem;
+        margin-bottom: 1.25rem;
         display: none;
-        align-items: center;
+        align-items: flex-start;
         gap: 0.75rem;
-        animation: slideDown 0.5s ease;
+        animation: slideDown 0.4s ease;
     }
 
-    .reset-success-banner.show {
-        display: flex;
-    }
+    .reset-banner.show { display: flex; }
+    .reset-banner i { font-size: 1.25rem; flex-shrink: 0; margin-top: 1px; }
+    .reset-banner strong { display: block; margin-bottom: 0.125rem; }
+    .reset-banner p { margin: 0; font-size: 0.8125rem; opacity: 0.92; }
 
-    .reset-success-banner i {
-        font-size: 1.5rem;
-    }
-
-    .reset-success-banner .banner-content {
-        flex: 1;
-    }
-
-    .reset-success-banner .banner-content strong {
-        display: block;
-        font-size: 1rem;
-    }
-
-    .reset-success-banner .banner-content p {
-        margin: 0;
-        font-size: 0.875rem;
-        opacity: 0.9;
-    }
-
-    .new-password-hint {
+    .hint-box {
         background: #f1f5f9;
         border-radius: 8px;
         padding: 0.5rem 0.75rem;
-        font-size: 0.813rem;
+        font-size: 0.8rem;
         color: #475569;
-        margin-top: 0.25rem;
+        margin-top: 0.375rem;
         display: none;
+        align-items: center;
+        gap: 0.375rem;
     }
-
-    .new-password-hint.show {
-        display: block;
-    }
-
-    .new-password-hint i {
-        color: #10b981;
-        margin-right: 0.5rem;
-    }
+    .hint-box.show { display: flex; }
 
     @media (max-width: 480px) {
-        .login-card { padding: 1.5rem; }
-        .login-brand h1 { font-size: 1.25rem; }
+        .login-card { padding: 1.5rem 1.25rem; border-radius: 20px; }
+        .login-brand h1 { font-size: 1.2rem; }
+        .login-brand .brand-icon { width: 56px; height: 56px; font-size: 1.5rem; }
     }
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="login-wrapper">
-    <div class="login-card" data-aos="fade-up">
+    <div class="login-card">
+        <!-- Brand -->
         <div class="login-brand">
-            <h1>Welcome Back</h1>
+            <div class="brand-icon">
+                <i class="fa-solid fa-scale-balanced"></i>
+            </div>
+            <h1>{{ school_name|default:"Disciplinary System" }}</h1>
             <p>Sign in to your account</p>
         </div>
 
-        <!-- Password Reset Success Banner -->
-        <div class="reset-success-banner {% if reset_approved %}show{% endif %}" id="resetBanner">
-            <div class="banner-content">
-                <p>Your password has been reset by the administrator. Please log in with your new password.</p>
+        <!-- Password reset approved banner -->
+        <div class="reset-banner {% if reset_approved %}show{% endif %}" id="resetBanner">
+            <i class="fa-solid fa-circle-check"></i>
+            <div>
+                <strong>Password reset approved!</strong>
+                <p>Your password has been reset by the administrator. Use your new password to log in.</p>
             </div>
         </div>
 
+        <!-- Flash messages -->
         {% if messages %}
             {% for message in messages %}
-            <div class="alert-modern alert-{{ message.tags }}">
-                {{ message }}
+            <div class="alert-banner {{ message.tags }}">
+                {% if message.tags == 'success' %}<i class="fa-solid fa-circle-check"></i>
+                {% elif message.tags == 'danger' or message.tags == 'error' %}<i class="fa-solid fa-circle-xmark"></i>
+                {% elif message.tags == 'warning' %}<i class="fa-solid fa-triangle-exclamation"></i>
+                {% else %}<i class="fa-solid fa-circle-info"></i>{% endif %}
+                <span>{{ message }}</span>
             </div>
             {% endfor %}
         {% endif %}
 
+        <!-- Error from view -->
         {% if error %}
-        <div class="alert-modern alert-danger">
+        <div class="alert-banner danger">
+            <i class="fa-solid fa-circle-xmark"></i>
+            <span>{{ error }}</span>
         </div>
         {% endif %}
 
-        <form method="post">
+        <!-- Login form -->
+        <form method="post" autocomplete="on">
             {% csrf_token %}
+
             <div class="form-group-modern">
-                <label>Username</label>
+                <label for="username">
+                    <i class="fa-solid fa-user me-1"></i> Username
+                </label>
                 <div class="input-wrapper">
-                    <div class="input-wrapper"><span class="input-icon"><i class="fas fa-user"></i></span><input type="text" name="username" placeholder="Enter username" required autofocus>
+                    <span class="input-icon"><i class="fa-solid fa-user"></i></span>
+                    <input type="text" id="username" name="username"
+                           placeholder="Enter your username"
+                           required autofocus autocomplete="username"
+                           inputmode="text">
                 </div>
             </div>
 
             <div class="form-group-modern">
-                <label>Password</label>
+                <label for="password">
+                    <i class="fa-solid fa-lock me-1"></i> Password
+                </label>
                 <div class="input-wrapper">
-                    <span class="input-icon"><i class="fas fa-lock"></i></span><input type="password" name="password" id="password" placeholder="Enter password" required>
-                    <button type="button" class="password-toggle" onclick="togglePassword()" tabindex="-1">
+                    <span class="input-icon"><i class="fa-solid fa-lock"></i></span>
+                    <input type="password" id="password" name="password"
+                           placeholder="Enter your password"
+                           required autocomplete="current-password">
+                    <button type="button" class="password-toggle"
+                            onclick="togglePassword()" aria-label="Show/hide password">
+                        <i class="fa-solid fa-eye" id="pwEyeIcon"></i>
                     </button>
                 </div>
-                <div class="new-password-hint" id="newPasswordHint">
-                    Use the temporary password sent to you via notification
+                <div class="hint-box" id="resetHint">
+                    <i class="fa-solid fa-circle-info text-primary"></i>
+                    Use the temporary password provided by the administrator.
                 </div>
             </div>
 
-            <i class="fas fa-sign-in-alt"></i> <button type="submit" class="btn-login">
+            <button type="submit" class="btn-login">
+                <i class="fa-solid fa-right-to-bracket"></i>
+                Sign In
             </button>
         </form>
 
+        <!-- Footer links -->
         <div class="login-footer">
+            <a href="/request-reset/">
+                <i class="fa-solid fa-key me-1"></i>Forgot password?
+            </a>
             <span class="divider">|</span>
+            <a href="/register/">
+                <i class="fa-solid fa-user-plus me-1"></i>Register
+            </a>
         </div>
     </div>
 </div>
 
 <script>
-    // ============================================
-    // PASSWORD TOGGLE
-    // ============================================
     function togglePassword() {
         const input = document.getElementById('password');
-        const icon = document.getElementById('passwordIcon');
-        
+        const icon  = document.getElementById('pwEyeIcon');
         if (input.type === 'password') {
             input.type = 'text';
+            icon.classList.replace('fa-eye', 'fa-eye-slash');
         } else {
             input.type = 'password';
+            icon.classList.replace('fa-eye-slash', 'fa-eye');
         }
     }
 
-    // ============================================
-    // CHECK FOR RESET PARAMETER
-    // ============================================
-    const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.get('reset') === 'approved') {
+    // Show reset banner + hint from URL param
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('reset') === 'approved') {
         document.getElementById('resetBanner').classList.add('show');
-        document.getElementById('newPasswordHint').classList.add('show');
-        
-        // Show notification
-        if ('Notification' in window && Notification.permission === 'granted') {
-            new Notification('Password Reset', {
-                body: 'Your password has been reset. Please log in with your new password.',
-                icon: '/static/images/logo.png'
-            });
-        }
+        document.getElementById('resetHint').classList.add('show');
     }
-
-    // ============================================
-    // KEYBOARD SHORTCUTS
-    // ============================================
-    document.addEventListener('keydown', function(e) {
-        // Ctrl+Shift+L for login shortcut
-        if (e.ctrlKey && e.shiftKey && e.key === 'L') {
-            e.preventDefault();
-            document.querySelector('form').submit();
-        }
-    });
-
 </script>
 {% endblock %}

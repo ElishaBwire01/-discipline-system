@@ -260,7 +260,7 @@ def _create_report(request, student, post):
         f"{comments}\n[Custom: {custom_case}]" if custom_case else comments
     )
 
-    report = DisciplineReport.objects.create(
+    report = DisciplineReport(
         student=student,
         reported_by=request.user,
         category=category,
@@ -269,7 +269,7 @@ def _create_report(request, student, post):
     )
     if custom_case:
         report.category_name = custom_case
-        report.save(update_fields=["category_name"])
+    report.save()
 
     rating_label = get_rating_label(rating)
     messages.success(
@@ -358,7 +358,7 @@ def root_redirect(request):
     accidentally pasted into the middle of `_class_teacher_scope` instead.
     """
     if request.user.is_authenticated:
-        return redirect("dashboard_redirect")
+        return redirect("core:dashboard")
     return redirect("/login/")
 
 
@@ -399,10 +399,7 @@ def custom_login(request):
 
             profile = get_teacher_profile(user)
             if profile:
-                if (
-                    not profile.is_approved
-                    and user.groups.filter(name="ClassTeacher").exists()
-                ):
+                if not profile.is_approved and not user.is_superuser:
                     messages.error(request, "Account pending admin approval.")
                     return render(
                         request, "login.html", {"error": "Account pending approval"}
@@ -459,7 +456,8 @@ def custom_logout(request):
     session_key = request.session.session_key
     if session_key:
         UserSession.objects.filter(session_key=session_key).update(
-            logged_out_at=timezone.now()
+            logged_out_at=timezone.now(),
+            is_active=False,
         )
 
     logout(request)
@@ -536,7 +534,7 @@ def register(request):
             group, _ = Group.objects.get_or_create(name=role)
             user.groups.add(group)
 
-            needs_approval = role == "ClassTeacher" and school.require_teacher_approval
+            needs_approval = school.require_teacher_approval
             TeacherProfile.objects.create(
                 user=user,
                 phone_number=phone,
@@ -577,7 +575,7 @@ def choose_stream(request):
     for them even once fixed.
     """
     if not request.user.groups.filter(name="ClassTeacher").exists():
-        return redirect("dashboard_redirect")
+        return redirect("core:dashboard")
 
     profile = get_teacher_profile(request.user)
     if not profile:
@@ -627,7 +625,11 @@ def choose_stream(request):
     return render(
         request,
         "choose_stream.html",
-        {"streams": streams, "forms": forms},
+        {
+            "streams": streams,
+            "forms": forms,
+            **_get_notification_context(request),
+        },
     )
 
 
@@ -640,6 +642,13 @@ def teacher_dashboard(request):
     """Subject/general teacher dashboard: sees all students school-wide (unlike
     a ClassTeacher, who is restricted to their own stream+form).
     """
+    if request.user.is_superuser:
+        return redirect("core:admin_dashboard")
+    if request.user.groups.filter(name="ClassTeacher").exists():
+        return redirect("core:class_teacher_dashboard")
+    if not request.user.groups.filter(name="Teacher").exists():
+        raise PermissionDenied("Teacher access required")
+
     per_page = _paginate_per_page(request)
     streams = _get_active_streams()
 
@@ -720,6 +729,8 @@ def class_teacher_dashboard(request):
     critical_count = base_qs.filter(risk_level="CRITICAL").count()
     warning_count = base_qs.filter(risk_level="WARNING").count()
     good_count = base_qs.filter(risk_level="GOOD").count()
+    avg_risk = base_qs.aggregate(avg=Avg("risk_score"))["avg"] or 0
+    total_reports = sum(s.reports.count() for s in base_qs)
 
     context = {
         "assigned_stream": profile.assigned_stream,
@@ -729,6 +740,15 @@ def class_teacher_dashboard(request):
         "critical_count": critical_count,
         "warning_count": warning_count,
         "good_count": good_count,
+        "total_reports": total_reports,
+        "forms": _get_form_choices(),
+        "class_stats": {
+            "total": total_in_class,
+            "critical": critical_count,
+            "warning": warning_count,
+            "good": good_count,
+            "avg_risk": round(avg_risk, 1),
+        },
         "categories": _get_active_categories(),
         "search_query": search_query,
         "per_page": per_page,
@@ -744,17 +764,25 @@ def admin_dashboard(request):
     Main admin landing page: school-wide stats plus pending-approval counts
     so an admin can see at a glance what needs attention.
     """
-    # Get all active students
-        # Get all students for display with pagination
     from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-    
+
+    if request.method == "POST" and request.POST.get("action") == "report_student":
+        student_id = request.POST.get("student_id")
+        if student_id:
+            student = get_object_or_404(Student, id=student_id, is_active=True)
+            _create_report(request, student, request.POST)
+        return redirect("core:admin_dashboard")
+
     students_list = Student.objects.filter(is_active=True).select_related('stream', 'grade_level')
     total_students = students_list.count()
-    
+    critical_count = students_list.filter(risk_level="CRITICAL").count()
+    warning_count = students_list.filter(risk_level="WARNING").count()
+    good_count = students_list.filter(risk_level="GOOD").count()
+
     # Pagination
     page = request.GET.get('page', 1)
-    per_page = request.GET.get('per_page', 20)
-    
+    per_page = _paginate_per_page(request)
+
     paginator = Paginator(students_list, per_page)
     try:
         students = paginator.page(page)
@@ -762,20 +790,12 @@ def admin_dashboard(request):
         students = paginator.page(1)
     except EmptyPage:
         students = paginator.page(paginator.num_pages)
-    total_students = students_list.count()
-    critical_count = students_list.filter(risk_level="CRITICAL").count()
-    warning_count = students_list.filter(risk_level="WARNING").count()
-    good_count = students_list.filter(risk_level="GOOD").count()
 
     # Admin specific counts
     pending_approvals = TeacherProfile.objects.filter(
         is_approved=False, is_suspended=False
     ).count()
     pending_resets = PasswordReset.objects.filter(status="pending").count()
-    # Get all students for display
-    students_list = Student.objects.filter(is_active=True).select_related('stream', 'grade_level')
-    total_students = students_list.count()
-    
     online_teachers = TeacherProfile.objects.filter(is_online=True).count()
 
     # Get recent reports
@@ -785,12 +805,11 @@ def admin_dashboard(request):
 
     # Build context
     context = {
-        "page_obj": students,  # For pagination
+        "page_obj": students,
         "students": students,
         "total_students": total_students,
         "grade_levels": GradeLevel.objects.filter(is_active=True).order_by("order"),
         "streams": _get_active_streams(),
-        "total_students": total_students,
         "critical_students": critical_count,
         "warning_students": warning_count,
         "good_students": good_count,
@@ -802,7 +821,7 @@ def admin_dashboard(request):
         "recent_reports": recent_reports,
         "avg_risk_score": students_list.aggregate(Avg("risk_score"))["risk_score__avg"] or 0,
         "forms": _get_form_choices(),
-        "forms": _get_form_choices(),
+        "per_page": per_page,
         **_get_notification_context(request),
     }
     return render(request, "admin_dashboard.html", context)
@@ -839,7 +858,7 @@ def student_profile(request, student_id):
         action = request.POST.get("action")
         if action == "report_student":
             _create_report(request, student, request.POST)
-            return redirect("student_profile", student_id=student_id)
+            return redirect("core:student_profile", student_id=student_id)
 
     category_breakdown = (
         reports.values("category__name").annotate(count=Count("id")).order_by("-count")
@@ -914,7 +933,7 @@ def edit_student(request, student_id):
             student.optional_notes = optional_notes
             student.save()
             messages.success(request, f"{student.name} updated successfully.")
-            return redirect("student_profile", student_id=student.id)
+            return redirect("core:student_profile", student_id=student.id)
 
     context = {
         "student": student,
@@ -1822,7 +1841,7 @@ def ai_trend_analysis(request):
             .order_by("reported_at__date")
         )
 
-        total_students_list = Student.objects.filter(is_active=True).count()
+        total_students = Student.objects.filter(is_active=True).count()
         current_critical = Student.objects.filter(
             is_active=True, risk_level="CRITICAL"
         ).count()
@@ -1831,7 +1850,7 @@ def ai_trend_analysis(request):
         ).count()
         current_good = Student.objects.filter(is_active=True, risk_level="GOOD").count()
 
-        improving_students_list = Student.objects.filter(
+        improving_students = Student.objects.filter(
             is_active=True, risk_level="WARNING", intervention_count__gt=0
         ).count()
 
@@ -2176,6 +2195,7 @@ def school_setup(request):
             messages.success(request, "Term deleted!")
             return redirect("core:school_setup")
 
+    last_upload_summary = request.session.pop("last_upload_summary", None)
     context = {
         "school": school,
         "grades": GradeLevel.objects.filter(school=school).order_by("order", "name"),
@@ -2185,6 +2205,8 @@ def school_setup(request):
         "terms": AcademicTerm.objects.filter(school=school).order_by(
             "-year", "-term_number"
         ),
+        "last_upload_summary": last_upload_summary,
+        "last_upload_ai_summary": (last_upload_summary or {}).get("ai_summary"),
         **_get_notification_context(request),
     }
     return render(request, "school_setup.html", context)
@@ -2268,20 +2290,82 @@ def _normalize_admission(raw):
 
 def _match_known_token(token, known_values):
     """Case-insensitive exact/substring match of `token` against known DB values (streams/grades)."""
-    token_lower = token.strip().lower()
+    if token is None:
+        return None
+    token_lower = str(token).strip().lower()
+    if not token_lower:
+        return None
     for value in known_values:
-        if value.lower() == token_lower:
-            return value
+        value_str = str(value).strip()
+        if value_str.lower() == token_lower:
+            return value_str
     for value in known_values:
-        if value.lower() in token_lower or token_lower in value.lower():
-            return value
+        value_str = str(value).strip()
+        if value_str.lower() in token_lower or token_lower in value_str.lower():
+            return value_str
     return None
 
 
+def _normalize_grade_name(value):
+    """Convert uploaded forms like 'Grade 8', 'form ten', or '8' into a canonical GradeLevel name."""
+    if value is None:
+        return "Form 1"
+    text = str(value).strip()
+    if not text:
+        return "Form 1"
+    lowered = text.lower()
+
+    form_patterns = {
+        "Form 1": [r"\bform\s*1\b", r"\bf1\b", r"\bgrade\s*1\b", r"\bclass\s*1\b", r"\b1st\s*form\b", r"\bform\s+one\b", r"\bone\b"],
+        "Form 2": [r"\bform\s*2\b", r"\bf2\b", r"\bgrade\s*2\b", r"\bclass\s*2\b", r"\b2nd\s*form\b", r"\bform\s+two\b", r"\btwo\b"],
+        "Form 3": [r"\bform\s*3\b", r"\bf3\b", r"\bgrade\s*3\b", r"\bclass\s*3\b", r"\b3rd\s*form\b", r"\bform\s+three\b", r"\bthree\b"],
+        "Form 4": [r"\bform\s*4\b", r"\bf4\b", r"\bgrade\s*4\b", r"\bclass\s*4\b", r"\b4th\s*form\b", r"\bform\s+four\b", r"\bfour\b"],
+        "Form 5": [r"\bform\s*5\b", r"\bf5\b", r"\bgrade\s*5\b", r"\bclass\s*5\b", r"\b5th\s*form\b", r"\bform\s+five\b", r"\bfive\b"],
+        "Form 6": [r"\bform\s*6\b", r"\bf6\b", r"\bgrade\s*6\b", r"\bclass\s*6\b", r"\b6th\s*form\b", r"\bform\s+six\b", r"\bsix\b"],
+        "Form 7": [r"\bform\s*7\b", r"\bf7\b", r"\bgrade\s*7\b", r"\bclass\s*7\b", r"\b7th\s*form\b", r"\bform\s+seven\b", r"\bseven\b"],
+        "Form 8": [r"\bform\s*8\b", r"\bf8\b", r"\bgrade\s*8\b", r"\bclass\s*8\b", r"\b8th\s*form\b", r"\bform\s+eight\b", r"\beight\b"],
+        "Form 9": [r"\bform\s*9\b", r"\bf9\b", r"\bgrade\s*9\b", r"\bclass\s*9\b", r"\b9th\s*form\b", r"\bform\s+nine\b", r"\bnine\b"],
+        "Form 10": [r"\bform\s*10\b", r"\bf10\b", r"\bgrade\s*10\b", r"\bclass\s*10\b", r"\b10th\s*form\b", r"\bform\s+ten\b", r"\bten\b"],
+    }
+    for grade_name, patterns in form_patterns.items():
+        if any(re.search(pattern, lowered) for pattern in patterns):
+            return grade_name
+
+    numeric_match = re.search(r"\b(\d{1,2})\b", text)
+    if numeric_match:
+        number = int(numeric_match.group(1))
+        if 1 <= number <= 10:
+            return f"Form {number}"
+
+    return text if text.startswith("Form ") else f"Form {text}"
+
+
+def _normalize_stream_name(value, known_streams=None):
+    """Normalize a stream label and prefer a known DB value when one matches."""
+    if value is None:
+        return "Unassigned"
+    text = str(value).strip()
+    if not text:
+        return "Unassigned"
+    if known_streams:
+        match = _match_known_token(text, known_streams)
+        if match:
+            return match
+    cleaned = re.sub(r"\s+", " ", text).strip(" -_|,;:/")
+    return cleaned or "Unassigned"
+
+
 def _detect_grade_in_text(text, known_grades):
+    if not text:
+        return None
+    normalized = _normalize_grade_name(text)
+    if normalized and normalized.startswith("Form "):
+        return normalized
     match = _match_known_token(text, known_grades)
     if match:
-        return match
+        normalized_match = _normalize_grade_name(match)
+        if normalized_match:
+            return normalized_match
     patterns = {
         "Form 1": [
             r"form\s*1\b",
@@ -2311,6 +2395,12 @@ def _detect_grade_in_text(text, known_grades):
             r"4th\s*form",
             r"form\s+four",
         ],
+        "Form 5": [r"form\s*5\b", r"\bf5\b", r"grade\s*5\b", r"5th\s*form", r"form\s+five"],
+        "Form 6": [r"form\s*6\b", r"\bf6\b", r"grade\s*6\b", r"6th\s*form", r"form\s+six"],
+        "Form 7": [r"form\s*7\b", r"\bf7\b", r"grade\s*7\b", r"7th\s*form", r"form\s+seven"],
+        "Form 8": [r"form\s*8\b", r"\bf8\b", r"grade\s*8\b", r"8th\s*form", r"form\s+eight"],
+        "Form 9": [r"form\s*9\b", r"\bf9\b", r"grade\s*9\b", r"9th\s*form", r"form\s+nine"],
+        "Form 10": [r"form\s*10\b", r"\bf10\b", r"grade\s*10\b", r"10th\s*form", r"form\s+ten"],
     }
     for grade, pats in patterns.items():
         if any(re.search(p, text.lower()) for p in pats):
@@ -2427,16 +2517,14 @@ def extract_from_excel(df, known_streams=None, known_grades=None):
 
             grade = (
                 _detect_grade_in_text(grade_raw, known_grades) if grade_raw else None
-            )
-            stream = (
-                _match_known_token(stream_raw, known_streams) if stream_raw else None
-            )
+            ) or _normalize_grade_name(grade_raw)
+            stream = _normalize_stream_name(stream_raw, known_streams)
 
             student_data = {
                 "name": name,
                 "admission": admission,
-                "grade": grade or grade_raw or default_grade,
-                "stream": stream or stream_raw or default_stream,
+                "grade": grade or default_grade,
+                "stream": stream or default_stream,
             }
             if year_raw:
                 student_data["year"] = year_raw
@@ -2519,18 +2607,96 @@ def _read_uploaded_text(upload_file):
     return raw.decode("utf-8", errors="replace")
 
 
+def build_upload_summary(rows):
+    """Build a structured summary for preview and reporting before saving rows."""
+    rows = list(rows or [])
+    preview_rows = []
+    seen = {}
+    duplicate_admission_count = 0
+
+    for row in rows:
+        admission = str(row.get("admission") or "").strip()
+        if not admission:
+            admission = "UNKNOWN"
+        item = {
+            "name": str(row.get("name") or "").strip(),
+            "admission": admission,
+            "grade": str(row.get("grade") or "").strip() or "Form 1",
+            "stream": str(row.get("stream") or "").strip() or "Unassigned",
+            "year": row.get("year") or "",
+            "notes": row.get("notes") or "",
+        }
+        preview_rows.append(item)
+        if admission in seen:
+            duplicate_admission_count += 1
+        else:
+            seen[admission] = True
+
+    summary = {
+        "total_rows": len(rows),
+        "unique_admissions": len(seen),
+        "duplicate_admission_count": duplicate_admission_count,
+        "preview_rows": preview_rows[:10],
+        "preview_has_more": len(preview_rows) > 10,
+    }
+    return summary
+
+
+def build_import_summary_message(summary):
+    """Generate a friendly message describing upload results for admin feedback."""
+    if not summary:
+        return "Import processed successfully."
+    duplicates = summary.get("duplicate_admission_count", 0)
+    new_rows = summary.get("unique_admissions", 0)
+    if duplicates:
+        return (
+            f"Imported {new_rows} unique student records and skipped {duplicates} duplicate admission number(s)."
+        )
+    return f"Imported {new_rows} student records successfully."
+
+
+def build_ai_upload_summary(summary):
+    """Create a concise AI-style summary for administrators after import."""
+    if not summary:
+        return "The spreadsheet import finished without producing a summary."
+
+    total_rows = summary.get("total_rows", 0)
+    unique = summary.get("unique_admissions", 0)
+    duplicates = summary.get("duplicate_admission_count", 0)
+    preview_rows = summary.get("preview_rows") or []
+    preview_contains_more = summary.get("preview_has_more", False)
+
+    parts = [
+        f"Reviewed {total_rows} rows from the uploaded file.",
+        f"Kept {unique} unique admission numbers for import.",
+    ]
+    if duplicates:
+        parts.append(f"Detected {duplicates} duplicate admission number(s) and skipped them.")
+    if preview_rows:
+        first = preview_rows[0]
+        parts.append(
+            f"Sample preview begins with {first.get('name', 'student')} ({first.get('admission', 'N/A')}) in {first.get('grade', 'Form 1')} / {first.get('stream', 'Unassigned')}."
+        )
+    if preview_contains_more:
+        parts.append("More rows are available in the upload preview for review.")
+    return " ".join(parts)
+
+
 @login_required
 @user_passes_test(admin_required)
-@transaction.atomic
 def bulk_upload_students(request):
+    """
+    PHASE 1 — Parse the uploaded file, run AI analysis on the data,
+    store the pending rows in the session, then redirect to the
+    confirmation page so the admin can review before anything is saved.
+    """
     if request.method != "POST" or not request.FILES.get("upload_file"):
-        return redirect("/admin-dashboard/")
+        return redirect("core:school_setup")
 
     upload_file = request.FILES["upload_file"]
     file_name = upload_file.name.lower()
     ext = os.path.splitext(file_name)[1]
 
-    # FIX (SECURITY ISSUE 3): validate size and extension BEFORE parsing.
     if ext not in _ALLOWED_UPLOAD_EXTENSIONS:
         messages.error(
             request,
@@ -2557,54 +2723,188 @@ def bulk_upload_students(request):
         students_data = []
 
         if file_name.endswith((".xlsx", ".xls")):
-            # Read every sheet, not just the first - scattered data sometimes
-            # lands on "Sheet2" or a renamed tab.
             sheets = pd.read_excel(upload_file, sheet_name=None, dtype=str)
             for _sheet_name, df in sheets.items():
                 if df.empty:
                     continue
-                students_data.extend(
-                    extract_from_excel(df, known_streams, known_grades)
-                )
+                students_data.extend(extract_from_excel(df, known_streams, known_grades))
         elif file_name.endswith(".csv"):
             df = pd.read_csv(upload_file, dtype=str)
             students_data.extend(extract_from_excel(df, known_streams, known_grades))
         else:
             content = _read_uploaded_text(upload_file)
-            students_data.extend(
-                extract_from_text(content, known_streams, known_grades)
-            )
+            students_data.extend(extract_from_text(content, known_streams, known_grades))
 
         if not students_data:
             messages.error(
                 request,
-                "No valid student data could be found in that file. Make sure each row/line "
-                "has at least a name and an admission number.",
+                "No valid student data could be found in that file. "
+                "Make sure each row/line has at least a name and an admission number.",
             )
             return redirect("/admin-dashboard/")
 
-        # De-duplicate admission numbers *within this batch* before touching the DB.
+        # De-duplicate within the batch
         deduped = {}
         batch_duplicates = 0
         for row in students_data:
             key = row["admission"]
             if key in deduped:
                 batch_duplicates += 1
-                continue
-            deduped[key] = row
+            else:
+                deduped[key] = row
         students_data = list(deduped.values())
 
-        # FIX (OPTIMIZATION 4 / IMPROVEMENT via bulk_create): resolve/create
-        # grades and streams first, then batch-create the new students in a
-        # single query instead of one INSERT per row.
-        grade_cache = {}
+        # Find which streams/grades would be NEW (don't exist yet)
+        existing_stream_names = set(known_streams)
+        existing_grade_names  = set(known_grades)
+        existing_admissions   = set(
+            Student.objects.filter(
+                admission_number__in=[r["admission"] for r in students_data]
+            ).values_list("admission_number", flat=True)
+        )
+
+        new_streams = sorted({
+            _normalize_stream_name(r.get("stream") or "Unassigned", known_streams)
+            for r in students_data
+            if _normalize_stream_name(r.get("stream") or "Unassigned", known_streams)
+               not in existing_stream_names
+            and _normalize_stream_name(r.get("stream") or "Unassigned", known_streams) != "Unassigned"
+        })
+        new_grades = sorted({
+            _normalize_grade_name(r.get("grade") or "Form 1")
+            for r in students_data
+            if _normalize_grade_name(r.get("grade") or "Form 1") not in existing_grade_names
+        })
+
+        # Build an AI narrative about what was found in the file
+        ai_analysis = _build_upload_ai_analysis(
+            students_data, new_streams, new_grades,
+            batch_duplicates, existing_admissions,
+        )
+
+        # Store everything in the session for phase 2
+        request.session["bulk_upload_pending"] = {
+            "rows": students_data,
+            "new_streams": new_streams,
+            "new_grades": new_grades,
+            "batch_duplicates": batch_duplicates,
+            "already_existed": list(existing_admissions),
+            "ai_analysis": ai_analysis,
+            "file_name": upload_file.name,
+            "generated_at": timezone.now().isoformat(),
+        }
+
+    except (ValueError, TypeError) as e:
+        messages.error(request, f"Error processing file: {e}")
+        return redirect("/admin-dashboard/")
+
+    return redirect("/bulk-upload-confirm/")
+
+
+def _build_upload_ai_analysis(students_data, new_streams, new_grades,
+                               batch_duplicates, existing_admissions):
+    """
+    Build a structured AI-style analysis of the parsed upload.
+    Returns a dict with keys: summary, warnings, suggestions, issues.
+    """
+    total = len(students_data)
+    skipped = len(existing_admissions)
+    new_count = total - skipped
+
+    # Detect streams that look like typos of each other
+    all_streams = [r.get("stream") or "Unassigned" for r in students_data]
+    stream_counts = {}
+    for s in all_streams:
+        stream_counts[s] = stream_counts.get(s, 0) + 1
+
+    # Detect rows with missing/defaulted data
+    missing_stream = sum(1 for r in students_data if not r.get("stream") or r.get("stream") == "Unassigned")
+    missing_grade  = sum(1 for r in students_data if not r.get("grade"))
+    missing_year   = sum(1 for r in students_data if not r.get("year"))
+
+    warnings = []
+    suggestions = []
+    issues = []
+
+    if missing_stream:
+        issues.append(f"{missing_stream} student(s) have no stream assigned — they will be placed in 'Unassigned'.")
+        suggestions.append("Add a 'Stream' or 'Class' column to your file to avoid manual re-assignment later.")
+    if missing_grade:
+        issues.append(f"{missing_grade} student(s) have no form/grade — they will default to Form 1.")
+        suggestions.append("Add a 'Form' or 'Grade' column to ensure correct class placement.")
+    if missing_year:
+        warnings.append(f"{missing_year} student(s) have no year — the current year ({timezone.now().year}) will be used.")
+    if batch_duplicates:
+        warnings.append(f"{batch_duplicates} duplicate admission number(s) found within the file and will be skipped.")
+    if skipped:
+        warnings.append(f"{skipped} student(s) already exist in the system and will be skipped.")
+    if new_streams:
+        suggestions.append(
+            f"The following streams are NEW and will be created automatically: {', '.join(new_streams)}. "
+            "Confirm these are correct names before proceeding."
+        )
+    if new_grades:
+        suggestions.append(
+            f"The following grade levels are NEW and will be created automatically: {', '.join(new_grades)}."
+        )
+
+    summary = (
+        f"Analysed {total} student records from the file. "
+        f"{new_count} are new and ready to import"
+        + (f", {skipped} already exist and will be skipped" if skipped else "")
+        + (f", {batch_duplicates} duplicates inside the file will be skipped" if batch_duplicates else "")
+        + "."
+    )
+
+    return {
+        "summary": summary,
+        "warnings": warnings,
+        "suggestions": suggestions,
+        "issues": issues,
+        "stream_breakdown": sorted(stream_counts.items(), key=lambda x: -x[1]),
+        "total_new": new_count,
+        "total_skip": skipped,
+    }
+
+
+@login_required
+@user_passes_test(admin_required)
+def bulk_upload_confirm(request):
+    """
+    PHASE 2A — Show the confirmation page with the AI analysis.
+    GET: render the preview.
+    POST with action=confirm: actually save the students.
+    POST with action=cancel: discard and return to dashboard.
+    """
+    pending = request.session.get("bulk_upload_pending")
+    if not pending:
+        messages.warning(request, "No pending upload found. Please upload a file first.")
+        return redirect("/admin-dashboard/")
+
+    if request.method == "POST":
+        action = request.POST.get("action", "cancel")
+
+        if action == "cancel":
+            request.session.pop("bulk_upload_pending", None)
+            messages.info(request, "Upload cancelled.")
+            return redirect("/admin-dashboard/")
+
+        # ── action == "confirm" ── actually save
+        school = School.objects.first()
+        if not school:
+            messages.error(request, "Please set up your school first.")
+            return redirect("core:school_setup")
+
+        students_data   = pending["rows"]
+        already_existed = set(pending["already_existed"])
+
+        grade_cache  = {}
         stream_cache = {}
 
         def get_or_create_grade(name):
             if name not in grade_cache:
                 grade_cache[name], _ = GradeLevel.objects.get_or_create(
-                    school=school,
-                    name=name,
+                    school=school, name=name,
                     defaults={"code": name[:3].upper(), "order": 0, "is_active": True},
                 )
             return grade_cache[name]
@@ -2612,85 +2912,80 @@ def bulk_upload_students(request):
         def get_or_create_stream(name):
             if name not in stream_cache:
                 stream_cache[name], _ = Stream.objects.get_or_create(
-                    school=school,
-                    name=name,
+                    school=school, name=name,
                     defaults={"code": name[:3].upper(), "is_active": True},
                 )
             return stream_cache[name]
 
-        existing_admissions = set(
-            Student.objects.filter(
-                admission_number__in=[row["admission"] for row in students_data]
-            ).values_list("admission_number", flat=True)
-        )
-
         new_students = []
-        errors = []
-        already_existed = len(existing_admissions)
+        errors       = []
 
-        for student_data in students_data:
-            if student_data["admission"] in existing_admissions:
-                continue
-            try:
-                grade_name = student_data.get("grade") or "Form 1"
-                grade = get_or_create_grade(grade_name)
-                stream_name = student_data.get("stream") or "Unassigned"
-                stream = get_or_create_stream(stream_name)
-
-                year_value = student_data.get("year")
+        with transaction.atomic():
+            for row in students_data:
+                if row["admission"] in already_existed:
+                    continue
                 try:
-                    year_value = int(year_value) if year_value else timezone.now().year
-                except (ValueError, TypeError):
-                    year_value = timezone.now().year
+                    grade_name  = _normalize_grade_name(row.get("grade") or "Form 1")
+                    grade       = get_or_create_grade(grade_name)
+                    stream_name = _normalize_stream_name(
+                        row.get("stream") or "Unassigned",
+                        list(Stream.objects.filter(is_active=True).values_list("name", flat=True)),
+                    )
+                    stream = get_or_create_stream(stream_name)
 
-                new_students.append(
-                    Student(
-                        admission_number=student_data["admission"],
-                        name=student_data["name"],
+                    try:
+                        year_value = int(row["year"]) if row.get("year") else timezone.now().year
+                    except (ValueError, TypeError):
+                        year_value = timezone.now().year
+
+                    new_students.append(Student(
+                        admission_number=row["admission"],
+                        name=row["name"],
                         stream=stream,
                         grade_level=grade,
                         form=grade_name,
                         year=year_value,
-                        optional_notes=student_data.get("notes", ""),
+                        optional_notes=row.get("notes", ""),
                         created_by=request.user,
                         is_active=True,
-                    )
-                )
-            except (ValueError, TypeError, KeyError) as row_error:
-                errors.append(f'{student_data.get("admission", "?")}: {row_error}')
+                    ))
+                except (ValueError, TypeError, KeyError) as row_err:
+                    errors.append(f'{row.get("admission", "?")}: {row_err}')
 
-        Student.objects.bulk_create(new_students, batch_size=500)
+            batch_size = 500
+            for start in range(0, len(new_students), batch_size):
+                Student.objects.bulk_create(
+                    new_students[start: start + batch_size],
+                    batch_size=batch_size,
+                )
+
         added = len(new_students)
         invalidate_lookup_caches()
+        request.session.pop("bulk_upload_pending", None)
 
         if added:
-            messages.success(request, f"Successfully added {added} students.")
+            messages.success(request, f"Successfully imported {added} student(s).")
         if already_existed:
-            messages.info(
-                request,
-                f"{already_existed} rows matched an admission number already in the system and were skipped.",
-            )
-        if batch_duplicates:
-            messages.info(
-                request,
-                f"{batch_duplicates} duplicate rows within the file itself were skipped.",
-            )
-        if errors:
-            for error in errors[:5]:
-                messages.warning(request, error)
-            if len(errors) > 5:
-                messages.warning(request, f"and {len(errors) - 5} more row errors.")
-        if not added and not already_existed and not errors:
-            messages.warning(
-                request, "The file was read but no new students were identified."
-            )
+            messages.info(request, f"{len(already_existed)} student(s) already existed and were skipped.")
+        if pending.get("batch_duplicates"):
+            messages.info(request, f"{pending['batch_duplicates']} duplicate admission(s) in the file were skipped.")
+        if pending.get("new_streams"):
+            messages.success(request, f"New streams created: {', '.join(pending['new_streams'])}.")
+        if pending.get("new_grades"):
+            messages.success(request, f"New grade levels created: {', '.join(pending['new_grades'])}.")
+        for err in errors[:5]:
+            messages.warning(request, err)
+        if len(errors) > 5:
+            messages.warning(request, f"…and {len(errors) - 5} more row errors.")
 
-    except (ValueError, TypeError) as e:
-        messages.error(request, f"Error processing file: {e}")
+        return redirect("/admin-dashboard/")
 
-    return redirect("/admin-dashboard/")
+    # GET — render confirmation page
+    return render(request, "bulk_upload_preview.html", {"pending": pending})
 
 
+@login_required
+@user_passes_test(admin_required)
 def generate_excel_template(request):
     """Generate an Excel template for bulk upload."""
     response = HttpResponse(
@@ -2715,6 +3010,8 @@ def generate_excel_template(request):
     return response
 
 
+@login_required
+@user_passes_test(admin_required)
 def download_text_template(request):
     """Generate a text-file template for bulk upload."""
     response = HttpResponse(content_type="text/plain")
@@ -2746,10 +3043,12 @@ def download_text_template(request):
 @login_required
 def ai_chat_page(request):
     """Render the AI Chat page."""
-    students_list = Student.objects.filter(is_active=True).select_related("stream")
+    students_list = Student.objects.filter(is_active=True).select_related("stream").order_by("name")
     context = {
         "streams": _get_active_streams(),
+        "students": students_list,
         "total_students": students_list.count(),
+        **_get_notification_context(request),
     }
     return render(request, "ai_chat.html", context)
 
@@ -2879,7 +3178,7 @@ def ai_predictive_analysis(request):
         students_list = Student.objects.filter(is_active=True)
         predictions = []
 
-        for student in students:
+        for student in students_list:
             reports = student.reports.order_by("reported_at")
             total_reports = reports.count()
             if total_reports == 0:
@@ -3567,23 +3866,27 @@ def approve_reset(request, reset_id):
     user.save()
 
     reset.status = "approved"
-    reset.approved_at = timezone.now()
-    reset.approved_by = request.user
-    reset.save()
+    reset.resolved_at = timezone.now()
+    reset.resolved_by = request.user
+    reset.new_password = ""
+    reset.save(update_fields=["status", "resolved_at", "resolved_by", "new_password"])
 
     notification = Notification.objects.create(
         title="Password Reset Approved",
         message=(
-            f"Your password has been reset by an administrator.\n"
+            "Your password has been reset by an administrator.\n"
             f"Your new temporary password is: {new_password}\n"
-            "Please log in and change it immediately from your profile settings."
+            "Please log in and change it immediately from your profile settings. "
+            "This message is the only copy of the password."
         ),
         notification_type="warning",
     )
     notification.target_users.add(user)
 
     messages.success(
-        request, f"Password reset for {user.username} approved and delivered via notification."
+        request,
+        f"Password reset for {user.username} approved. "
+        f"Temporary password (share once, then they should change it): {new_password}",
     )
     return redirect("core:admin_reset_requests")
 
@@ -3594,10 +3897,10 @@ def approve_reset(request, reset_id):
 def deny_reset(request, reset_id):
     """Deny a pending password-reset request."""
     reset = get_object_or_404(PasswordReset, id=reset_id, status="pending")
-    reset.status = "denied"
-    reset.approved_by = request.user
-    reset.approved_at = timezone.now()
-    reset.save()
+    reset.status = "rejected"
+    reset.resolved_by = request.user
+    reset.resolved_at = timezone.now()
+    reset.save(update_fields=["status", "resolved_by", "resolved_at"])
     messages.success(request, f"Reset request for {reset.user.username} denied.")
     return redirect("core:admin_reset_requests")
 
@@ -3642,7 +3945,7 @@ def export_summary_report(request):
     """Export a school-wide summary report (CSV) with headline statistics,
     a stream breakdown, a form breakdown, and the ten most recent reports."""
     try:
-        total_students_list = Student.objects.filter(is_active=True).count()
+        total_students = Student.objects.filter(is_active=True).count()
         total_reports = DisciplineReport.objects.count()
         critical = Student.objects.filter(is_active=True, risk_level="CRITICAL").count()
         warning = Student.objects.filter(is_active=True, risk_level="WARNING").count()
@@ -4499,42 +4802,73 @@ def media_test(request):
 @login_required
 def add_student(request):
     """Add a new student to the system."""
-    # Check permissions
-    if not request.user.is_superuser and not request.user.groups.filter(name__in=['Admin', 'Teacher']).exists():
+    is_class_teacher = request.user.groups.filter(name="ClassTeacher").exists()
+    is_teacher = request.user.groups.filter(name="Teacher").exists()
+    if not request.user.is_superuser and not is_teacher and not is_class_teacher:
         messages.error(request, "You don't have permission to add students.")
-        return redirect('core:dashboard')
+        return redirect("core:dashboard")
 
-    # Get data for dropdowns
+    profile = get_teacher_profile(request.user)
     school = School.objects.first()
-    streams = Stream.objects.filter(school=school, is_active=True).order_by('name') if school else Stream.objects.filter(is_active=True).order_by('name')
-    grade_levels = GradeLevel.objects.filter(is_active=True).order_by('order')
+    streams = (
+        Stream.objects.filter(school=school, is_active=True).order_by("name")
+        if school
+        else Stream.objects.filter(is_active=True).order_by("name")
+    )
+    grade_levels = GradeLevel.objects.filter(is_active=True).order_by("order")
     forms = Student.FORM_CHOICES
 
-    if request.method == 'POST':
-        # Create student
+    if is_class_teacher and not request.user.is_superuser:
+        if not profile or not profile.has_chosen_stream or not profile.assigned_stream_id:
+            messages.error(request, "Choose your class before adding students.")
+            return redirect("core:choose_stream")
+        streams = Stream.objects.filter(id=profile.assigned_stream_id)
+
+    form_context = {
+        "streams": streams,
+        "grade_levels": grade_levels,
+        "forms": forms,
+        "lock_class": is_class_teacher and not request.user.is_superuser,
+        "assigned_form": getattr(profile, "assigned_form", "") if profile else "",
+    }
+
+    if request.method == "POST":
+        admission_number = request.POST.get("admission_number", "").strip()
+        name = request.POST.get("name", "").strip()
+        stream_id = request.POST.get("stream")
+        grade_level_id = request.POST.get("grade_level")
+        form = request.POST.get("form")
+        optional_notes = request.POST.get("optional_notes", "").strip()
+
         try:
-            admission_number = request.POST.get('admission_number', '').strip()
-            name = request.POST.get('name', '').strip()
-            stream_id = request.POST.get('stream')
-            grade_level_id = request.POST.get('grade_level')
-            form = request.POST.get('form')
-            year = request.POST.get('year', timezone.now().year)
-            optional_notes = request.POST.get('optional_notes', '').strip()
+            year = int(request.POST.get("year") or timezone.now().year)
+        except (ValueError, TypeError):
+            year = timezone.now().year
 
-            # Validate
-            if not admission_number or not name:
-                messages.error(request, "Admission number and name are required.")
-                return render(request, 'add_student.html', {
-                    'streams': streams,
-                    'grade_levels': grade_levels,
-                    'forms': forms,
-                })
+        if is_class_teacher and not request.user.is_superuser:
+            stream_id = str(profile.assigned_stream_id)
+            form = profile.assigned_form
 
-            # Get stream
-            stream = Stream.objects.get(id=stream_id) if stream_id else None
-            grade_level = GradeLevel.objects.get(id=grade_level_id) if grade_level_id else None
+        if not admission_number or not name:
+            messages.error(request, "Admission number and name are required.")
+            return render(request, "add_student.html", form_context)
+        if not stream_id:
+            messages.error(request, "Please select a stream.")
+            return render(request, "add_student.html", form_context)
+        if not form:
+            messages.error(request, "Please select a form.")
+            return render(request, "add_student.html", form_context)
+        if Student.objects.filter(admission_number=admission_number).exists():
+            messages.error(request, "A student with that admission number already exists.")
+            return render(request, "add_student.html", form_context)
 
-            # Create student
+        try:
+            stream = Stream.objects.get(id=stream_id, is_active=True)
+            grade_level = (
+                GradeLevel.objects.get(id=grade_level_id, is_active=True)
+                if grade_level_id
+                else None
+            )
             student = Student.objects.create(
                 admission_number=admission_number,
                 name=name,
@@ -4543,70 +4877,176 @@ def add_student(request):
                 form=form,
                 year=year,
                 optional_notes=optional_notes,
-                created_by=request.user
+                created_by=request.user,
             )
-
             messages.success(request, f"Student '{student.name}' added successfully!")
-            return redirect('core:student_profile', student_id=student.id)
-
+            return redirect("core:student_profile", student_id=student.id)
+        except Stream.DoesNotExist:
+            messages.error(request, "Invalid stream selected.")
+        except GradeLevel.DoesNotExist:
+            messages.error(request, "Invalid grade selected.")
         except Exception as e:
             messages.error(request, f"Error adding student: {e}")
-            return render(request, 'add_student.html', {
-                'streams': streams,
-                'grade_levels': grade_levels,
-                'forms': forms,
-            })
+        return render(request, "add_student.html", form_context)
 
-    # GET request - render the form with all dropdown data
-    return render(request, 'add_student.html', {
-        'streams': streams,
-        'grade_levels': grade_levels,
-        'forms': forms,
-    })
+    return render(request, "add_student.html", form_context)
 
-# ============================================
-# UPDATED: Password Reset Request with Redirect
-# ============================================
 
-@never_cache
-@rate_limited("password_reset_request", limit=5, window_seconds=600)
-# ============================================
-# RESET SENT PAGE
-# ============================================
 def reset_sent(request):
     """Show pending approval page with auto-redirect."""
     return render(request, "reset_request_sent.html")
 
-# ============================================
-# UPDATED: Approve Reset with Auto-Redirect
-# ============================================
 
-@login_required
-@user_passes_test(admin_required)
-@require_POST
-# ============================================
-# RESET SENT PAGE
-# ============================================
-# ============================================
-# RESET STATUS API (for auto-refresh)
-# ============================================
 @login_required
 def reset_status_api(request):
     """Check if a password reset has been approved for the current user."""
     try:
-        # Check for the most recent pending reset for the user
         reset = PasswordReset.objects.filter(
             user=request.user,
-            status__in=['pending', 'approved']
-        ).order_by('-requested_at').first()
-        
+            status__in=["pending", "approved"],
+        ).order_by("-requested_at").first()
+
         if reset:
             return JsonResponse({
-                'status': reset.status,
-                'reset_id': reset.id,
-                'requested_at': reset.requested_at.isoformat(),
-                'approved_at': reset.approved_at.isoformat() if reset.approved_at else None
+                "status": reset.status,
+                "reset_id": reset.id,
+                "requested_at": reset.requested_at.isoformat(),
+                "approved_at": reset.resolved_at.isoformat() if reset.resolved_at else None,
             })
-        return JsonResponse({'status': 'none'})
+        return JsonResponse({"status": "none"})
     except Exception as e:
-        return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+        return JsonResponse({"status": "error", "message": str(e)}, status=500)
+
+
+# ============================================
+# ADMIN ENGINEERING AGENT VIEWS
+# ============================================
+
+
+@login_required
+@user_passes_test(admin_required)
+def admin_agent_page(request):
+    """Render the Admin Engineering Agent page — superusers only."""
+    from .models import School
+    school = School.objects.first()
+    context = {
+        "streams": _get_active_streams(),
+        "school": school,
+        **_get_notification_context(request),
+    }
+    return render(request, "admin_agent.html", context)
+
+
+@login_required
+@user_passes_test(admin_required)
+@rate_limited("admin_agent_chat", limit=60, window_seconds=60)
+def admin_agent_chat_api(request):
+    """
+    Chat endpoint for the admin engineering agent.
+    POST body: {message: str, history: [...], mode: str}
+    """
+    if request.method != "POST":
+        return JsonResponse({"error": "Method not allowed"}, status=405)
+    try:
+        data = json.loads(request.body)
+    except json.JSONDecodeError:
+        return JsonResponse({"error": "Invalid JSON"}, status=400)
+
+    user_message = data.get("message", "").strip()
+    history      = data.get("history", [])
+    mode         = data.get("mode", "INSPECT").upper()
+
+    if user_message and mode not in {"INSPECT", "ANALYSIS", "REPAIR", "TEST", "INCIDENT"}:
+        mode = "INSPECT"
+
+    if not user_message:
+        return JsonResponse({"error": "Message is required."}, status=400)
+
+    try:
+        from .admin_agent import AdminAgent
+        agent  = AdminAgent()
+        result = agent.chat(user_message=user_message, conversation_history=history, mode=mode)
+        return JsonResponse({
+            "success":      result["success"],
+            "response":     result.get("response", ""),
+            "action":       result.get("action"),
+            "provider":     result.get("provider"),
+            "tool_calls":   result.get("tool_calls", []),
+            "think_steps":  result.get("think_steps", []),
+            "audit":        result.get("audit", []),
+            "intent":       result.get("intent", ""),
+            "replan_count": result.get("replan_count", 0),
+            "mode":         mode,
+        })
+    except Exception as e:
+        logger.exception("Admin agent chat failed")
+        return JsonResponse({"success": False, "error": str(e)}, status=500)
+
+
+@login_required
+@user_passes_test(admin_required)
+def admin_agent_execute_api(request):
+    """
+    Execute a confirmed action from the admin agent.
+    POST body: {action_type: str, params: dict}
+    """
+    if request.method != "POST":
+        return JsonResponse({"error": "Method not allowed"}, status=405)
+    try:
+        data = json.loads(request.body)
+    except json.JSONDecodeError:
+        return JsonResponse({"error": "Invalid JSON"}, status=400)
+
+    action_type = data.get("action_type", "").strip()
+    params      = data.get("params", {})
+
+    if not action_type:
+        return JsonResponse({"error": "action_type is required."}, status=400)
+
+    try:
+        from .admin_agent import AdminAgent
+        agent  = AdminAgent()
+        result = agent.execute_action(action_type, params)
+        invalidate_lookup_caches()
+        return JsonResponse({
+            "success": result.get("success", False),
+            "message": result.get("message", ""),
+            "data":    result.get("data"),
+        })
+    except Exception as e:
+        logger.exception("Admin agent execute failed")
+        return JsonResponse({"success": False, "message": str(e)}, status=500)
+
+
+@login_required
+@user_passes_test(admin_required)
+def admin_agent_tool_api(request):
+    """
+    Run a read tool directly and return results.
+    POST body: {tool: str, params: dict}
+    """
+    if request.method != "POST":
+        return JsonResponse({"error": "Method not allowed"}, status=405)
+    try:
+        data = json.loads(request.body)
+    except json.JSONDecodeError:
+        return JsonResponse({"error": "Invalid JSON"}, status=400)
+
+    tool_name = data.get("tool", "").strip()
+    params    = data.get("params", {})
+
+    if not tool_name:
+        return JsonResponse({"error": "tool name is required."}, status=400)
+
+    try:
+        from .admin_agent import AdminAgent
+        agent  = AdminAgent()
+        result = agent.run_tool(tool_name, params)
+        return JsonResponse({
+            "ok":     result.get("ok", False),
+            "output": result.get("output", ""),
+            "data":   result.get("data"),
+        })
+    except Exception as e:
+        logger.exception("Admin agent tool failed: %s", tool_name)
+        return JsonResponse({"ok": False, "output": str(e), "data": None}, status=500)

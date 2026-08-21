@@ -1432,3 +1432,228 @@ django.db.utils.OperationalError: connection to server at "aws-0-us-east-1.poole
 
 
 ================================================================================
+
+================================================================================
+Time: 2026-08-15 07:35:34
+URL: /bulk-upload-students/
+Method: POST
+User: admin
+IP: 127.0.0.1
+Error: ImportError: Pandas requires version '3.1.5' or newer of 'openpyxl' (version '3.1.2' currently installed).
+--------------------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\CMC BANGLADESH\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\CMC BANGLADESH\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\CMC BANGLADESH\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\CMC BANGLADESH\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\CMC BANGLADESH\OneDrive\Desktop\disciplinev12\core\views.py", line 2562, in bulk_upload_students
+    sheets = pd.read_excel(upload_file, sheet_name=None, dtype=str)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\CMC BANGLADESH\AppData\Local\Programs\Python\Python311\Lib\site-packages\pandas\io\excel\_base.py", line 481, in read_excel
+    io = ExcelFile(
+         ^^^^^^^^^^
+  File "C:\Users\CMC BANGLADESH\AppData\Local\Programs\Python\Python311\Lib\site-packages\pandas\io\excel\_base.py", line 1621, in __init__
+    self._reader = self._engines[engine](
+                   ^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\CMC BANGLADESH\AppData\Local\Programs\Python\Python311\Lib\site-packages\pandas\io\excel\_openpyxl.py", line 559, in __init__
+    import_optional_dependency("openpyxl")
+  File "C:\Users\CMC BANGLADESH\AppData\Local\Programs\Python\Python311\Lib\site-packages\pandas\compat\_optional.py", line 187, in import_optional_dependency
+    raise ImportError(msg)
+ImportError: Pandas requires version '3.1.5' or newer of 'openpyxl' (version '3.1.2' currently installed).
+
+================================================================================
+
+================================================================================
+Time: 2026-08-16 09:04:09
+URL: /logout/
+Method: GET
+User: bwire
+IP: 127.0.0.1
+Error: FieldDoesNotExist: UserSession has no field named 'logged_out_at'
+--------------------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\CMC BANGLADESH\QRCODE\venv\Lib\site-packages\django\db\models\options.py", line 684, in get_field
+    return self.fields_map[field_name]
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^
+KeyError: 'logged_out_at'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\CMC BANGLADESH\QRCODE\venv\Lib\site-packages\django\core\handlers\base.py", line 198, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\CMC BANGLADESH\QRCODE\venv\Lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\CMC BANGLADESH\OneDrive\Desktop\disciplinev12\core\views.py", line 461, in custom_logout
+    UserSession.objects.filter(session_key=session_key).update(
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        logged_out_at=timezone.now()
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\CMC BANGLADESH\QRCODE\venv\Lib\site-packages\django\db\models\query.py", line 1274, in update
+    query.add_update_values(kwargs)
+    ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^
+  File "C:\Users\CMC BANGLADESH\QRCODE\venv\Lib\site-packages\django\db\models\sql\subqueries.py", line 89, in add_update_values
+    field = self.get_meta().get_field(name)
+  File "C:\Users\CMC BANGLADESH\QRCODE\venv\Lib\site-packages\django\db\models\options.py", line 686, in get_field
+    raise FieldDoesNotExist(
+        "%s has no field named '%s'" % (self.object_name, field_name)
+    )
+django.core.exceptions.FieldDoesNotExist: UserSession has no field named 'logged_out_at'
+
+================================================================================
+
+================================================================================
+Time: 2026-08-16 09:04:13
+URL: /logout/
+Method: GET
+User: bwire
+IP: 127.0.0.1
+Error: FieldDoesNotExist: UserSession has no field named 'logged_out_at'
+--------------------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\CMC BANGLADESH\QRCODE\venv\Lib\site-packages\django\db\models\options.py", line 684, in get_field
+    return self.fields_map[field_name]
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^
+KeyError: 'logged_out_at'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\CMC BANGLADESH\QRCODE\venv\Lib\site-packages\django\core\handlers\base.py", line 198, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\CMC BANGLADESH\QRCODE\venv\Lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\CMC BANGLADESH\OneDrive\Desktop\disciplinev12\core\views.py", line 461, in custom_logout
+    UserSession.objects.filter(session_key=session_key).update(
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        logged_out_at=timezone.now()
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\CMC BANGLADESH\QRCODE\venv\Lib\site-packages\django\db\models\query.py", line 1274, in update
+    query.add_update_values(kwargs)
+    ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^
+  File "C:\Users\CMC BANGLADESH\QRCODE\venv\Lib\site-packages\django\db\models\sql\subqueries.py", line 89, in add_update_values
+    field = self.get_meta().get_field(name)
+  File "C:\Users\CMC BANGLADESH\QRCODE\venv\Lib\site-packages\django\db\models\options.py", line 686, in get_field
+    raise FieldDoesNotExist(
+        "%s has no field named '%s'" % (self.object_name, field_name)
+    )
+django.core.exceptions.FieldDoesNotExist: UserSession has no field named 'logged_out_at'
+
+================================================================================
+
+================================================================================
+Time: 2026-08-16 09:09:04
+URL: /ai/api/predictive-analysis/
+Method: GET
+User: bwire
+IP: 127.0.0.1
+Error: NameError: name 'students' is not defined
+--------------------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\CMC BANGLADESH\QRCODE\venv\Lib\site-packages\django\core\handlers\base.py", line 198, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\CMC BANGLADESH\QRCODE\venv\Lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\CMC BANGLADESH\OneDrive\Desktop\disciplinev12\core\views.py", line 3057, in ai_predictive_analysis
+    for student in students:
+                   ^^^^^^^^
+NameError: name 'students' is not defined. Did you mean: 'Student'?
+
+================================================================================
+
+================================================================================
+Time: 2026-08-16 09:09:07
+URL: /ai/api/predictive-analysis/
+Method: GET
+User: bwire
+IP: 127.0.0.1
+Error: NameError: name 'students' is not defined
+--------------------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\CMC BANGLADESH\QRCODE\venv\Lib\site-packages\django\core\handlers\base.py", line 198, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\CMC BANGLADESH\QRCODE\venv\Lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\CMC BANGLADESH\OneDrive\Desktop\disciplinev12\core\views.py", line 3057, in ai_predictive_analysis
+    for student in students:
+                   ^^^^^^^^
+NameError: name 'students' is not defined. Did you mean: 'Student'?
+
+================================================================================
+
+================================================================================
+Time: 2026-08-16 17:25:27
+URL: /class-teacher-dashboard/
+Method: GET
+User: Elisha
+IP: 127.0.0.1
+Error: ValueError: Need 2 values to unpack in for loop; got 6. 
+--------------------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\CMC BANGLADESH\QRCODE\venv\Lib\site-packages\django\core\handlers\base.py", line 198, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\CMC BANGLADESH\QRCODE\venv\Lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\CMC BANGLADESH\QRCODE\venv\Lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\CMC BANGLADESH\OneDrive\Desktop\disciplinev12\core\views.py", line 741, in class_teacher_dashboard
+    return render(request, "class_teacher_dashboard.html", context)
+  File "C:\Users\CMC BANGLADESH\QRCODE\venv\Lib\site-packages\django\shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "C:\Users\CMC BANGLADESH\QRCODE\venv\Lib\site-packages\django\template\loader.py", line 62, in render_to_string
+    return template.render(context, request)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+  File "C:\Users\CMC BANGLADESH\QRCODE\venv\Lib\site-packages\django\template\backends\django.py", line 107, in render
+    return self.template.render(context)
+           ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "C:\Users\CMC BANGLADESH\QRCODE\venv\Lib\site-packages\django\template\base.py", line 174, in render
+    return self._render(context)
+           ~~~~~~~~~~~~^^^^^^^^^
+  File "C:\Users\CMC BANGLADESH\QRCODE\venv\Lib\site-packages\django\template\base.py", line 166, in _render
+    return self.nodelist.render(context)
+           ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "C:\Users\CMC BANGLADESH\QRCODE\venv\Lib\site-packages\django\template\base.py", line 1091, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "C:\Users\CMC BANGLADESH\QRCODE\venv\Lib\site-packages\django\template\base.py", line 1052, in render_annotated
+    return self.render(context)
+           ~~~~~~~~~~~^^^^^^^^^
+  File "C:\Users\CMC BANGLADESH\QRCODE\venv\Lib\site-packages\django\template\loader_tags.py", line 160, in render
+    return compiled_parent._render(context)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "C:\Users\CMC BANGLADESH\QRCODE\venv\Lib\site-packages\django\template\base.py", line 166, in _render
+    return self.nodelist.render(context)
+           ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "C:\Users\CMC BANGLADESH\QRCODE\venv\Lib\site-packages\django\template\base.py", line 1091, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "C:\Users\CMC BANGLADESH\QRCODE\venv\Lib\site-packages\django\template\base.py", line 1052, in render_annotated
+    return self.render(context)
+           ~~~~~~~~~~~^^^^^^^^^
+  File "C:\Users\CMC BANGLADESH\QRCODE\venv\Lib\site-packages\django\template\loader_tags.py", line 66, in render
+    result = block.nodelist.render(context)
+  File "C:\Users\CMC BANGLADESH\QRCODE\venv\Lib\site-packages\django\template\base.py", line 1091, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "C:\Users\CMC BANGLADESH\QRCODE\venv\Lib\site-packages\django\template\base.py", line 1052, in render_annotated
+    return self.render(context)
+           ~~~~~~~~~~~^^^^^^^^^
+  File "C:\Users\CMC BANGLADESH\QRCODE\venv\Lib\site-packages\django\template\defaulttags.py", line 237, in render
+    raise ValueError(
+    ...<3 lines>...
+    )
+ValueError: Need 2 values to unpack in for loop; got 6. 
+
+================================================================================

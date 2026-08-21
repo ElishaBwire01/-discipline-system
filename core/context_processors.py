@@ -1,6 +1,4 @@
-  # core/context_processors.py
-
-import os
+# core/context_processors.py
 
 from django.contrib.auth.models import User
 from django.db.models import Count
@@ -50,12 +48,12 @@ def user_management_context(request):
         "school": school,
         # Dropdown options
         "streams": streams,
-        "forms": ["Form 1", "Form 2", "Form 3", "Form 4"],
+        "forms": [choice[0] for choice in Student.FORM_CHOICES],
         "categories": categories,
         # Notification defaults
         "notification_count": 0,
-        os.environ.get("UNREAD_NOTIFICATIONS_VALUE", "unread_notifications"): [],
-        os.environ.get("SECRET_KEY", "admin_notification_count"): 0,
+        "unread_notifications": [],
+        "admin_notification_count": 0,
         # Admin stats defaults
         "pending_approvals": 0,
         "pending_resets": 0,
@@ -73,9 +71,7 @@ def user_management_context(request):
         try:
             notifications = request.user.notifications.filter(is_read=False)
             context["notification_count"] = notifications.count()
-            context[
-                os.environ.get("UNREAD_NOTIFICATIONS_VALUE", "unread_notifications")
-            ] = notifications[:15]
+            context["unread_notifications"] = notifications[:15]
         except Exception:
             pass
 
@@ -84,12 +80,11 @@ def user_management_context(request):
             try:
                 # Count pending approvals (exclude current admin)
                 pending_approvals = (
-                    User.objects.filter(
-                        teacher_profile__is_approved=False,
-                        teacher_profile__is_suspended=False,
-                        groups__name="ClassTeacher",
+                    TeacherProfile.objects.filter(
+                        is_approved=False,
+                        is_suspended=False,
                     )
-                    .exclude(id=request.user.id)
+                    .exclude(user_id=request.user.id)
                     .count()
                 )
                 context["pending_approvals"] = pending_approvals
@@ -119,7 +114,7 @@ def user_management_context(request):
                 context["total_reports"] = total_reports
 
                 # Total admin notifications count
-                context[os.environ.get("SECRET_KEY", "admin_notification_count")] = (
+                context["admin_notification_count"] = (
                     pending_approvals + pending_resets + critical_students
                 )
 
@@ -133,29 +128,19 @@ def user_management_context(request):
                 # Get teacher profile
                 profile = TeacherProfile.objects.filter(user=request.user).first()
                 if profile and profile.assigned_stream:
-                    # Count students in assigned stream
                     stream_students = Student.objects.filter(
                         is_active=True, stream=profile.assigned_stream
                     )
-                    context[
-                        os.environ.get(
-                            "CLASS_STUDENTS_COUNT_VALUE", "class_students_count"
-                        )
-                    ] = stream_students.count()
+                    if profile.assigned_form:
+                        stream_students = stream_students.filter(form=profile.assigned_form)
+                    context["class_students_count"] = stream_students.count()
 
-                    # Count critical students in class
-                    context[
-                        os.environ.get(
-                            "CLASS_CRITICAL_COUNT_VALUE", "class_critical_count"
-                        )
-                    ] = stream_students.filter(risk_score__gte=60).count()
+                    context["class_critical_count"] = stream_students.filter(risk_score__gte=60).count()
 
-                    # Count warning students in class
                     context["class_warning_count"] = stream_students.filter(
                         risk_score__range=(30, 59)
                     ).count()
 
-                    # Count good students in class
                     context["class_good_count"] = stream_students.filter(
                         risk_score__lt=30
                     ).count()

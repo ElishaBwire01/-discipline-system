@@ -1,74 +1,223 @@
 {% extends 'base.html' %}
 
-{% block title %}Manage Users{% endblock %}
+{% block title %}Manage Users — {{ school_name|default:"Disciplinary System" }}{% endblock %}
 
 {% block content %}
-<div class="card-modern" data-aos="fade-up">
+<div class="card-modern">
     <div class="card-header-modern">
+        <span class="header-icon"><i class="fa-solid fa-users-gear"></i></span>
         User Management
-        {% if pending_approvals > 0 %}<span class="badge bg-light text-dark ms-2">{{ pending_approvals }} pending</span>{% endif %}
-        <span class="badge bg-light text-dark ms-2 ms-auto">Total: {{ teacher_users|length }}</span>
+        {% if pending_approvals > 0 %}
+            <span class="badge bg-warning text-dark ms-2">{{ pending_approvals }} pending</span>
+        {% endif %}
+        <span class="badge bg-light text-dark ms-auto">{{ teacher_users|length }} user{{ teacher_users|length|pluralize }}</span>
     </div>
-    <div class="card-body">
+    <div class="card-body p-3">
+
+        <!-- Filter tabs -->
         <div class="d-flex flex-wrap gap-2 mb-3">
-            <a href="?status=" class="btn-modern btn-modern-secondary btn-modern-sm">All</a>
-            <a href="?status=pending" class="btn-modern btn-modern-warning btn-modern-sm">Pending</a>
-            <a href="?status=approved" class="btn-modern btn-modern-success btn-modern-sm">Approved</a>
-            <a href="?status=suspended" class="btn-modern btn-modern-danger btn-modern-sm">Suspended</a>
+            <a href="?status=" class="btn-modern btn-modern-secondary btn-modern-sm {% if not status_filter %}active{% endif %}">
+                <i class="fa-solid fa-list me-1"></i>All
+            </a>
+            <a href="?status=pending" class="btn-modern btn-modern-warning btn-modern-sm {% if status_filter == 'pending' %}active{% endif %}">
+                <i class="fa-solid fa-user-clock me-1"></i>Pending
+            </a>
+            <a href="?status=approved" class="btn-modern btn-modern-success btn-modern-sm {% if status_filter == 'approved' %}active{% endif %}">
+                <i class="fa-solid fa-user-check me-1"></i>Approved
+            </a>
+            <a href="?status=suspended" class="btn-modern btn-modern-danger btn-modern-sm {% if status_filter == 'suspended' %}active{% endif %}">
+                <i class="fa-solid fa-user-slash me-1"></i>Suspended
+            </a>
         </div>
-        
+
         <div class="table-responsive">
             <table class="table-modern">
-                <thead><tr><th>Username</th><th>Full Name</th><th>Role</th><th>Stream</th><th>Status</th><th>Actions</th></tr></thead>
+                <thead>
+                    <tr>
+                        <th>Username</th>
+                        <th>Full Name</th>
+                        <th>Role</th>
+                        <th>Stream / Form</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
                 <tbody>
-                    {% for user in teacher_users %}
-                    <tr class="{% if user.teacher_profile.is_suspended %}bg-danger bg-opacity-10{% elif not user.teacher_profile.is_approved %}bg-warning bg-opacity-10{% endif %}">
-                        <td><strong>{{ user.username }}</strong></td>
-                        <td>{{ user.get_full_name|default:"-" }}</td>
-                        <td>{% if user.is_superuser %}<span class="badge-modern badge-critical">Admin</span>{% elif user.groups.first %}<span class="badge-modern badge-info">{{ user.groups.first.name }}</span>{% else %}<span class="badge-modern badge-secondary">Teacher</span>{% endif %}</td>
-                        <td>{% if user.teacher_profile.assigned_stream %}{{ user.teacher_profile.assigned_stream.get_name_display }}{% else %}-{% endif %}</td>
-                        <td>{% if user.teacher_profile.is_suspended %}<span class="badge-modern badge-critical">Suspended</span>{% elif user.teacher_profile.is_approved %}<span class="badge-modern badge-success">Approved</span>{% else %}<span class="badge-modern badge-warning">Pending</span>{% endif %}</td>
+                    {% for u in teacher_users %}
+                    <tr class="{% if u.teacher_profile.is_suspended %}bg-danger bg-opacity-10{% elif not u.teacher_profile.is_approved %}bg-warning bg-opacity-10{% endif %}">
+
+                        <!-- Username -->
+                        <td><strong>{{ u.username }}</strong></td>
+
+                        <!-- Full name -->
+                        <td>{{ u.get_full_name|default:"—" }}</td>
+
+                        <!-- Role badge -->
                         <td>
-                            <div class="d-flex gap-1 flex-wrap">
-                                {% if not user.teacher_profile.is_approved and not user.teacher_profile.is_suspended and not user.is_superuser %}
-                                <form method="post" action="/approve_user/{{ user.id }}/">
+                            {% if u.is_superuser %}
+                                <span class="badge-modern badge-critical"><i class="fa-solid fa-shield-halved me-1"></i>Admin</span>
+                            {% elif u.groups.first %}
+                                <span class="badge-modern badge-info"><i class="fa-solid fa-chalkboard-user me-1"></i>{{ u.groups.first.name }}</span>
+                            {% else %}
+                                <span class="badge-modern badge-info"><i class="fa-solid fa-person-chalkboard me-1"></i>Teacher</span>
+                            {% endif %}
+                        </td>
+
+                        <!-- Stream / form assignment -->
+                        <td>
+                            {% if u.teacher_profile.assigned_stream %}
+                                {{ u.teacher_profile.assigned_stream.name }}
+                                {% if u.teacher_profile.assigned_form %} — {{ u.teacher_profile.assigned_form }}{% endif %}
+                            {% else %}—{% endif %}
+                        </td>
+
+                        <!-- Status badge -->
+                        <td>
+                            {% if u.teacher_profile.is_suspended %}
+                                <span class="badge-modern badge-critical"><i class="fa-solid fa-ban me-1"></i>Suspended</span>
+                            {% elif u.teacher_profile.is_approved %}
+                                <span class="badge-modern badge-success"><i class="fa-solid fa-circle-check me-1"></i>Approved</span>
+                            {% else %}
+                                <span class="badge-modern badge-warning"><i class="fa-solid fa-clock me-1"></i>Pending</span>
+                            {% endif %}
+                        </td>
+
+                        <!-- Actions -->
+                        <td>
+                            <div class="d-flex gap-1 flex-wrap align-items-center">
+
+                                <!-- Approve (only for pending, non-admin) -->
+                                {% if not u.teacher_profile.is_approved and not u.teacher_profile.is_suspended and not u.is_superuser %}
+                                <form method="post" action="/approve-user/{{ u.id }}/" style="display:inline">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn-modern btn-modern-success btn-modern-sm">
+                                        <i class="fa-solid fa-check"></i> Approve
+                                    </button>
                                 </form>
                                 {% endif %}
-                                {% if user.teacher_profile.is_approved and not user.teacher_profile.is_suspended and not user.is_superuser %}
-                                {% endif %}
-                                {% if user.teacher_profile.is_suspended and not user.is_superuser %}
-                                <form method="post" action="/unsuspend_user/{{ user.id }}/">
+
+                                <!-- Unsuspend (only for suspended, non-admin) -->
+                                {% if u.teacher_profile.is_suspended and not u.is_superuser %}
+                                <form method="post" action="/unsuspend-user/{{ u.id }}/" style="display:inline">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn-modern btn-modern-secondary btn-modern-sm">
+                                        <i class="fa-solid fa-rotate-left"></i> Reinstate
+                                    </button>
                                 </form>
                                 {% endif %}
-                                {% if not user.is_superuser %}
+
+                                <!-- Suspend (only for approved, non-admin) -->
+                                {% if u.teacher_profile.is_approved and not u.teacher_profile.is_suspended and not u.is_superuser %}
+                                <button type="button" class="btn-modern btn-modern-warning btn-modern-sm"
+                                        onclick="suspendUser({{ u.id }})">
+                                    <i class="fa-solid fa-user-slash"></i> Suspend
+                                </button>
                                 {% endif %}
+
+                                <!-- View profile -->
+                                <a href="/profile/{{ u.id }}/" class="btn-modern btn-modern-secondary btn-modern-sm">
+                                    <i class="fa-solid fa-eye"></i>
+                                </a>
+
+                                <!-- Ban (non-admin only) -->
+                                {% if not u.is_superuser %}
+                                <button type="button" class="btn-modern btn-modern-danger btn-modern-sm"
+                                        onclick="banUser({{ u.id }}, '{{ u.username }}')">
+                                    <i class="fa-solid fa-skull"></i>
+                                </button>
+                                {% endif %}
+
                             </div>
                         </td>
                     </tr>
-                    {% empty %}<tr><td colspan="6" class="text-center py-4 text-muted">No users found</td></tr>{% endfor %}
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="text-center py-4 text-muted">
+                            <i class="fa-solid fa-users-slash fa-2x mb-2 d-block"></i>
+                            No users found
+                        </td>
+                    </tr>
+                    {% endfor %}
                 </tbody>
             </table>
+        </div>
+
+    </div>
+</div>
+
+<!-- ===== SUSPEND MODAL ===== -->
+<div class="modal fade" id="suspendModal" tabindex="-1" aria-labelledby="suspendModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content border-0 shadow-lg rounded-4">
+            <div class="modal-header border-0">
+                <h5 class="modal-title" id="suspendModalLabel">
+                    <i class="fa-solid fa-user-slash text-warning me-2"></i>Suspend User
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="post" id="suspendForm">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <p class="text-muted mb-3">Please provide a reason for the suspension. The user will be notified.</p>
+                    <textarea name="reason" class="form-control-modern" rows="3"
+                              placeholder="Enter reason for suspension..." required></textarea>
+                </div>
+                <div class="modal-footer border-0">
+                    <button type="button" class="btn-modern btn-modern-secondary" data-bs-dismiss="modal">
+                        <i class="fa-solid fa-xmark me-1"></i>Cancel
+                    </button>
+                    <button type="submit" class="btn-modern btn-modern-warning">
+                        <i class="fa-solid fa-user-slash me-1"></i>Suspend
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
 
-<!-- Suspend Modal -->
-<div class="modal fade" id="suspendModal" tabindex="-1">
-    <div class="modal-dialog"><div class="modal-content border-0 shadow-lg rounded-4">
-        <form method="post" id="suspendForm"><div class="modal-body"><p>Reason for suspension</p><textarea name="reason" class="form-control-modern" rows="3" placeholder="Enter reason..." required></textarea></div><div class="modal-footer border-0"><button type="button" class="btn-modern btn-modern-secondary" data-bs-dismiss="modal">Cancel</button><button type="submit" class="btn-modern btn-modern-warning">Suspend</button></div></form>
-    </div></div>
-</div>
-
-<!-- Ban Modal -->
-<div class="modal fade" id="deleteModal" tabindex="-1">
-    <div class="modal-dialog"><div class="modal-content border-0 shadow-lg rounded-4">
-        <form method="post" id="deleteForm"><div class="modal-body"><p class="text-danger fw-bold">?? This action is irreversible!</p><p>Ban <strong id="deleteUserName"></strong> permanently.</p><textarea name="reason" class="form-control-modern" rows="3" placeholder="Reason for ban..." required></textarea></div><div class="modal-footer border-0"><button type="button" class="btn-modern btn-modern-secondary" data-bs-dismiss="modal">Cancel</button><button type="submit" class="btn-modern btn-modern-danger">Permanently Ban</button></div></form>
-    </div></div>
+<!-- ===== BAN MODAL ===== -->
+<div class="modal fade" id="banModal" tabindex="-1" aria-labelledby="banModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content border-0 shadow-lg rounded-4">
+            <div class="modal-header border-0">
+                <h5 class="modal-title" id="banModalLabel">
+                    <i class="fa-solid fa-skull text-danger me-2"></i>Permanently Ban User
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="post" id="banForm">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="alert-modern alert alert-danger mb-3" role="alert">
+                        <i class="fa-solid fa-triangle-exclamation me-2"></i>
+                        This action is <strong>irreversible</strong>. The account will be permanently disabled.
+                    </div>
+                    <p>Banning user: <strong id="banUserName"></strong></p>
+                    <textarea name="reason" class="form-control-modern" rows="3"
+                              placeholder="Reason for permanent ban..." required></textarea>
+                </div>
+                <div class="modal-footer border-0">
+                    <button type="button" class="btn-modern btn-modern-secondary" data-bs-dismiss="modal">
+                        <i class="fa-solid fa-xmark me-1"></i>Cancel
+                    </button>
+                    <button type="submit" class="btn-modern btn-modern-danger">
+                        <i class="fa-solid fa-skull me-1"></i>Permanently Ban
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
 
 <script>
-function suspendUser(id) { document.getElementById('suspendForm').action = '/suspend-user/'+id+'/'; new bootstrap.Modal(document.getElementById('suspendModal')).show(); }
-function deleteUser(id, name) { document.getElementById('deleteForm').action = '/ban-user/'+id+'/'; document.getElementById('deleteUserName').textContent = name; new bootstrap.Modal(document.getElementById('deleteModal')).show(); }
+function suspendUser(id) {
+    document.getElementById('suspendForm').action = '/suspend-user/' + id + '/';
+    new bootstrap.Modal(document.getElementById('suspendModal')).show();
+}
+function banUser(id, name) {
+    document.getElementById('banForm').action = '/ban-user/' + id + '/';
+    document.getElementById('banUserName').textContent = name;
+    new bootstrap.Modal(document.getElementById('banModal')).show();
+}
 </script>
 {% endblock %}
-

@@ -4,11 +4,15 @@
 {% block title %}Add Student - {{ school_name|default:"Disciplinary System" }}{% endblock %}
 
 {% block content %}
-<div class="card-modern" data-aos="fade-up">
+<div class="card-modern">
     <div class="card-header-modern">
+        <span class="header-icon"><i class="fa-solid fa-user-plus"></i></span>
         Add Student
-        <a href="{% url 'core:bulk_upload_students' %}" class="btn btn-sm btn-outline-light float-end">
+        {% if user.is_superuser %}
+        <a href="{% url 'core:school_setup' %}" class="btn btn-sm btn-outline-light ms-auto">
+            <i class="fa-solid fa-file-arrow-up me-1"></i>Bulk Upload
         </a>
+        {% endif %}
     </div>
     <div class="card-body">
         <form method="post" class="row g-3">
@@ -27,13 +31,16 @@
             </div>
 
             <div class="col-md-4">
-                <label class="form-label-modern">Stream/Class</label>
-                <select name="stream" class="form-control-modern">
+                <label class="form-label-modern">Stream/Class *</label>
+                <select name="stream" class="form-control-modern" required {% if lock_class %}disabled{% endif %}>
                     <option value="">-- Select Stream --</option>
                     {% for stream in streams %}
-                        <option value="{{ stream.id }}">{{ stream.name }}</option>
+                        <option value="{{ stream.id }}" {% if lock_class %}selected{% endif %}>{{ stream.name }}</option>
                     {% endfor %}
                 </select>
+                {% if lock_class %}
+                <input type="hidden" name="stream" value="{{ streams.0.id }}">
+                {% endif %}
             </div>
 
             <div class="col-md-4">
@@ -47,13 +54,16 @@
             </div>
 
             <div class="col-md-4">
-                <label class="form-label-modern">Form</label>
-                <select name="form" class="form-control-modern">
+                <label class="form-label-modern">Form *</label>
+                <select name="form" class="form-control-modern" required {% if lock_class %}disabled{% endif %}>
                     <option value="">-- Select Form --</option>
                     {% for form_key, form_name in forms %}
-                        <option value="{{ form_key }}">{{ form_name }}</option>
+                        <option value="{{ form_key }}" {% if lock_class and assigned_form == form_key %}selected{% endif %}>{{ form_name }}</option>
                     {% endfor %}
                 </select>
+                {% if lock_class %}
+                <input type="hidden" name="form" value="{{ assigned_form }}">
+                {% endif %}
             </div>
 
             <div class="col-md-12">
@@ -70,8 +80,10 @@
 
             <div class="col-12">
                 <button type="submit" class="btn-modern btn-modern-primary">
+                    <i class="fa-solid fa-user-plus me-1"></i> Add Student
                 </button>
-                <a href="{% url 'core:dashboard' %}" class="btn-modern btn-modern-secondary">
+                <a href="{% url 'core:dashboard' %}" class="btn-modern btn-modern-secondary ms-2">
+                    <i class="fa-solid fa-arrow-left me-1"></i> Cancel
                 </a>
             </div>
         </form>

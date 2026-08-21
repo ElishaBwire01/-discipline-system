@@ -720,9 +720,11 @@
 
             <div class="left-actions">
                 <a href="/dashboard/" class="btn-profile btn-profile-secondary btn-profile-block">
+                    <i class="fa-solid fa-arrow-left me-1"></i>Back to Dashboard
                 </a>
                 {% if viewing_other %}
                 <a href="/profile/" class="btn-profile btn-profile-primary btn-profile-block">
+                    <i class="fa-solid fa-user-gear me-1"></i>My Profile
                 </a>
                 {% endif %}
             </div>
@@ -740,8 +742,10 @@
 
             <div class="tab-nav" role="tablist">
                 <button class="tab-btn active" data-tab="account" onclick="switchTab('account')">
+                    <i class="fa-solid fa-user me-1"></i>Account
                 </button>
                 <button class="tab-btn" data-tab="security" onclick="switchTab('security')">
+                    <i class="fa-solid fa-lock me-1"></i>Security
                 </button>
             </div>
 
@@ -750,6 +754,7 @@
 
                 <div class="accordion-item open" id="acc-photo">
                     <div class="accordion-header" onclick="toggleAccordion('acc-photo')">
+                        <i class="fa-solid fa-image me-2"></i>Profile Photo
                     </div>
                     <div class="accordion-body">
                         <div class="accordion-body-inner">
@@ -768,6 +773,7 @@
                                         </div>
                                     </div>
                                     <button type="submit" class="btn-profile btn-profile-primary btn-profile-block">
+                                        <i class="fa-solid fa-upload me-1"></i>Upload Photo
                                     </button>
                                 </div>
                             </form>
@@ -777,6 +783,7 @@
 
                 <div class="accordion-item" id="acc-name">
                     <div class="accordion-header" onclick="toggleAccordion('acc-name')">
+                        <i class="fa-solid fa-user-pen me-2"></i>Full Name
                     </div>
                     <div class="accordion-body">
                         <div class="accordion-body-inner">
@@ -799,6 +806,7 @@
                                         </div>
                                         <div class="full-width">
                                             <button type="submit" class="btn-profile btn-profile-primary btn-profile-block">
+                                                <i class="fa-solid fa-floppy-disk me-1"></i>Save Name
                                             </button>
                                         </div>
                                     </div>
@@ -814,6 +822,7 @@
 
                 <div class="accordion-item" id="acc-username">
                     <div class="accordion-header" onclick="toggleAccordion('acc-username')">
+                        <i class="fa-solid fa-tag me-2"></i>Username
                     </div>
                     <div class="accordion-body">
                         <div class="accordion-body-inner">
@@ -832,6 +841,7 @@
                                         </div>
                                         <div class="full-width">
                                             <button type="submit" class="btn-profile btn-profile-primary btn-profile-block">
+                                                <i class="fa-solid fa-floppy-disk me-1"></i>Save Username
                                             </button>
                                         </div>
                                     </div>
@@ -843,6 +853,7 @@
 
                 <div class="accordion-item" id="acc-email">
                     <div class="accordion-header" onclick="toggleAccordion('acc-email')">
+                        <i class="fa-solid fa-envelope me-2"></i>Email Address
                     </div>
                     <div class="accordion-body">
                         <div class="accordion-body-inner">
@@ -861,6 +872,7 @@
                                         </div>
                                         <div class="full-width">
                                             <button type="submit" class="btn-profile btn-profile-primary btn-profile-block">
+                                                <i class="fa-solid fa-floppy-disk me-1"></i>Save Email
                                             </button>
                                         </div>
                                     </div>
@@ -872,6 +884,7 @@
 
                 <div class="accordion-item" id="acc-password">
                     <div class="accordion-header" onclick="toggleAccordion('acc-password')">
+                        <i class="fa-solid fa-key me-2"></i>Change Password
                     </div>
                     <div class="accordion-body">
                         <div class="accordion-body-inner">
@@ -897,6 +910,7 @@
                                         </div>
                                         <div class="full-width">
                                             <button type="submit" class="btn-profile btn-profile-warning btn-profile-block">
+                                                <i class="fa-solid fa-key me-1"></i>Change Password
                                             </button>
                                         </div>
                                     </div>
