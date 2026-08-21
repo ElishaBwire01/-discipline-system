@@ -644,11 +644,23 @@ class AdminActionExecutor:
         ok, sk = len(results["created"]), len(results["skipped"])
         return {"success": ok > 0 or sk > 0, "message": f"Bulk: {ok} created, {sk} skipped, {len(results['failed'])} failed.", "data": results}
 
+    def _get_stream(self, stream_id_or_name, school=None):
+        """Resolve a stream by id or name, scoped to the current school."""
+        from .models import Stream, School
+        if school is None:
+            school = School.objects.first()
+        key = str(stream_id_or_name)
+        qs = Stream.objects.filter(school=school) if school else Stream.objects
+        if key.isdigit():
+            return qs.get(id=int(key))
+        return qs.get(name__iexact=key)
+
     def delete_stream(self, stream_id_or_name):
-        from .models import Stream
+        from .models import Stream, School
         from django.core.cache import cache
         try:
-            s = Stream.objects.get(id=int(stream_id_or_name)) if str(stream_id_or_name).isdigit() else Stream.objects.get(name__iexact=str(stream_id_or_name))
+            school = School.objects.first()
+            s = self._get_stream(stream_id_or_name, school)
             name = s.name
             all_students = s.students.count()
             if all_students > 0:
@@ -666,15 +678,18 @@ class AdminActionExecutor:
             return {"success": False, "message": str(e)}
 
     def reassign_stream_students(self, from_stream_name, to_stream_name):
-        from .models import Stream, Student
+        from .models import Stream, Student, School
         from django.core.cache import cache
         try:
+            school = School.objects.first()
             try:
-                src = Stream.objects.get(name__iexact=str(from_stream_name))
+                src = self._get_stream(from_stream_name, school)
             except Stream.DoesNotExist:
                 return {"success": False, "message": f"Source stream '{from_stream_name}' not found."}
             try:
-                dst = Stream.objects.get(name__iexact=str(to_stream_name), is_active=True)
+                dst = self._get_stream(to_stream_name, school)
+                if not dst.is_active:
+                    raise Stream.DoesNotExist
             except Stream.DoesNotExist:
                 return {"success": False, "message": f"Destination stream '{to_stream_name}' not found or inactive."}
             count = Student.objects.filter(stream=src).update(stream=dst)
@@ -686,15 +701,16 @@ class AdminActionExecutor:
             return {"success": False, "message": str(e)}
 
     def rename_stream(self, stream_id_or_name, new_name):
-        from .models import Stream
+        from .models import Stream, School
         from django.core.cache import cache
         try:
-            s = Stream.objects.get(id=int(stream_id_or_name)) if str(stream_id_or_name).isdigit() else Stream.objects.get(name__iexact=str(stream_id_or_name))
+            school = School.objects.first()
+            s = self._get_stream(stream_id_or_name, school)
             old = s.name
             s.name = _safe_str(new_name, 50)
             s.save(update_fields=["name"])
             cache.delete("active_streams")
-            return {"success": True, "message": f"Stream renamed '{old}' → '{s.name}'."}
+            return {"success": True, "message": f"Stream renamed '{old}' to '{s.name}'."}
         except Stream.DoesNotExist:
             return {"success": False, "message": "Stream not found."}
         except Exception as e:
@@ -1257,7 +1273,23 @@ class AdminAgent:
             elif action_type == "bulk_create_streams":
                 return ex.bulk_create_streams(params.get("streams", []))
             elif action_type == "reassign_stream_students":
-                return ex.reassign_stream_students(**params)
+                # Normalise: LLMs sometimes emit from_stream_id/to_stream_id (integer IDs)
+                # instead of the required from_stream_name/to_stream_name strings.
+                # Look up the name from the DB so both forms are accepted.
+                p = dict(params)
+                if "from_stream_id" in p or "to_stream_id" in p:
+                    from .models import Stream
+                    if "from_stream_id" in p and "from_stream_name" not in p:
+                        try:
+                            p["from_stream_name"] = Stream.objects.get(id=int(p.pop("from_stream_id"))).name
+                        except (Stream.DoesNotExist, ValueError, TypeError):
+                            p["from_stream_name"] = str(p.pop("from_stream_id", ""))
+                    if "to_stream_id" in p and "to_stream_name" not in p:
+                        try:
+                            p["to_stream_name"] = Stream.objects.get(id=int(p.pop("to_stream_id"))).name
+                        except (Stream.DoesNotExist, ValueError, TypeError):
+                            p["to_stream_name"] = str(p.pop("to_stream_id", ""))
+                return ex.reassign_stream_students(**p)
             elif action_type == "delete_stream":
                 return ex.delete_stream(**params)
             elif action_type == "rename_stream":

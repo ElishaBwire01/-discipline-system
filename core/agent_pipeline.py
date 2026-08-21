@@ -782,12 +782,26 @@ class Synthesizer:
 {{"type": "ACTION_TYPE", "params": {{...}}, "description": "brief summary", "risk": "HIGH"}}
 ```
 
-## WRITE ACTIONS AVAILABLE
-create_stream, bulk_create_streams, delete_stream, reassign_stream_students, rename_stream,
-add_student, bulk_add_students, edit_student, delete_student,
-update_school, create_category, delete_category,
-approve_teacher, suspend_teacher, reset_password, delete_report, recalculate_risk,
-apply_patch(path, search, replace), create_file(path, content)
+## WRITE ACTIONS AVAILABLE (use EXACT param names shown)
+create_stream(name, code, description)
+bulk_create_streams(streams=[{{"name": "...", "code": "..."}}, ...])
+delete_stream(stream_id_or_name)
+reassign_stream_students(from_stream_name, to_stream_name)   -- ALWAYS use stream NAME strings, never IDs
+rename_stream(stream_id_or_name, new_name)
+add_student(name, admission_number, stream_name, form, year, notes)
+bulk_add_students(students=[{{"name": "...", "admission_number": "...", "stream_name": "...", "form": "..."}}, ...])
+edit_student(admission_or_id, name, stream_name, form, year, notes)
+delete_student(admission_or_id)
+update_school(name, short_name, motto, phone, email, address, current_year, terms_per_year)
+create_category(key, name, description, risk_weight, severity_level, default_rating)
+delete_category(key_or_id)
+approve_teacher(username)
+suspend_teacher(username, reason)
+reset_password(username, new_password)
+delete_report(report_id)
+recalculate_risk()
+apply_patch(path, search, replace)
+create_file(path, content)
 """
 
     def __init__(self, ai_caller):
