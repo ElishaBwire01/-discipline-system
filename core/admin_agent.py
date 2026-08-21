@@ -140,13 +140,18 @@ class EngineeringToolkit:
             for pat in get_resolver().url_patterns:
                 _collect(pat)
 
-            # Source tree summary
+            # Source tree summary — skip symlinks and unreadable paths (e.g. venv/lib64 on Windows)
             source_files = []
             for ext in ["*.py", "*.html"]:
                 for p in base.rglob(ext):
-                    if any(skip in str(p) for skip in [".git", "__pycache__", ".venv", "venv", "migrations", "staticfiles"]):
+                    try:
+                        if p.is_symlink():
+                            continue
+                        if any(skip in str(p) for skip in [".git", "__pycache__", ".venv", "venv", "migrations", "staticfiles"]):
+                            continue
+                        source_files.append(str(p.relative_to(base)))
+                    except (OSError, PermissionError):
                         continue
-                    source_files.append(str(p.relative_to(base)))
 
             # Settings snapshot (safe subset)
             settings_info = {}
@@ -281,14 +286,34 @@ class EngineeringToolkit:
             return {"ok": False, "output": str(e), "data": ""}
 
     def search_code(self, pattern: str, path: str = "", file_ext: str = ".py") -> dict:
-        """Regex search across source files. Returns matching lines with file:line context."""
+        """
+        Regex search across source files.  Returns matching lines with file:line context.
+        Results are capped at 120 matching LINES.
+        If pattern is '.*' or empty (a file-list request), returns a deduplicated file list instead.
+        """
         try:
             base = _base_dir()
             root = (base / path).resolve() if path else base
             results = []
-            rx = re.compile(pattern, re.IGNORECASE)
+            is_file_list = not pattern or pattern.strip() in (".*", "*", "")
+            rx = re.compile(pattern if pattern else ".", re.IGNORECASE)
+            files_seen = set()
             for fp in root.rglob(f"*{file_ext}"):
-                if any(skip in str(fp) for skip in [".git", "__pycache__", ".venv", "venv", "migrations"]):
+                try:
+                    if fp.is_symlink():
+                        continue
+                    if any(skip in str(fp) for skip in [".git", "__pycache__", ".venv", "venv", "migrations"]):
+                        continue
+                except (OSError, PermissionError):
+                    continue
+                # File-list mode: just collect file paths, one per file
+                if is_file_list:
+                    rel = str(fp.relative_to(base))
+                    if rel not in files_seen:
+                        files_seen.add(rel)
+                        results.append(rel)
+                        if len(results) >= 200:
+                            break
                     continue
                 try:
                     for i, line in enumerate(fp.read_text(encoding="utf-8", errors="replace").splitlines(), 1):
@@ -296,10 +321,13 @@ class EngineeringToolkit:
                             results.append(f"{fp.relative_to(base)}:{i}  {line.rstrip()}")
                             if len(results) >= 120:
                                 break
-                except Exception:
+                except (OSError, PermissionError, Exception):
                     pass
                 if len(results) >= 120:
                     break
+            if is_file_list:
+                summary = f"Found {len(results)} {file_ext} file(s)"
+                return {"ok": True, "output": summary, "data": "\n".join(results) or "(none found)"}
             return {
                 "ok": True,
                 "output": f"Found {len(results)} match(es) for /{pattern}/",

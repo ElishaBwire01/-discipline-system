@@ -241,11 +241,23 @@ class ContextBuilder:
 
         t0 = time.monotonic()
 
-        # Always include school overview (tiny)
+        # Always include school overview (tiny) + DB table map so the LLM
+        # never guesses table names (e.g. "school" instead of "core_school").
         try:
             from core.admin_agent_queries import AdminDataReader
             reader = AdminDataReader()
             ctx["school_overview"] = reader.get_full_school_context()
+        except Exception:
+            pass
+
+        try:
+            from django.apps import apps as django_apps
+            table_map = {
+                m.__name__: m._meta.db_table
+                for app in django_apps.get_app_configs()
+                for m in app.get_models()
+            }
+            ctx["db_table_map"] = table_map   # e.g. {"School": "core_school", ...}
         except Exception:
             pass
 
@@ -442,14 +454,14 @@ Produce a JSON array of investigation steps. Each step has:
 
 ALLOWED TOOLS:
   read_file(path)
-  search_code(pattern, path, file_ext)
+  search_code(pattern, path, file_ext)   -- use file_ext=".html" for templates, file_ext=".py" for Python files; use pattern="" to list all files of that type
   inspect_route(url)
   inspect_model(model_name)   -- model_name MUST be the Python class name e.g. "Stream", "Student", "TeacherProfile" (NOT the DB table name like "core_stream")
   list_routes()
   read_logs(tail_chars)
   parse_tracebacks()
   diagnostics()
-  db_query(query)
+  db_query(query)   -- CRITICAL: ALWAYS use the exact Django table name from db_table_map in context (e.g. "core_school" NOT "school", "core_disciplinecategory" NOT "offense")
   db_row_counts()
   app_manifest()
   run_management_command(command, args)
