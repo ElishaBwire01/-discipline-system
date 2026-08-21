@@ -82,7 +82,10 @@ class AdminDataReader:
                     school.require_teacher_approval if school else False
                 ),
             }
+            # Scope streams to the primary school to avoid cross-school leakage
             streams = list(
+                Stream.objects.filter(school=school, is_active=True).values("id", "name", "code")
+                if school else
                 Stream.objects.filter(is_active=True).values("id", "name", "code")
             )
             total_students = Student.objects.filter(is_active=True).count()
@@ -495,15 +498,17 @@ class LocalQueryRouter:
         return _lines(f"**Suspended teachers ({susp.count()}):**", rows)
 
     def _streams(self) -> str:
+        school = self.reader.school()
+        qs = Stream.objects.filter(school=school) if school else Stream.objects.all()
         rows = []
-        for s in Stream.objects.all().order_by("name"):
+        for s in qs.order_by("name"):
             count = s.students.filter(is_active=True).count()
             flag  = "✅ active" if s.is_active else "❌ inactive"
             rows.append(
                 f"- **{s.name}** (code: {s.code or '—'}, id {s.id}, {flag}) — "
                 f"{count} active student(s)"
             )
-        return _lines(f"**Streams in DB ({Stream.objects.count()}):**", rows)
+        return _lines(f"**Streams in DB ({qs.count()}):**", rows)
 
     def _grades(self) -> str:
         rows = [
@@ -822,8 +827,13 @@ class LocalQueryRouter:
             dupes = ", ".join(d["admission_number"] for d in dup_adm[:10])
             issues.append(f"🔴 **DUPLICATE admission numbers:** {dupes}")
 
+        school = self.reader.school()
+        active_streams_qs = (
+            Stream.objects.filter(school=school, is_active=True)
+            if school else Stream.objects.filter(is_active=True)
+        )
         empty_streams = [
-            s.name for s in Stream.objects.filter(is_active=True)
+            s.name for s in active_streams_qs
             if not s.students.filter(is_active=True).exists()
         ]
         if empty_streams:
