@@ -243,6 +243,16 @@ class LocalQueryRouter:
         if self._match(n, ["app manifest", "application manifest", "source tree", "source files"]):
             return self._app_manifest_summary()
 
+        # File counts — "how many html/template/py/python files"
+        if self._match(n, ["how many template", "number of template", "count template",
+                            "how many html", "number of html", "count html",
+                            "how many html file", "list html", "list template"]):
+            return self._file_count(".html")
+        if self._match(n, ["how many python", "how many py", "number of python", "number of py",
+                            "count python", "count py file", "how many py file",
+                            "list python file", "list py file", "list py"]):
+            return self._file_count(".py")
+
         # School identity
         if (
             self._match(n, ["school name", "name of the school", "name of this school",
@@ -281,8 +291,9 @@ class LocalQueryRouter:
         if self._match(n, ["term", "academic term"]):
             return self._terms()
 
-        # Categories
-        if self._match(n, ["categor"]):
+        # Categories / offenses (the discipline category model is called DisciplineCategory,
+        # not Offense — accept both terms so users aren't confused)
+        if self._match(n, ["categor", "offense", "offence", "offens"]):
             return self._categories()
 
         # Password resets
@@ -307,18 +318,22 @@ class LocalQueryRouter:
         if self._match(n, ["how many student", "number of student", "count student", "student count"]):
             return self._student_count()
 
-        # Students by stream/form
+        # General student list — checked BEFORE stream-form regex so that
+        # "write down the students" / "list students" / "show all students"
+        # never falls into the stream-search path.
+        if self._match(n, ["list student", "show student", "all student",
+                            "write down the student", "write down student",
+                            "name of student", "names of student"]):
+            return self._students()
+
+        # Students by stream/form — only match when a clear stream qualifier is present
         stream_form_match = re.search(
-            r"student[s]?\s+(?:in\s+)?(?:stream\s+)?([a-z0-9 ]+?)(?:\s+form\s+(\d+))?$", n
+            r"student[s]?\s+(?:in\s+)?(?:stream\s+)([a-z][a-z0-9 ]{1,}?)(?:\s+form\s+(\d+))?$", n
         )
-        if stream_form_match and self._match(n, ["student"]):
+        if stream_form_match and self._match(n, ["student in", "students in"]):
             stream_hint = stream_form_match.group(1).strip()
             form_hint = stream_form_match.group(2)
             return self._students_by_stream_form(stream_hint, form_hint)
-
-        # General student list
-        if self._match(n, ["list student", "show student", "all student"]):
-            return self._students()
 
         # Reports
         if self._match(n, ["how many report", "number of report", "count report"]):
@@ -913,6 +928,34 @@ class LocalQueryRouter:
             )
         except Exception as e:
             return f"Manifest error: {e}"
+
+    def _file_count(self, ext: str) -> str:
+        """
+        Count and list project files with the given extension.
+        Skips venv, __pycache__, .git, migrations, staticfiles, and symlinks.
+        """
+        try:
+            base = Path(settings.BASE_DIR)
+            SKIP = {".git", "__pycache__", ".venv", "venv", "migrations", "staticfiles"}
+            files = []
+            for p in base.rglob(f"*{ext}"):
+                try:
+                    if p.is_symlink():
+                        continue
+                    if any(s in str(p) for s in SKIP):
+                        continue
+                    files.append(str(p.relative_to(base)))
+                except (OSError, PermissionError):
+                    continue
+            label = "HTML template" if ext == ".html" else f"{ext.lstrip('.')} source"
+            lines = [f"  {f}" for f in sorted(files)[:200]]
+            return (
+                f"**{label} files in this project: {len(files)}**\n" +
+                "\n".join(lines) +
+                ("\n  …(showing first 200)" if len(files) > 200 else "")
+            )
+        except Exception as e:
+            return f"File count error: {e}"
 
 
 # ─────────────────────────────────────────────────────────────────────────────
