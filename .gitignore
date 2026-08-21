@@ -1,35 +1,97 @@
+# ============================================================
 # Python
-*.pyc
+# ============================================================
+*.py[cod]
 __pycache__/
+*.pyo
+
+# Virtual environments
 venv/
 env/
+.venv/
+
+# Environment variables / secrets
 .env
-*.sqlite3
+.env.*
+!.env.example
+
+# Python logs
 *.log
 
+
+# ============================================================
 # Django
-*.log
+# ============================================================
 *.pot
-*.pyc
 local_settings.py
+
+# Database files
 db.sqlite3
 db.sqlite3-journal
+*.sqlite3
+*.sqlite3-journal
+
+# User-uploaded / generated files
 media/
 staticfiles/
 
-# Supabase secrets
-.env
-.env.local
-.env.production
 
-# IDE
+# ============================================================
+# Secret / backup environment files
+# ============================================================
+.env.backup*
+.env.bak
+*.env.bak
+*.env.backup
+
+# Local environment scripts
+env.ps1
+
+
+# ============================================================
+# Backup files
+# ============================================================
+*.bak
+*.backup
+*.backup_*
+*_backup/
+*_backups/
+backup_*/
+backups_*/
+.backup/
+.fix_backup/
+
+
+# ============================================================
+# IDE / Editors
+# ============================================================
 .vscode/
 .idea/
 *.swp
 *.swo
+*.swn
 
-# OS
+
+# ============================================================
+# Operating System
+# ============================================================
 .DS_Store
 Thumbs.db
-.env
-env.ps1
+Desktop.ini
+
+
+# ============================================================
+# Temporary files
+# ============================================================
+*.tmp
+*.temp
+*.cache
+*.old
+*~
+
+
+# ============================================================
+# Test / local files
+# ============================================================
+smoke_upload.csv
+test_connections.py
