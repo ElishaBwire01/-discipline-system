@@ -1,14 +1,10 @@
-# ============================================================
-<<<<<<< Updated upstream
+﻿# ============================================================
 # Python
-=======
 # PYTHON
->>>>>>> Stashed changes
 # ============================================================
 *.py[cod]
 __pycache__/
 *.pyo
-<<<<<<< Updated upstream
 
 # Virtual environments
 venv/
@@ -38,7 +34,6 @@ db.sqlite3-journal
 
 # User-uploaded / generated files
 media/
-=======
 *.pyd
 
 # Virtual environments
@@ -73,11 +68,9 @@ local_settings.py
 *.sqlite-*
 
 # Django generated files
->>>>>>> Stashed changes
 staticfiles/
 media/
 
-<<<<<<< Updated upstream
 
 # ============================================================
 # Secret / backup environment files
@@ -107,7 +100,6 @@ backups_*/
 
 # ============================================================
 # IDE / Editors
-=======
 # ============================================================
 # BACKUPS
 # ============================================================
@@ -137,7 +129,6 @@ Untitled-*.ps1
 
 # ============================================================
 # IDE / EDITORS
->>>>>>> Stashed changes
 # ============================================================
 .vscode/
 .idea/
@@ -145,20 +136,16 @@ Untitled-*.ps1
 *.swo
 *.swn
 
-<<<<<<< Updated upstream
 
 # ============================================================
 # Operating System
-=======
 # ============================================================
 # OPERATING SYSTEM
->>>>>>> Stashed changes
 # ============================================================
 .DS_Store
 Thumbs.db
 Desktop.ini
 
-<<<<<<< Updated upstream
 
 # ============================================================
 # Temporary files
@@ -175,7 +162,6 @@ Desktop.ini
 # ============================================================
 smoke_upload.csv
 test_connections.py
-=======
 # ============================================================
 # BUILD / CACHE
 # ============================================================
@@ -209,4 +195,12 @@ yarn-error.log*
 *.temp
 *.orig
 *~
->>>>>>> Stashed changes
+
+env.ps1
+supabase/config.toml
+Untitled-*.ps1
+
+environment_report_*.txt
+deployment_*audit*.txt
+deployment_inspection*.txt
+
