@@ -906,15 +906,17 @@ class LocalQueryRouter:
             for pat in get_resolver().url_patterns:
                 _count(pat)
 
+            import os as _os
             base = Path(settings.BASE_DIR)
-            py_files = [
-                p for p in base.rglob("*.py")
-                if not any(s in str(p) for s in [".git", "__pycache__", ".venv", "venv", "migrations"])
-            ]
-            html_files = [
-                p for p in base.rglob("*.html")
-                if not any(s in str(p) for s in [".git", "__pycache__", ".venv", "venv"])
-            ]
+            SKIP = {".git", "__pycache__", ".venv", "venv", "migrations", "node_modules"}
+            py_files, html_files = [], []
+            for root, dirs, filenames in _os.walk(str(base), followlinks=False):
+                dirs[:] = [d for d in dirs if d not in SKIP]
+                for f in filenames:
+                    if f.endswith(".py"):
+                        py_files.append(f)
+                    elif f.endswith(".html"):
+                        html_files.append(f)
             return (
                 f"**Application Manifest**\n"
                 f"- Backend: Django\n"
@@ -932,21 +934,20 @@ class LocalQueryRouter:
     def _file_count(self, ext: str) -> str:
         """
         Count and list project files with the given extension.
-        Skips venv, __pycache__, .git, migrations, staticfiles, and symlinks.
+        Uses os.walk(followlinks=False) to avoid hanging on Windows symlinks.
         """
         try:
+            import os as _os
             base = Path(settings.BASE_DIR)
-            SKIP = {".git", "__pycache__", ".venv", "venv", "migrations", "staticfiles"}
+            SKIP = {".git", "__pycache__", ".venv", "venv", "migrations", "staticfiles", "node_modules"}
             files = []
-            for p in base.rglob(f"*{ext}"):
-                try:
-                    if p.is_symlink():
-                        continue
-                    if any(s in str(p) for s in SKIP):
-                        continue
-                    files.append(str(p.relative_to(base)))
-                except (OSError, PermissionError):
-                    continue
+            suffix = ext if ext.startswith(".") else f".{ext}"
+            for root, dirs, filenames in _os.walk(str(base), followlinks=False):
+                dirs[:] = [d for d in dirs if d not in SKIP]
+                for f in filenames:
+                    if f.endswith(suffix):
+                        rel = _os.path.relpath(_os.path.join(root, f), str(base))
+                        files.append(rel)
             label = "HTML template" if ext == ".html" else f"{ext.lstrip('.')} source"
             lines = [f"  {f}" for f in sorted(files)[:200]]
             return (

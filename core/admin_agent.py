@@ -140,18 +140,17 @@ class EngineeringToolkit:
             for pat in get_resolver().url_patterns:
                 _collect(pat)
 
-            # Source tree summary — skip symlinks and unreadable paths (e.g. venv/lib64 on Windows)
+            # Source tree summary — use os.walk(followlinks=False) to avoid
+            # hanging on venv/lib64 symlinks on Windows (WinError 1920).
             source_files = []
-            for ext in ["*.py", "*.html"]:
-                for p in base.rglob(ext):
-                    try:
-                        if p.is_symlink():
-                            continue
-                        if any(skip in str(p) for skip in [".git", "__pycache__", ".venv", "venv", "migrations", "staticfiles"]):
-                            continue
-                        source_files.append(str(p.relative_to(base)))
-                    except (OSError, PermissionError):
-                        continue
+            SKIP_DIRS = {".git", "__pycache__", ".venv", "venv", "migrations", "staticfiles", "node_modules"}
+            import os as _os
+            for root, dirs, filenames in _os.walk(str(base), followlinks=False):
+                dirs[:] = [d for d in dirs if d not in SKIP_DIRS]
+                for fname in filenames:
+                    if fname.endswith(".py") or fname.endswith(".html"):
+                        rel = _os.path.relpath(_os.path.join(root, fname), str(base))
+                        source_files.append(rel)
 
             # Settings snapshot (safe subset)
             settings_info = {}
@@ -292,47 +291,54 @@ class EngineeringToolkit:
         If pattern is '.*' or empty (a file-list request), returns a deduplicated file list instead.
         """
         try:
+            import os as _os
             base = _base_dir()
-            root = (base / path).resolve() if path else base
-            results = []
+            root_str = str((base / path).resolve()) if path else str(base)
+            SKIP_DIRS = {".git", "__pycache__", ".venv", "venv", "migrations", "node_modules"}
+            results    = []
+            files_seen = set()
             is_file_list = not pattern or pattern.strip() in (".*", "*", "")
             rx = re.compile(pattern if pattern else ".", re.IGNORECASE)
-            files_seen = set()
-            for fp in root.rglob(f"*{file_ext}"):
-                try:
-                    if fp.is_symlink():
+            suffix = file_ext if file_ext.startswith(".") else f".{file_ext}"
+
+            for root, dirs, filenames in _os.walk(root_str, followlinks=False):
+                dirs[:] = [d for d in dirs if d not in SKIP_DIRS]
+                for fname in filenames:
+                    if not fname.endswith(suffix):
                         continue
-                    if any(skip in str(fp) for skip in [".git", "__pycache__", ".venv", "venv", "migrations"]):
-                        continue
-                except (OSError, PermissionError):
-                    continue
-                # File-list mode: just collect file paths, one per file
-                if is_file_list:
-                    rel = str(fp.relative_to(base))
-                    if rel not in files_seen:
-                        files_seen.add(rel)
-                        results.append(rel)
-                        if len(results) >= 200:
-                            break
-                    continue
-                try:
-                    for i, line in enumerate(fp.read_text(encoding="utf-8", errors="replace").splitlines(), 1):
-                        if rx.search(line):
-                            results.append(f"{fp.relative_to(base)}:{i}  {line.rstrip()}")
-                            if len(results) >= 120:
+                    full_path = _os.path.join(root, fname)
+                    try:
+                        rel = _os.path.relpath(full_path, str(base))
+                    except ValueError:
+                        rel = full_path
+                    if is_file_list:
+                        if rel not in files_seen:
+                            files_seen.add(rel)
+                            results.append(rel)
+                            if len(results) >= 200:
                                 break
-                except (OSError, PermissionError, Exception):
-                    pass
-                if len(results) >= 120:
+                        continue
+                    try:
+                        with open(full_path, encoding="utf-8", errors="replace") as fh:
+                            for i, line in enumerate(fh, 1):
+                                if rx.search(line):
+                                    results.append(f"{rel}:{i}  {line.rstrip()}")
+                                    if len(results) >= 120:
+                                        break
+                    except (OSError, PermissionError):
+                        pass
+                    if len(results) >= 120:
+                        break
+                if (is_file_list and len(results) >= 200) or (not is_file_list and len(results) >= 120):
                     break
+
             if is_file_list:
-                summary = f"Found {len(results)} {file_ext} file(s)"
-                return {"ok": True, "output": summary, "data": "\n".join(results) or "(none found)"}
-            return {
-                "ok": True,
-                "output": f"Found {len(results)} match(es) for /{pattern}/",
-                "data": "\n".join(results) or "(no matches)",
-            }
+                return {"ok": True,
+                        "output": f"Found {len(results)} {suffix} file(s)",
+                        "data": "\n".join(results) or "(none found)"}
+            return {"ok": True,
+                    "output": f"Found {len(results)} match(es) for /{pattern}/",
+                    "data": "\n".join(results) or "(no matches)"}
         except Exception as e:
             return {"ok": False, "output": str(e), "data": ""}
 
