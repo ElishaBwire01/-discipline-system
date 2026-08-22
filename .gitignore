@@ -1,39 +1,9 @@
 ﻿# ============================================================
-# Python
 # PYTHON
 # ============================================================
 *.py[cod]
 __pycache__/
 *.pyo
-
-# Virtual environments
-venv/
-env/
-.venv/
-
-# Environment variables / secrets
-.env
-.env.*
-!.env.example
-
-# Python logs
-*.log
-
-
-# ============================================================
-# Django
-# ============================================================
-*.pot
-local_settings.py
-
-# Database files
-db.sqlite3
-db.sqlite3-journal
-*.sqlite3
-*.sqlite3-journal
-
-# User-uploaded / generated files
-media/
 *.pyd
 
 # Virtual environments
@@ -41,6 +11,8 @@ venv/
 .venv/
 env/
 ENV/
+env.bak/
+venv.bak/
 
 # ============================================================
 # ENVIRONMENT & SECRETS
@@ -48,9 +20,13 @@ ENV/
 .env
 .env.*
 !.env.example
+.env.backup*
+*.env.bak
+*.env.backup
 
-# Environment helper scripts containing secrets
+# Secret scripts
 env.ps1
+Untitled-*.ps1
 
 # ============================================================
 # DJANGO
@@ -59,7 +35,7 @@ env.ps1
 *.pot
 local_settings.py
 
-# SQLite databases and backups
+# SQLite databases
 *.sqlite3
 *.sqlite3-*
 *.db
@@ -67,65 +43,35 @@ local_settings.py
 *.sqlite
 *.sqlite-*
 
-# Django generated files
+# Django static/media
 staticfiles/
 media/
 
-
 # ============================================================
-# Secret / backup environment files
+# BACKUPS (NEVER COMMIT)
 # ============================================================
-.env.backup*
-.env.bak
-*.env.bak
-*.env.backup
-
-# Local environment scripts
-env.ps1
-
-
-# ============================================================
-# Backup files
-# ============================================================
-*.bak
-*.backup
-*.backup_*
-*_backup/
-*_backups/
-backup_*/
-backups_*/
-.backup/
-.fix_backup/
-
-
-# ============================================================
-# IDE / Editors
-# ============================================================
-# BACKUPS
-# ============================================================
-# Backup directories
-.fix_backup/
-backup*/
-backups*/
-*_backup*/
-*_backups*/
-template_backup*/
-views_backup*/
-
-# Backup files
 *.bak
 *.backup
 *.backup_*
 *.bak_*
+backup*/
+backups*/
+*_backup*/
+*_backups*/
+.fix_backup/
+template_backup*/
+views_backup*/
+secret_migration_backup_*/
 
 # ============================================================
-# TEST / DEBUG OUTPUT
+# TEST / DEBUG
 # ============================================================
 error_logs.txt
 smoke_upload.csv
-
-# Temporary/debug scripts
-Untitled-*.ps1
+deployment_*.txt
+environment_report_*.txt
+*.tmp
+*.temp
 
 # ============================================================
 # IDE / EDITORS
@@ -136,9 +82,6 @@ Untitled-*.ps1
 *.swo
 *.swn
 
-
-# ============================================================
-# Operating System
 # ============================================================
 # OPERATING SYSTEM
 # ============================================================
@@ -146,22 +89,6 @@ Untitled-*.ps1
 Thumbs.db
 Desktop.ini
 
-
-# ============================================================
-# Temporary files
-# ============================================================
-*.tmp
-*.temp
-*.cache
-*.old
-*~
-
-
-# ============================================================
-# Test / local files
-# ============================================================
-smoke_upload.csv
-test_connections.py
 # ============================================================
 # BUILD / CACHE
 # ============================================================
@@ -173,15 +100,7 @@ build/
 .ruff_cache/
 
 # ============================================================
-# COVERAGE
-# ============================================================
-.coverage
-.coverage.*
-htmlcov/
-.pytest_cache/
-
-# ============================================================
-# NODE / FRONTEND (if used later)
+# NODE / FRONTEND
 # ============================================================
 node_modules/
 npm-debug.log*
@@ -189,18 +108,21 @@ yarn-debug.log*
 yarn-error.log*
 
 # ============================================================
-# TEMPORARY FILES
+# SUPABASE
 # ============================================================
-*.tmp
-*.temp
-*.orig
-*~
-
-env.ps1
 supabase/config.toml
-Untitled-*.ps1
 
-environment_report_*.txt
-deployment_*audit*.txt
-deployment_inspection*.txt
-
+# ============================================================
+# LOCAL SCRIPTS (keep only shared ones)
+# ============================================================
+test_*.py
+add_*.py
+fix_*.py
+patch_*.py
+debug_*.py
+create_*.py
+verify_*.py
+update_*.py
+apply_*.py
+*.sh
+*.sed
