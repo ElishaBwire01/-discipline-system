@@ -36,10 +36,16 @@ IS_DEV = not IS_VERCEL
 # SECURITY
 # ============================================================
 
-SECRET_KEY = os.environ.get(
-    "SECRET_KEY",
-    "django-insecure-dev-key-change-in-production"
-)
+SECRET_KEY = os.environ.get("SECRET_KEY")
+
+if not SECRET_KEY and IS_VERCEL:
+    raise ValueError(
+        "SECRET_KEY environment variable is required in production!"
+    )
+
+if not SECRET_KEY:
+    SECRET_KEY = "django-insecure-dev-key-change-in-production"
+    print("WARNING: Using insecure development SECRET_KEY")
 
 # Never enable DEBUG in production unless explicitly requested.
 DEBUG = os.environ.get(
@@ -67,8 +73,7 @@ else:
     default_allowed_hosts = (
         "localhost,127.0.0.1,"
         ".trycloudflare.com,"
-        ".vercel.app,"
-        ".supabase.co"
+        ".vercel.app"
     )
 
     ALLOWED_HOSTS = [
@@ -95,6 +100,9 @@ CSRF_TRUSTED_ORIGINS = [
 
 # Automatically trust Vercel deployments when running on Vercel.
 if IS_VERCEL:
+    vercel_url = os.environ.get("VERCEL_URL")
+    if vercel_url:
+        CSRF_TRUSTED_ORIGINS.append(f"https://{vercel_url}")
     CSRF_TRUSTED_ORIGINS.extend(
         [
             "https://*.vercel.app",
@@ -199,10 +207,16 @@ WSGI_APPLICATION = "disciplinary_program.wsgi.application"
 # Get DATABASE_URL from environment
 # For Supabase, it should be:
 # postgresql://postgres:[PASSWORD]@db.[PROJECT_REF].supabase.co:5432/postgres
-DATABASE_URL = os.environ.get(
-    "DATABASE_URL",
-    "sqlite:///db.sqlite3"
-)
+DATABASE_URL = os.environ.get("DATABASE_URL")
+
+if not DATABASE_URL and IS_VERCEL:
+    raise ValueError(
+        "DATABASE_URL environment variable is required in production!"
+    )
+
+if not DATABASE_URL:
+    DATABASE_URL = "sqlite:///db.sqlite3"
+    print("INFO: Using SQLite for local development")
 
 # Configure database with production-ready settings
 DATABASES = {
@@ -288,69 +302,39 @@ if IS_VERCEL:
     pass
 
 # ============================================================
-# LOGGING
-# ============================================================
-#
-# IMPORTANT FOR VERCEL:
-#
-# /var/task is read-only.
-#
-# Therefore:
-#
-# LOCAL:
-#     BASE_DIR / "logs"
-#
-# VERCEL:
-#     /tmp/logs
-#
-# /tmp is writable during the serverless execution.
-#
-# Logs written to /tmp should be considered temporary.
-# They should NOT be used as permanent storage.
+# LOGGING - VERCEL SAFE (Read-only filesystem fix)
 # ============================================================
 
 if IS_VERCEL:
+    # Vercel filesystem is read-only except for /tmp
     LOGS_DIR = Path("/tmp/logs")
 else:
     LOGS_DIR = BASE_DIR / "logs"
 
-# Creating the directory is now safe:
-# - locally -> project/logs
-# - Vercel -> /tmp/logs
-LOGS_DIR.mkdir(
-    parents=True,
-    exist_ok=True
-)
+# Safely create the logging directory
+try:
+    LOGS_DIR.mkdir(parents=True, exist_ok=True)
+except OSError:
+    # If we can't create the directory (read-only filesystem), use memory-only
+    LOGS_DIR = None
 
-LOG_FILE = LOGS_DIR / "django.log"
+LOG_FILE = LOGS_DIR / "django.log" if LOGS_DIR else None
 
 LOGGING = {
     "version": 1,
-
     "disable_existing_loggers": False,
 
     "formatters": {
-        "verbose": {
-            "format": (
-                "{levelname} {asctime} "
-                "{module} {process:d} "
-                "{thread:d} {message}"
-            ),
-            "style": "{",
+        "json": {
+            "format": '{"level": "%(levelname)s", "time": "%(asctime)s", "module": "%(module)s", "message": "%(message)s"}',
+            "style": "%",
         },
-
         "simple": {
             "format": "{levelname} {message}",
             "style": "{",
         },
-        
-        "json": {
-            "format": (
-                '{{"level": "{levelname}", '
-                '"time": "{asctime}", '
-                '"module": "{module}", '
-                '"message": "{message}"}}'
-            ),
+        "verbose": {
+            "format": "{levelname} {asctime} {module} {process:d} {thread:d} {message}",
             "style": "{",
         },
     },
@@ -359,52 +343,51 @@ LOGGING = {
         # Console logging is especially useful on Vercel
         # because Vercel captures stdout/stderr.
         "console": {
-            "level": "INFO" if IS_VERCEL else "DEBUG",
+            "level": "INFO",
             "class": "logging.StreamHandler",
             "formatter": "json" if IS_VERCEL else "simple",
-        },
-
-        # Temporary file logging.
-        "file": {
-            "level": "ERROR",
-            "class": "logging.FileHandler",
-            "filename": str(LOG_FILE),
-            "formatter": "verbose",
         },
     },
 
     "root": {
-        "handlers": [
-            "console",
-            "file",
-        ],
-        "level": "INFO" if IS_VERCEL else "DEBUG",
+        "handlers": ["console"],
+        "level": "INFO",
     },
 
     "loggers": {
         "django": {
-            "handlers": [
-                "console",
-                "file",
-            ],
+            "handlers": ["console"],
             "level": "ERROR",
             "propagate": False,
         },
-        
         "django.db.backends": {
             "handlers": ["console"],
-            "level": "ERROR",  # Set to DEBUG to see SQL queries
+            "level": "ERROR",
             "propagate": False,
         },
-        
-        # Your app loggers
         "core": {
-            "handlers": ["console", "file"],
-            "level": "INFO" if IS_VERCEL else "DEBUG",
+            "handlers": ["console"],
+            "level": "INFO",
             "propagate": False,
         },
     },
 }
+
+# File logging is optional - Vercel primarily uses console logging
+# Only add file handler if we can write to the directory
+if LOGS_DIR and LOG_FILE:
+    try:
+        LOGGING["handlers"]["file"] = {
+            "level": "ERROR",
+            "class": "logging.FileHandler",
+            "filename": str(LOG_FILE),
+            "formatter": "verbose",
+        }
+        LOGGING["root"]["handlers"].append("file")
+        LOGGING["loggers"]["django"]["handlers"].append("file")
+        LOGGING["loggers"]["core"]["handlers"].append("file")
+    except (OSError, PermissionError):
+        pass
 
 # ============================================================
 # MEDIA FILES
@@ -585,9 +568,6 @@ if IS_VERCEL:
     
     # Referrer policy
     SECURE_REFERRER_POLICY = "strict-origin-when-cross-origin"
-    
-    # HSTS (already set above)
-    # SECURE_HSTS_SECONDS = 31536000
     
     # Secure cookies
     SESSION_COOKIE_SAMESITE = "Lax"
