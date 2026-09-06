@@ -1,16 +1,28 @@
-#!/bin/bash
-# build.sh - Build script for Vercel
+﻿#!/bin/bash
 
-echo "🔧 Starting build process..."
+set -e
 
-# Install dependencies
-pip install -r requirements.txt
+echo "============================================================"
+echo " DISCIPLINE SYSTEM - VERCEL BUILD"
+echo "============================================================"
 
-# Collect static files
+echo ""
+echo "Installing Python dependencies..."
+python -m pip install -r requirements.txt
+
+echo ""
+echo "Checking Django configuration..."
+python manage.py check
+
+echo ""
+echo "Applying Django database migrations..."
+python manage.py migrate --noinput
+
+echo ""
+echo "Collecting static files..."
 python manage.py collectstatic --noinput --clear
 
-# Verify static files
-echo "📁 Static files collected:"
-ls -la staticfiles/
-
-echo "✅ Build complete!"
+echo ""
+echo "============================================================"
+echo " BUILD COMPLETE"
+echo "============================================================"
