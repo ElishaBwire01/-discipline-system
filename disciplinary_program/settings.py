@@ -1,6 +1,6 @@
 """
 Django settings for disciplinary_program project.
-Production-ready with Vercel + Supabase support.
+Production-ready with Vercel + Supabase + Cloudflare support.
 """
 
 import os
@@ -59,7 +59,7 @@ DEBUG = os.environ.get(
 }
 
 # ============================================================
-# ALLOWED HOSTS
+# ALLOWED HOSTS - Cloudflare Tunnel Support
 # ============================================================
 
 if "test" in sys.argv:
@@ -70,10 +70,15 @@ if "test" in sys.argv:
     ]
 
 else:
+    # Cloudflare tunnel domains + Vercel + local development
     default_allowed_hosts = (
         "localhost,127.0.0.1,"
-        ".trycloudflare.com,"
-        ".vercel.app"
+        ".trycloudflare.com,"      # Cloudflare temporary tunnels
+        ".cfargotunnel.com,"       # Cloudflare named tunnels
+        ".cloudflare.com,"         # Cloudflare domains
+        ".ngrok.io,"               # Ngrok alternative
+        ".vercel.app,"             # Vercel deployments
+        "*"                        # Allow all in development (remove for production)
     )
 
     ALLOWED_HOSTS = [
@@ -86,9 +91,10 @@ else:
     ]
 
 # ============================================================
-# CSRF TRUSTED ORIGINS
+# CSRF TRUSTED ORIGINS - Cloudflare Tunnel Support
 # ============================================================
 
+# Get CSRF trusted origins from environment or use defaults
 CSRF_TRUSTED_ORIGINS = [
     origin.strip()
     for origin in os.environ.get(
@@ -98,17 +104,46 @@ CSRF_TRUSTED_ORIGINS = [
     if origin.strip()
 ]
 
+# Cloudflare tunnel CSRF trusted origins
+cloudflare_origins = [
+    "https://*.trycloudflare.com",
+    "https://*.cfargotunnel.com",
+    "https://*.cloudflare.com",
+    "http://*.trycloudflare.com",
+    "http://*.cfargotunnel.com",
+]
+
+# Add Cloudflare origins by default in development
+if IS_DEV:
+    CSRF_TRUSTED_ORIGINS.extend(cloudflare_origins)
+    # Also trust any custom domain
+    custom_domain = os.environ.get("CLOUDFLARE_DOMAIN")
+    if custom_domain:
+        CSRF_TRUSTED_ORIGINS.append(f"https://{custom_domain}")
+        CSRF_TRUSTED_ORIGINS.append(f"http://{custom_domain}")
+
 # Automatically trust Vercel deployments when running on Vercel.
 if IS_VERCEL:
+    # Vercel supplies VERCEL_URL without https://.
     vercel_url = os.environ.get("VERCEL_URL")
+
     if vercel_url:
-        CSRF_TRUSTED_ORIGINS.append(f"https://{vercel_url}")
+        vercel_url = vercel_url.strip().rstrip("/")
+
+        # Only append a host-style Vercel URL.
+        if vercel_url:
+            CSRF_TRUSTED_ORIGINS.append(
+                f"https://{vercel_url}"
+            )
+
+    # Wildcards cover Vercel preview deployment URLs.
     CSRF_TRUSTED_ORIGINS.extend(
         [
             "https://*.vercel.app",
             "https://*.vercel-staging.com",
         ]
     )
+
 else:
     # Allow local development with ngrok/cloudflare
     CSRF_TRUSTED_ORIGINS.extend(
@@ -117,6 +152,8 @@ else:
             "https://localhost:8000",
             "http://127.0.0.1:8000",
             "https://127.0.0.1:8000",
+            "http://localhost:3000",
+            "http://127.0.0.1:3000",
         ]
     )
 
@@ -124,6 +161,31 @@ else:
 CSRF_TRUSTED_ORIGINS = list(
     dict.fromkeys(CSRF_TRUSTED_ORIGINS)
 )
+
+# ============================================================
+# CORS Settings (for Cloudflare tunnels)
+# ============================================================
+
+# If you're using CORS headers (for API endpoints)
+CORS_ALLOW_ALL_ORIGINS = IS_DEV  # Only in development
+CORS_ALLOW_CREDENTIALS = True
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:8000",
+    "https://localhost:8000",
+    "http://127.0.0.1:8000",
+    "https://127.0.0.1:8000",
+    "https://*.trycloudflare.com",
+    "https://*.cfargotunnel.com",
+    "http://*.trycloudflare.com",
+    "http://*.cfargotunnel.com",
+]
+
+if IS_VERCEL:
+    CORS_ALLOWED_ORIGINS.extend([
+        "https://*.vercel.app",
+        "https://*.vercel-staging.com",
+    ])
 
 # ============================================================
 # APPLICATION DEFINITION
@@ -137,6 +199,9 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
 
+    # CORS headers (if using API)
+    # "corsheaders",
+
     # Your apps
     "core",
 ]
@@ -144,6 +209,9 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     # Security middleware first
     "django.middleware.security.SecurityMiddleware",
+    
+    # CORS middleware (if using corsheaders)
+    # "corsheaders.middleware.CorsMiddleware",
     
     # Session middleware
     "django.contrib.sessions.middleware.SessionMiddleware",
@@ -540,16 +608,22 @@ SESSION_COOKIE_AGE = 86400  # 24 hours in seconds
 SESSION_SAVE_EVERY_REQUEST = True
 
 # ============================================================
+# SECURE PROXY SSL HEADER - FIXED
+# ============================================================
+
+# Define this BEFORE using it
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+
+# Override for Vercel if needed
+if IS_VERCEL:
+    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+
+# ============================================================
 # PRODUCTION SECURITY (Vercel-specific)
 # ============================================================
 
 if IS_VERCEL:
     # SSL/HTTPS settings
-    SECURE_PROXY_SSL_HEADER = (
-        "HTTP_X_FORWARDED_PROTO",
-        "https",
-    )
-    
     SECURE_SSL_REDIRECT = True
     SECURE_HSTS_SECONDS = 31536000  # 1 year
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
@@ -559,8 +633,7 @@ if IS_VERCEL:
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
     SESSION_COOKIE_HTTPONLY = True
-    CSRF_COOKIE_HTTPONLY = True
-    
+    CSRF_COOKIE_HTTPONLY = False
     # Additional security headers
     SECURE_BROWSER_XSS_FILTER = True
     SECURE_CONTENT_TYPE_NOSNIFF = True
@@ -572,6 +645,22 @@ if IS_VERCEL:
     # Secure cookies
     SESSION_COOKIE_SAMESITE = "Lax"
     CSRF_COOKIE_SAMESITE = "Lax"
+
+# ============================================================
+# CLOUDFLARE SPECIFIC SETTINGS
+# ============================================================
+
+# Cloudflare tunnel configuration
+CLOUDFLARE_TUNNEL_URL = os.environ.get("CLOUDFLARE_TUNNEL_URL", "")
+
+# For Cloudflare WARP or Zero Trust
+CLOUDFLARE_ACCESS_ENABLED = os.environ.get("CLOUDFLARE_ACCESS_ENABLED", "False").lower() in {"1", "true", "yes", "on"}
+
+if CLOUDFLARE_ACCESS_ENABLED:
+    # Settings for Cloudflare Access
+    CLOUDFLARE_ACCESS_CLIENT_ID = os.environ.get("CLOUDFLARE_ACCESS_CLIENT_ID", "")
+    CLOUDFLARE_ACCESS_CLIENT_SECRET = os.environ.get("CLOUDFLARE_ACCESS_CLIENT_SECRET", "")
+    CLOUDFLARE_ACCESS_TEAM_DOMAIN = os.environ.get("CLOUDFLARE_ACCESS_TEAM_DOMAIN", "")
 
 # ============================================================
 # CORS (if needed for API)
@@ -634,7 +723,7 @@ if IS_DEV and DEBUG:
         pass
 
 # ============================================================
-# HEALTH CHECK (for Vercel)
+# HEALTH CHECK (for Vercel & Cloudflare)
 # ============================================================
 
 # Simple health check endpoint
