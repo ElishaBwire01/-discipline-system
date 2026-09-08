@@ -1,1 +1,1 @@
-https://discipline-ft7md2ede-elisha-program.vercel.app/﻿# Discipline System
+https://discipline-ft7md2ede-elisha-program.vercel.app/﻿
