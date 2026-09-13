@@ -251,7 +251,7 @@
             <i class="fa-solid fa-circle-check"></i>
             <div>
                 <strong>Password reset approved!</strong>
-                <p>Your password has been reset by the administrator. Use your new password to log in.</p>
+                <p>Log in with your username (no password required). You will be prompted to set a new password immediately.</p>
             </div>
         </div>
 
@@ -309,7 +309,7 @@
                 </div>
                 <div class="hint-box" id="resetHint">
                     <i class="fa-solid fa-circle-info text-primary"></i>
-                    Use the temporary password provided by the administrator.
+                    Log in with just your username; you will set a new password next.
                 </div>
             </div>
 
@@ -350,6 +350,11 @@
     if (params.get('reset') === 'approved') {
         document.getElementById('resetBanner').classList.add('show');
         document.getElementById('resetHint').classList.add('show');
+        const pwField = document.getElementById('password');
+        if (pwField) {
+            pwField.removeAttribute('required');
+            pwField.placeholder = 'Any password (you will set a new one next)';
+        }
     }
 </script>
 {% endblock %}

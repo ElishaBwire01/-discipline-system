@@ -45,7 +45,7 @@ from .models import (
 # ─────────────────────────────────────────────────────────────────────────────
 
 def _norm(text: str) -> str:
-    return re.sub(r"\s+", " ", (text or "").strip().lower())
+    return re.sub(r"\s+", " ", re.sub(r"[-_]+", " ", (text or "").strip().lower()))
 
 
 def _lines(title: str, rows: list, empty: str = "None found.") -> str:
@@ -628,18 +628,38 @@ class LocalQueryRouter:
     def _top_risk(self, limit: int = 25) -> str:
         qs = (
             Student.objects.filter(is_active=True)
-            .exclude(risk_level="GOOD")
+            .annotate(report_count=Count("reports"), report_points=Sum("reports__points"))
             .select_related("stream")
-            .order_by("-risk_score")[:limit]
+            .order_by("-risk_score", "-report_points", "-report_count", "name")[:limit]
         )
         rows = [
             f"- **{s.name}** #{s.admission_number} | "
             f"{s.stream.name if s.stream else '—'} {s.form} | "
             f"score={s.risk_score} {s.risk_level} | "
-            f"reports={s.reports.count()}"
+            f"reports={s.report_count} | report points={s.report_points or 0}"
             for s in qs
         ]
-        return _lines("**Highest-risk students (live risk_score, non-GOOD):**", rows, "No warning/critical students.")
+        active_count = Student.objects.filter(is_active=True).count()
+        elevated_count = Student.objects.filter(
+            is_active=True, risk_score__gte=30
+        ).count()
+        if not rows:
+            return (
+                "**At-risk student check — live from DB:**\n"
+                f"- Active students checked: **{active_count}**\n"
+                f"- Students at WARNING/CRITICAL threshold (risk_score >= 30): **{elevated_count}**\n"
+                "- Result: **No at-risk students are recorded under the configured thresholds.**"
+            )
+        if elevated_count == 0:
+            heading = "**No at-risk students are recorded under the configured thresholds. Highest scores checked:**"
+        else:
+            heading = f"**Most at-risk students — live from DB (top {len(rows)} of {active_count} active):**"
+        return (
+            heading + "\n"
+            f"- Active students checked: **{active_count}**\n"
+            f"- Students at WARNING/CRITICAL threshold (risk_score >= 30): **{elevated_count}**\n"
+            + "\n".join(rows)
+        )
 
     def _warning_students(self) -> str:
         qs = (

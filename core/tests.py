@@ -2,6 +2,7 @@ import pandas as pd
 from django.test import TestCase
 
 from core.ai_chat import PollinationAIChat
+from core.admin_agent_queries import LocalQueryRouter
 from core.views import build_upload_summary, extract_from_excel
 from core.models import Student, Stream
 
@@ -17,15 +18,48 @@ class AiTruthfulnessTests(TestCase):
         self.assertIn("data unavailable", response)
         self.assertNotIn("admission:", response)
 
-    def test_missing_stats_request_returns_data_unavailable(self):
+    def test_stats_request_reads_live_database(self):
         client = PollinationAIChat()
         result = client.chat("How many students are in the system?")
 
         self.assertTrue(result.get("success"))
-        self.assertEqual(result.get("mode"), "data_unavailable")
+        self.assertEqual(result.get("mode"), "local_db")
         response = (result.get("response") or "").lower()
-        self.assertIn("data unavailable", response)
-        self.assertNotIn("total students:", response)
+        self.assertIn("active students", response)
+        self.assertNotIn("data unavailable", response)
+
+    def test_at_risk_question_returns_ranked_live_records(self):
+        stream = Stream.objects.create(name="STEM")
+        Student.objects.create(
+            admission_number="RISK001", name="Critical Student", stream=stream,
+            form="Form 1", risk_score=80,
+        )
+        Student.objects.create(
+            admission_number="RISK002", name="Warning Student", stream=stream,
+            form="Form 1", risk_score=40,
+        )
+
+        result = PollinationAIChat().chat("Who are the most at-risk students?")
+
+        self.assertTrue(result.get("success"))
+        self.assertEqual(result.get("mode"), "local_db")
+        response = result.get("response") or ""
+        self.assertIn("Critical Student", response)
+        self.assertIn("score=80", response)
+        self.assertIn("Warning Student", response)
+        self.assertNotIn("DATA UNAVAILABLE", response)
+
+    def test_at_risk_question_reports_no_elevated_records(self):
+        stream = Stream.objects.create(name="STEM")
+        Student.objects.create(
+            admission_number="GOOD001", name="Good Student", stream=stream,
+            form="Form 1", risk_score=0,
+        )
+
+        response = LocalQueryRouter().answer("Who are the most at-risk students?")
+
+        self.assertIn("No at-risk students are recorded", response)
+        self.assertIn("Active students checked: **1**", response)
 
     def test_extract_from_excel_infers_higher_forms_and_streams(self):
         df = pd.DataFrame(

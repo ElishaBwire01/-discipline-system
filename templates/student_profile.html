@@ -275,7 +275,10 @@
                 <h4 class="mb-0">{{ student.name }}</h4>
                 <small class="text-light">{{ student.admission_number }}</small>
                 <div class="mt-2 d-flex gap-2 justify-content-center flex-wrap">
-                    {% if user.is_superuser or user.teacher_profile.assigned_stream == student.stream %}
+                    {% if user.is_superuser or user.groups.all.0.name == "ClassTeacher" %}
+                    <a href="/student/{{ student.id }}/edit/" class="btn btn-sm btn-modern btn-modern-secondary" style="background: linear-gradient(135deg, #64748b, #475569); color: white;">
+                        <i class="fa-solid fa-pen me-1"></i>Edit Student
+                    </a>
                     {% endif %}
                     <button class="btn btn-sm" id="aiInsightsBtn" style="background: linear-gradient(135deg, #7c3aed, #2563eb); color: white; border: none; padding: 6px 16px;">
                         <i class="fa-solid fa-brain me-1"></i>AI Insights
@@ -372,22 +375,27 @@
                                 <td>{{ report.reported_at|date:"Y-m-d H:i" }}</td>
                                 <td><span class="badge-modern badge-critical">{{ report.category.name }}</span></td>
                                 <td>
-                                    <a href="#" class="teacher-link" data-user-id="{{ report.reported_by.id }}" title="View {{ report.reported_by.get_full_name|default:report.reported_by.username }}'s Profile">
-                                        {% if report.reported_by.teacher_profile.profile_picture %}
-                                            <img src="{{ report.reported_by.teacher_profile.profile_picture.url }}" 
-                                                 alt="{{ report.reported_by.username }}" 
-                                                 class="teacher-avatar"
-                                                 onerror="this.style.display='none'; this.parentElement.querySelector('.teacher-avatar-fallback').style.display='flex';">
-                                            <span class="teacher-avatar-fallback">
-                                                {{ report.reported_by.get_full_name|default:report.reported_by.username|slice:":1"|upper }}
-                                            </span>
-                                        {% else %}
-                                            <span class="teacher-avatar-placeholder">
-                                                {{ report.reported_by.get_full_name|default:report.reported_by.username|slice:":1"|upper }}
-                                            </span>
-                                        {% endif %}
-                                        {{ report.reported_by.get_full_name|default:report.reported_by.username }}
-                                    </a>
+                                    <div class="d-flex align-items-center gap-2 flex-wrap">
+                                        <a href="#" class="teacher-link" data-user-id="{{ report.reported_by.id }}" title="Quick View {{ report.reported_by.get_full_name|default:report.reported_by.username }}">
+                                            {% if report.reported_by.teacher_profile.profile_picture %}
+                                                <img src="{{ report.reported_by.teacher_profile.profile_picture.url }}"
+                                                     alt="{{ report.reported_by.username }}"
+                                                     class="teacher-avatar"
+                                                     onerror="this.style.display='none'; this.parentElement.querySelector('.teacher-avatar-fallback').style.display='flex';">
+                                                <span class="teacher-avatar-fallback">
+                                                    {{ report.reported_by.get_full_name|default:report.reported_by.username|slice:":1"|upper }}
+                                                </span>
+                                            {% else %}
+                                                <span class="teacher-avatar-placeholder">
+                                                    {{ report.reported_by.get_full_name|default:report.reported_by.username|slice:":1"|upper }}
+                                                </span>
+                                            {% endif %}
+                                            {{ report.reported_by.get_full_name|default:report.reported_by.username }}
+                                        </a>
+                                        <a href="/profile/{{ report.reported_by.id }}/" class="btn-modern btn-modern-sm btn-modern-secondary" title="View Full Profile">
+                                            <i class="fa-solid fa-eye"></i>
+                                        </a>
+                                    </div>
                                 </td>
                                 <td class="text-danger fw-bold">+{{ report.points }}</td>
                                 <td>

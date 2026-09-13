@@ -1,0 +1,165 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Role Requests — {{ school_name|default:"Disciplinary System" }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card-modern">
+                <div class="card-header-modern">
+                    <span class="header-icon"><i class="fa-solid fa-user-gear"></i></span>
+                    Role Requests
+                    <span class="badge bg-light text-dark ms-2">{{ pending_requests|length }} Pending</span>
+                    <span class="badge bg-light text-dark ms-1">{{ all_requests|length }} Total</span>
+                </div>
+                <div class="card-body p-3">
+
+                    {% if pending_requests %}
+                    <!-- Pending Requests -->
+                    <div class="mb-4">
+                        <h5 class="mb-3"><i class="fa-solid fa-clock me-1"></i>Pending</h5>
+                        {% for req in pending_requests %}
+                        <div class="card p-3 mb-2" style="border-left: 4px solid #f59e0b;">
+                            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                                <div>
+                                    <strong>{{ req.requester.get_full_name|default:req.requester.username }}</strong>
+                                    <span class="badge-modern badge-info ms-2">{{ req.get_requested_role_display }}</span>
+                                    <div class="small text-muted mt-1">
+                                        Requested: {{ req.created_at|date:"Y-m-d H:i" }}
+                                        {% if req.target_stream %} → {{ req.target_stream.name }}{% endif %}
+                                        {% if req.target_form %} Form {{ req.target_form }}{% endif %}
+                                        {% if req.target_grade %} Grade {{ req.target_grade.name }}{% endif %}
+                                    </div>
+                                </div>
+                                <div class="d-flex gap-1">
+                                    <form method="post" action="/role-requests/approve/{{ req.id }}/" style="display:inline">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn-modern btn-modern-success btn-modern-sm">
+                                            <i class="fa-solid fa-check me-1"></i>Approve
+                                        </button>
+                                    </form>
+                                    <form method="post" action="/role-requests/reject/{{ req.id }}/" style="display:inline">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn-modern btn-modern-danger btn-modern-sm">
+                                            <i class="fa-solid fa-xmark me-1"></i>Reject
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    <hr>
+
+                    <!-- All Requests -->
+                    <h5 class="mb-3"><i class="fa-solid fa-list me-1"></i>All Requests</h5>
+                    {% if all_requests %}
+                    <div class="table-responsive">
+                        <table class="table-modern">
+                            <thead>
+                                <tr>
+                                    <th>Requester</th>
+                                    <th>Requested Role</th>
+                                    <th>Target</th>
+                                    <th>Status</th>
+                                    <th>Reviewed By</th>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for req in all_requests %}
+                                <tr>
+                                    <td><strong>{{ req.requester.get_full_name|default:req.requester.username }}</strong></td>
+                                    <td><span class="badge-modern badge-info">{{ req.get_requested_role_display }}</span></td>
+                                    <td>
+                                        {% if req.target_stream %}{{ req.target_stream.name }}{% endif %}
+                                        {% if req.target_form %} Form {{ req.target_form }}{% endif %}
+                                        {% if req.target_grade %} Gr.{{ req.target_grade.name }}{% endif %}
+                                        {% if not req.target_stream and not req.target_form and not req.target_grade %}Any{% endif %}
+                                    </td>
+                                    <td>
+                                        {% if req.status == "pending" %}
+                                            <span class="badge-modern badge-warning">Pending</span>
+                                        {% elif req.status == "approved" %}
+                                            <span class="badge-modern badge-success">Approved</span>
+                                        {% else %}
+                                            <span class="badge-modern badge-critical">Rejected</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{% if req.reviewed_by %}{{ req.reviewed_by.get_full_name|default:req.reviewed_by.username }}{% else %}—{% endif %}</td>
+                                    <td>{{ req.created_at|date:"Y-m-d H:i" }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                        <p class="text-muted text-center py-3">No role requests yet.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Manual Role Assignment -->
+        <div class="card-modern">
+            <div class="card-header-modern">
+                <i class="fa-solid fa-user-cog"></i> Manual Role Assignment (Admin Only)
+            </div>
+            <div class="card-body p-4">
+                <form method="post" action="/role-requests/manual/">
+                    {% csrf_token %}
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label-modern">Select User</label>
+                            <select name="user_id" class="form-control-modern" required>
+                                <option value="">-- Select User --</option>
+                                {% for u in all_users %}
+                                <option value="{{ u.id }}">{{ u.get_full_name|default:u.username }} ({{ u.groups.all.0.name|default:"User" }})</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label-modern">Assign Role</label>
+                            <select name="assign_role" class="form-control-modern" required>
+                                <option value="">-- Select Role --</option>
+                                <option value="Admin">Admin</option>
+                                <option value="ClassTeacher">Class Teacher</option>
+                                <option value="Teacher">Teacher</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label-modern">Stream</label>
+                            <select name="assign_stream" class="form-control-modern">
+                                <option value="">-- Select --</option>
+                                {% for stream in streams %}
+                                <option value="{{ stream.id }}">{{ stream.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label-modern">Form</label>
+                            <select name="assign_form" class="form-control-modern">
+                                <option value="">-- Select --</option>
+                                <option value="A">Form A</option>
+                                <option value="B">Form B</option>
+                                <option value="C">Form C</option>
+                                <option value="D">Form D</option>
+                                <option value="E">Form E</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <button type="submit" class="btn-modern btn-modern-primary">
+                            <i class="fa-solid fa-user-cog me-1"></i>Apply Assignment
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

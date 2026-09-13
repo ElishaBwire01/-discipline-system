@@ -3,93 +3,7 @@
 
 {% block title %}Add Student - {{ school_name|default:"Disciplinary System" }}{% endblock %}
 
-{% block content %}
-<div class="card-modern">
-    <div class="card-header-modern">
-        <span class="header-icon"><i class="fa-solid fa-user-plus"></i></span>
-        Add Student
-        {% if user.is_superuser %}
-        <a href="{% url 'core:school_setup' %}" class="btn btn-sm btn-outline-light ms-auto">
-            <i class="fa-solid fa-file-arrow-up me-1"></i>Bulk Upload
-        </a>
-        {% endif %}
-    </div>
-    <div class="card-body">
-        <form method="post" class="row g-3">
-            {% csrf_token %}
-
-            <div class="col-md-6">
-                <label class="form-label-modern">Admission Number *</label>
-                <input type="text" name="admission_number" class="form-control-modern"
-                       placeholder="e.g., 2024-001" required>
-            </div>
-
-            <div class="col-md-6">
-                <label class="form-label-modern">Full Name *</label>
-                <input type="text" name="name" class="form-control-modern"
-                       placeholder="Enter full name" required>
-            </div>
-
-            <div class="col-md-4">
-                <label class="form-label-modern">Stream/Class *</label>
-                <select name="stream" class="form-control-modern" required {% if lock_class %}disabled{% endif %}>
-                    <option value="">-- Select Stream --</option>
-                    {% for stream in streams %}
-                        <option value="{{ stream.id }}" {% if lock_class %}selected{% endif %}>{{ stream.name }}</option>
-                    {% endfor %}
-                </select>
-                {% if lock_class %}
-                <input type="hidden" name="stream" value="{{ streams.0.id }}">
-                {% endif %}
-            </div>
-
-            <div class="col-md-4">
-                <label class="form-label-modern">Grade Level</label>
-                <select name="grade_level" class="form-control-modern">
-                    <option value="">-- Select Grade --</option>
-                    {% for grade in grade_levels %}
-                        <option value="{{ grade.id }}">{{ grade.name }} ({{ grade.code }})</option>
-                    {% endfor %}
-                </select>
-            </div>
-
-            <div class="col-md-4">
-                <label class="form-label-modern">Form *</label>
-                <select name="form" class="form-control-modern" required {% if lock_class %}disabled{% endif %}>
-                    <option value="">-- Select Form --</option>
-                    {% for form_key, form_name in forms %}
-                        <option value="{{ form_key }}" {% if lock_class and assigned_form == form_key %}selected{% endif %}>{{ form_name }}</option>
-                    {% endfor %}
-                </select>
-                {% if lock_class %}
-                <input type="hidden" name="form" value="{{ assigned_form }}">
-                {% endif %}
-            </div>
-
-            <div class="col-md-12">
-                <label class="form-label-modern">Year</label>
-                <input type="number" name="year" class="form-control-modern"
-                       value="{% now 'Y' %}" required>
-            </div>
-
-            <div class="col-12">
-                <label class="form-label-modern">Optional Notes</label>
-                <textarea name="optional_notes" class="form-control-modern" rows="3"
-                          placeholder="Any additional information about the student..."></textarea>
-            </div>
-
-            <div class="col-12">
-                <button type="submit" class="btn-modern btn-modern-primary">
-                    <i class="fa-solid fa-user-plus me-1"></i> Add Student
-                </button>
-                <a href="{% url 'core:dashboard' %}" class="btn-modern btn-modern-secondary ms-2">
-                    <i class="fa-solid fa-arrow-left me-1"></i> Cancel
-                </a>
-            </div>
-        </form>
-    </div>
-</div>
-
+{% block extra_css %}
 <style>
     .form-label-modern {
         font-weight: 600;
@@ -106,6 +20,7 @@
         font-size: 0.9375rem;
         transition: all 0.3s;
         background: #f8fafc;
+        color: #0f172a;
     }
     .form-control-modern:focus {
         border-color: #2563eb;
@@ -117,5 +32,166 @@
         color: #0f172a !important;
         background: white !important;
     }
+    .pic-upload-area {
+        border: 2px dashed #cbd5e1;
+        border-radius: 12px;
+        padding: 1.5rem;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s;
+        background: #f8fafc;
+    }
+    .pic-upload-area:hover {
+        border-color: #2563eb;
+        background: #eff6ff;
+    }
+    .pic-upload-area .upload-icon {
+        font-size: 2rem;
+        color: #94a3b8;
+    }
+    .pic-upload-area .upload-text {
+        font-size: 0.875rem;
+        color: #64748b;
+        margin-top: 0.5rem;
+    }
+    .pic-upload-area .upload-hint {
+        font-size: 0.7rem;
+        color: #94a3b8;
+        margin-top: 0.25rem;
+    }
 </style>
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card-modern">
+            <div class="card-header-modern">
+                <span class="header-icon"><i class="fa-solid fa-user-plus"></i></span>
+                Add Student
+                {% if user.is_superuser %}
+                <a href="{% url 'core:school_setup' %}" class="btn btn-sm btn-outline-light ms-auto">
+                    <i class="fa-solid fa-file-arrow-up me-1"></i>Bulk Upload
+                </a>
+                {% endif %}
+            </div>
+            <div class="card-body p-4">
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+
+                    <!-- Profile Picture -->
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-4 text-center">
+                            <div class="pic-upload-area" id="picUploadArea" onclick="document.getElementById('profile_picture').click()">
+                                <img id="picPreview" style="width:100px;height:100px;border-radius:50%;object-fit:cover;display:none;" alt="Preview">
+                                <div id="picPlaceholder" style="display:block;">
+                                    <div class="upload-icon"><i class="fa-solid fa-camera"></i></div>
+                                    <div class="upload-text">Tap to add photo</div>
+                                    <div class="upload-hint">JPG, PNG, WEBP (max 5MB)</div>
+                                </div>
+                            </div>
+                            <input type="file" name="profile_picture" class="form-control-modern" accept=".jpg,.jpeg,.png,.webp" id="profile_picture" style="display:none;" onchange="previewPic(this)">
+                        </div>
+                        <div class="col-md-8">
+                            <div class="student-info-card">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="info-label">Admission Number *</div>
+                                        <div class="info-value">Required</div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="info-label">Grade Level</div>
+                                        <div class="info-value">Optional</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Student Fields -->
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label-modern">Full Name *</label>
+                            <input type="text" name="name" class="form-control-modern" placeholder="Enter full name" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label-modern">Admission Number *</label>
+                            <input type="text" name="admission_number" class="form-control-modern" placeholder="e.g., 2024-001" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label-modern">Stream/Class *</label>
+                            <select name="stream" class="form-control-modern" required {% if lock_class %}disabled{% endif %}>
+                                <option value="">-- Select Stream --</option>
+                                {% for stream in streams %}
+                                    <option value="{{ stream.id }}" {% if lock_class %}selected{% endif %}>{{ stream.name }}</option>
+                                {% endfor %}
+                            </select>
+                            {% if lock_class %}
+                            <input type="hidden" name="stream" value="{{ streams.0.id }}">
+                            {% endif %}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label-modern">Grade Level {% if lock_class %}<span class="text-muted" style="font-weight:400;font-size:.75rem;">(optional, locked)</span>{% endif %}</label>
+                            <select name="grade_level" class="form-control-modern" {% if lock_class %}disabled{% endif %}>
+                                <option value="">-- Select Grade --</option>
+                                {% for grade in grade_levels %}
+                                    <option value="{{ grade.id }}">{{ grade.name }} ({{ grade.code }})</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label-modern">Form *</label>
+                            <select name="form" class="form-control-modern" required {% if lock_class %}disabled{% endif %}>
+                                <option value="">-- Select Form --</option>
+                                {% for form_key, form_name in forms %}
+                                    <option value="{{ form_key }}" {% if lock_class and assigned_form == form_key %}selected{% endif %}>{{ form_name }}</option>
+                                {% endfor %}
+                            </select>
+                            {% if lock_class %}
+                            <input type="hidden" name="form" value="{{ assigned_form }}">
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label-modern">Year</label>
+                            <input type="number" name="year" class="form-control-modern" value="{% now 'Y' %}">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label-modern">Risk Score (Optional)</label>
+                            <input type="number" name="risk_score" class="form-control-modern" min="0" max="100" value="0" placeholder="0-100">
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label-modern">Optional Notes</label>
+                            <textarea name="optional_notes" class="form-control-modern" rows="3" placeholder="Any additional information about the student..."></textarea>
+                        </div>
+                    </div>
+
+                    <div class="d-flex gap-2 mt-4 flex-wrap">
+                        <button type="submit" class="btn-modern btn-modern-primary">
+                            <i class="fa-solid fa-user-plus me-1"></i>Add Student
+                        </button>
+                        <a href="{% url 'core:dashboard' %}" class="btn-modern btn-modern-secondary">
+                            <i class="fa-solid fa-arrow-left me-1"></i>Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function previewPic(input) {
+    if (input.files && input.files[0]) {
+        var reader = new FileReader();
+        reader.onload = function(e) {
+            var preview = document.getElementById('picPreview');
+            var placeholder = document.getElementById('picPlaceholder');
+            preview.src = e.target.result;
+            preview.style.display = 'block';
+            placeholder.style.display = 'none';
+        };
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+</script>
 {% endblock %}

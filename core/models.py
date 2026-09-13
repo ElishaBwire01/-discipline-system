@@ -127,6 +127,7 @@ class TeacherProfile(models.Model):
     suspended_at = models.DateTimeField(blank=True, null=True)
     approved_at = models.DateTimeField(blank=True, null=True)
     approved_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='approved_teachers')
+    must_reset_password = models.BooleanField(default=False)
 
     def __str__(self):
         return f"{self.user.get_full_name()} - {self.assigned_stream}"
@@ -505,6 +506,38 @@ class Notification(models.Model):
         if not self.target_users.exists():
             self.is_read = True
             self.save(update_fields=['is_read'])
+
+
+class RoleRequest(models.Model):
+    ROLE_CHOICES = [
+        ("Admin", "Admin"),
+        ("ClassTeacher", "Class Teacher"),
+        ("Teacher", "Teacher"),
+    ]
+    STATUS_CHOICES = [
+        ("pending", "Pending"),
+        ("approved", "Approved"),
+        ("rejected", "Rejected"),
+    ]
+
+    requester = models.ForeignKey(User, on_delete=models.CASCADE, related_name="role_requests")
+    requested_role = models.CharField(max_length=20, choices=ROLE_CHOICES)
+    target_stream = models.ForeignKey(Stream, on_delete=models.SET_NULL, null=True, blank=True)
+    target_form = models.CharField(max_length=10, blank=True, null=True)
+    target_grade = models.ForeignKey(GradeLevel, on_delete=models.SET_NULL, null=True, blank=True)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="pending")
+    reviewed_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name="reviewed_requests")
+    reviewed_at = models.DateTimeField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+        indexes = [
+            models.Index(fields=["status", "created_at"]),
+        ]
+
+    def __str__(self):
+        return f"{self.requester} → {self.requested_role} ({self.status})"
 
 
 class PasswordReset(models.Model):

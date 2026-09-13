@@ -257,3 +257,101 @@
         font-size: 2.5rem;
     }
 }
+
+/* ===== CLICKABLE STAT CARDS ===== */
+.stat-grid a.stat-card {
+    text-decoration: none; color: inherit;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    transition: var(--transition);
+}
+.stat-grid a.stat-card:hover {
+    transform: translateY(-3px); box-shadow: var(--shadow-lg);
+}
+
+/* ===== TOUCH FRIENDLY ===== */
+.btn, .btn-modern, .nav-link, .offcanvas-nav-link {
+    -webkit-tap-highlight-color: transparent;
+    cursor: pointer;
+}
+.btn-modern, .btn-modern-sm {
+    min-height: 44px;
+}
+.offcanvas-nav-link {
+    min-height: 48px;
+}
+
+/* ===== CARD ACTION ICONS ===== */
+.card-action-btn {
+    width: 36px; height: 36px;
+    display: inline-flex; align-items: center; justify-content: center;
+    border-radius: var(--radius);
+    background: rgba(255,255,255,0.15);
+    color: white; border: none; cursor: pointer;
+    transition: var(--transition);
+    flex-shrink: 0;
+}
+.card-action-btn:hover {
+    background: rgba(255,255,255,0.3);
+    transform: scale(1.1);
+}
+
+/* ===== STUDENT TABLE → CARDS (MOBILE) ===== */
+@media (max-width: 576px) {
+    /* Convert table rows to cards */
+    .table-modern thead { display: none; }
+    .table-modern tbody tr {
+        display: block;
+        background: white;
+        border: 1px solid var(--gray-200);
+        border-radius: var(--radius);
+        padding: 0.75rem;
+        margin-bottom: 0.75rem;
+        box-shadow: var(--shadow-sm);
+    }
+    .table-modern tbody td {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0.35rem 0.5rem;
+        border: none;
+        font-size: 0.8rem;
+        min-height: 32px;
+    }
+    .table-modern tbody td::before {
+        content: attr(data-label);
+        font-weight: 600;
+        color: var(--gray-500);
+        font-size: 0.65rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-right: auto;
+    }
+    /* Hide less important columns on mobile */
+    .table-modern tbody td:nth-child(2),
+    .table-modern tbody td:nth-child(4),
+    .table-modern tbody td:nth-child(6),
+    .table-modern tbody td:nth-child(7),
+    .table-modern tbody td:nth-child(8) {
+        display: none;
+    }
+    /* Show name and action columns */
+    .table-modern tbody td:nth-child(3) {
+        border-bottom: 1px solid var(--gray-100);
+        padding-bottom: 0.5rem;
+        margin-bottom: 0.25rem;
+    }
+    .table-modern tbody td:nth-child(9) {
+        justify-content: flex-end;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+    }
+    /* Mobile-only popup button */
+    .table-modern tbody td:nth-child(9) .btn-outline-primary {
+        min-height: 44px;
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
+    /* Bulk edit toolbar */
+    #bulkEditToolbar .row.g-3 { flex-wrap: nowrap; overflow-x: auto; }
+}

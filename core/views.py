@@ -52,6 +52,7 @@ from .models import (
     GradeLevel,
     Notification,
     PasswordReset,
+    RoleRequest,
     School,
     Stream,
     Student,
@@ -104,10 +105,13 @@ def rate_limited(key_prefix, limit, window_seconds):
                 logger.warning(
                     "Rate limit exceeded | key=%s | ip=%s", key_prefix, _client_ip(request)
                 )
-                return JsonResponse(
-                    {"error": "Too many requests. Please try again later."},
-                    status=429,
-                )
+                if request.headers.get("x-requested-with") == "XMLHttpRequest" or request.is_ajax():
+                    return JsonResponse(
+                        {"error": "Too many requests. Please try again later."},
+                        status=429,
+                    )
+                messages.error(request, "Too many login attempts. Please wait a few minutes and try again.")
+                return render(request, "login.html")
             try:
                 cache.incr(cache_key)
             except ValueError:
@@ -271,6 +275,25 @@ def _create_report(request, student, post):
         report.category_name = custom_case
     report.save()
 
+    # Notify class teachers whose class includes this student
+    ct_profiles = TeacherProfile.objects.filter(
+        user__groups__name="ClassTeacher",
+        assigned_stream_id=student.stream_id,
+        assigned_form=student.form,
+        is_active=True,
+    ).select_related("user")
+    for ct_profile in ct_profiles:
+        if ct_profile.user_id != request.user.id:
+            notif = Notification.objects.create(
+                title=f"New Report: {student.name}",
+                message=f"A report was filed for student {student.name} "
+                        f"({student.admission_number}) in your class {student.stream.name}/{student.form}. "
+                        f"Category: {category_name}. Reported by {request.user.get_full_name() or request.user.username}.",
+                notification_type="warning",
+                student=student,
+            )
+            notif.target_users.add(ct_profile.user)
+
     rating_label = get_rating_label(rating)
     messages.success(
         request,
@@ -380,7 +403,7 @@ def dashboard_redirect(request):
 
 
 @never_cache
-@rate_limited("login", limit=10, window_seconds=300)
+@rate_limited("login", limit=20, window_seconds=300)
 def custom_login(request):
     if request.user.is_authenticated:
         return redirect("/dashboard/")
@@ -389,6 +412,17 @@ def custom_login(request):
         username = request.POST.get("username", "").strip()
         password = request.POST.get("password", "")
         user = authenticate(request, username=username, password=password)
+
+        if user is None:
+            try:
+                user = User.objects.get(username=username)
+                profile = get_teacher_profile(user)
+                if profile and profile.must_reset_password and user.is_active:
+                    pass
+                else:
+                    user = None
+            except User.DoesNotExist:
+                user = None
 
         if user is not None:
             if not user.is_active:
@@ -424,6 +458,9 @@ def custom_login(request):
                 profile.is_online = True
                 profile.last_activity = timezone.now()
                 profile.save(update_fields=["is_online", "last_activity"])
+
+            if profile and profile.must_reset_password:
+                return redirect("core:user_profile_settings")
 
             if user.groups.filter(name="ClassTeacher").exists():
                 if not profile or not profile.has_chosen_stream:
@@ -639,20 +676,28 @@ def choose_stream(request):
 
 @login_required
 def teacher_dashboard(request):
-    """Subject/general teacher dashboard: sees all students school-wide (unlike
-    a ClassTeacher, who is restricted to their own stream+form).
+    """Subject/general teacher dashboard: sees all students school-wide.
+    Class teachers can also access this to see all students, report,
+    and view profiles, but cannot edit students.
     """
     if request.user.is_superuser:
         return redirect("core:admin_dashboard")
-    if request.user.groups.filter(name="ClassTeacher").exists():
-        return redirect("core:class_teacher_dashboard")
-    if not request.user.groups.filter(name="Teacher").exists():
+    if not request.user.groups.filter(name="Teacher").exists() and not request.user.groups.filter(name="ClassTeacher").exists():
         raise PermissionDenied("Teacher access required")
+
+    is_class_teacher = request.user.groups.filter(name="ClassTeacher").exists()
 
     per_page = _paginate_per_page(request)
     streams = _get_active_streams()
 
     students_qs, search_query, stream_filter, form_filter = get_filtered_students(request)
+    students_qs = students_qs.select_related("stream", "grade_level")
+    if search_query:
+        students_qs = students_qs.filter(
+            Q(name__icontains=search_query)
+            | Q(admission_number__icontains=search_query)
+        )
+    students_qs = students_qs.order_by("name")
 
     paginator = Paginator(students_qs, per_page)
     students_page = paginator.get_page(request.GET.get("page"))
@@ -667,8 +712,8 @@ def teacher_dashboard(request):
                 return redirect("/teacher-dashboard/")
 
     context = {
-        "page_obj": students_page,  # For pagination template
-        "per_page": per_page,  # For pagination
+        "page_obj": students_page,
+        "per_page": per_page,
         "streams": streams,
         "students": students_page,
         "categories": _get_active_categories(),
@@ -676,7 +721,7 @@ def teacher_dashboard(request):
         "search_query": search_query,
         "stream_filter": stream_filter,
         "form_filter": form_filter,
-        "per_page": per_page,
+        "is_class_teacher": is_class_teacher,
         **_get_notification_context(request),
     }
     return render(request, "teacher_dashboard.html", context)
@@ -723,6 +768,42 @@ def class_teacher_dashboard(request):
                 _create_report(request, student, request.POST)
                 return redirect("/class-teacher-dashboard/")
             messages.error(request, "That student is not in your class.")
+        elif action == "add_student":
+            admission_number = request.POST.get("admission_number", "").strip()
+            name = request.POST.get("name", "").strip()
+            form = request.POST.get("form", "").strip()
+            year_str = request.POST.get("year", str(timezone.now().year))
+            profile_picture = request.FILES.get("profile_picture")
+            stream = profile.assigned_stream
+
+            if not admission_number or not name:
+                messages.error(request, "Admission number and name are required.")
+            elif not form:
+                messages.error(request, "Please select a form.")
+            elif Student.objects.filter(admission_number=admission_number).exists():
+                messages.error(request, "A student with that admission number already exists.")
+            else:
+                try:
+                    year = int(year_str)
+                except (ValueError, TypeError):
+                    year = timezone.now().year
+                student = Student.objects.create(
+                    admission_number=admission_number,
+                    name=name,
+                    stream=stream,
+                    form=form,
+                    year=year,
+                    created_by=request.user,
+                )
+                if profile_picture:
+                    max_size_bytes = 5 * 1024 * 1024
+                    allowed_extensions = {".jpg", ".jpeg", ".png", ".webp"}
+                    ext = os.path.splitext(profile_picture.name)[1].lower()
+                    if profile_picture.size <= max_size_bytes and ext in allowed_extensions:
+                        student.profile_picture = profile_picture
+                        student.save(update_fields=["profile_picture"])
+                messages.success(request, f"Student '{student.name}' added to {stream.name}!")
+                return redirect("/class-teacher-dashboard/")
 
     # Calculate class statistics
     total_in_class = base_qs.count()
@@ -752,9 +833,62 @@ def class_teacher_dashboard(request):
         "categories": _get_active_categories(),
         "search_query": search_query,
         "per_page": per_page,
+        "streams": Stream.objects.filter(id=profile.assigned_stream_id, is_active=True).order_by("name"),
+        "grade_levels": GradeLevel.objects.filter(is_active=True).order_by("order"),
+        "lock_class": True,
+        "assigned_form": profile.assigned_form or "",
         **_get_notification_context(request),
     }
     return render(request, "class_teacher_dashboard.html", context)
+
+
+@login_required
+@user_passes_test(class_teacher_required)
+def class_summary(request):
+    """
+    Class teacher's class summary page: shows class overview, discipline rate,
+    top critical students, and report generation options.
+    """
+    profile = get_teacher_profile(request.user)
+    if not profile or not profile.has_chosen_stream:
+        return redirect("core:choose_stream")
+
+    base_qs = _class_teacher_scope(profile)
+    students = base_qs.select_related("stream", "grade_level").order_by("name")
+
+    total = students.count()
+    critical = students.filter(risk_level="CRITICAL").order_by("-risk_score")[:5]
+    warning = students.filter(risk_level="WARNING").order_by("-risk_score")[:5]
+    avg_risk = students.aggregate(avg=Avg("risk_score"))["avg"] or 0
+    total_reports = sum(s.reports.count() for s in students)
+    critical_count = students.filter(risk_level="CRITICAL").count()
+    warning_count = students.filter(risk_level="WARNING").count()
+    good_count = students.filter(risk_level="GOOD").count()
+
+    category_breakdown = (
+        DisciplineReport.objects.filter(student__in=students)
+        .values("category__name")
+        .annotate(count=Count("id"))
+        .order_by("-count")[:10]
+    )
+
+    context = {
+        "assigned_stream": profile.assigned_stream,
+        "assigned_form": profile.assigned_form,
+        "total_students": total,
+        "critical_count": critical_count,
+        "warning_count": warning_count,
+        "good_count": good_count,
+        "critical_students": critical,
+        "warning_students": warning,
+        "avg_risk": round(avg_risk, 1),
+        "total_reports": total_reports,
+        "category_breakdown": category_breakdown,
+        "streams": _get_active_streams(),
+        "grade_levels": GradeLevel.objects.filter(is_active=True).order_by("order"),
+        **_get_notification_context(request),
+    }
+    return render(request, "class_summary.html", context)
 
 
 @login_required
@@ -766,12 +900,85 @@ def admin_dashboard(request):
     """
     from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
-    if request.method == "POST" and request.POST.get("action") == "report_student":
-        student_id = request.POST.get("student_id")
-        if student_id:
-            student = get_object_or_404(Student, id=student_id, is_active=True)
-            _create_report(request, student, request.POST)
-        return redirect("core:admin_dashboard")
+    if request.method == "POST":
+        action = request.POST.get("action")
+        if action == "report_student":
+            student_id = request.POST.get("student_id")
+            if student_id:
+                student = get_object_or_404(Student, id=student_id, is_active=True)
+                _create_report(request, student, request.POST)
+            return redirect("core:admin_dashboard")
+        elif action == "bulk_edit":
+            student_ids = request.POST.getlist("student_ids")
+            edit_field = request.POST.get("edit_field", "")
+            edit_value = request.POST.get("edit_value", "").strip()
+            if student_ids and edit_field:
+                updated = 0
+                for sid in student_ids:
+                    try:
+                        s = Student.objects.get(id=sid, is_active=True)
+                        if edit_field == "stream_id":
+                            try:
+                                s.stream = Stream.objects.get(id=edit_value, is_active=True)
+                            except Stream.DoesNotExist:
+                                continue
+                        elif edit_field == "grade_level_id":
+                            if edit_value:
+                                try:
+                                    s.grade_level = GradeLevel.objects.get(id=edit_value, is_active=True)
+                                except GradeLevel.DoesNotExist:
+                                    continue
+                            else:
+                                s.grade_level = None
+                        elif edit_field == "form":
+                            s.form = edit_value
+                        elif edit_field == "year":
+                            try:
+                                s.year = int(edit_value)
+                            except (ValueError, TypeError):
+                                continue
+                        s.save()
+                        updated += 1
+                    except Student.DoesNotExist:
+                        continue
+                messages.success(request, f"Updated {updated} student(s).")
+            return redirect("core:admin_dashboard")
+
+        elif action == "bulk_transfer":
+            source_stream_id = request.POST.get("transfer_source_stream", "")
+            target_stream_id = request.POST.get("transfer_target_stream", "")
+            transfer_grade = request.POST.get("transfer_grade", "")
+            transfer_form = request.POST.get("transfer_form", "")
+
+            if not source_stream_id or not target_stream_id:
+                messages.error(request, "Select both source and target streams.")
+                return redirect("core:admin_dashboard")
+
+            try:
+                source_stream = Stream.objects.get(id=source_stream_id, is_active=True)
+                target_stream = Stream.objects.get(id=target_stream_id, is_active=True)
+            except Stream.DoesNotExist:
+                messages.error(request, "Invalid stream selected.")
+                return redirect("core:admin_dashboard")
+
+            if source_stream.id == target_stream.id:
+                messages.error(request, "Source and target streams must be different.")
+                return redirect("core:admin_dashboard")
+
+            transfer_qs = Student.objects.filter(stream=source_stream, is_active=True)
+            if transfer_grade:
+                transfer_qs = transfer_qs.filter(grade_level__id=transfer_grade)
+            if transfer_form:
+                transfer_qs = transfer_qs.filter(form=transfer_form)
+
+            count = transfer_qs.count()
+            if count > 0:
+                transfer_qs.update(stream=target_stream)
+                messages.success(request, f"Transferred {count} student(s) from '{source_stream.name}' to '{target_stream.name}'.")
+            else:
+                messages.info(request, "No students match the selected filters.")
+            invalidate_lookup_caches()
+            return redirect("core:admin_dashboard")
 
     students_list = Student.objects.filter(is_active=True).select_related('stream', 'grade_level')
     total_students = students_list.count()
@@ -822,6 +1029,12 @@ def admin_dashboard(request):
         "avg_risk_score": students_list.aggregate(Avg("risk_score"))["risk_score__avg"] or 0,
         "forms": _get_form_choices(),
         "per_page": per_page,
+        "critical_percentage": round(critical_count / total_students * 100, 1) if total_students else 0,
+        "warning_percentage": round(warning_count / total_students * 100, 1) if total_students else 0,
+        "good_percentage": round(good_count / total_students * 100, 1) if total_students else 0,
+        "critical_students_count": critical_count,
+        "warning_students_count": warning_count,
+        "good_students_count": good_count,
         **_get_notification_context(request),
     }
     return render(request, "admin_dashboard.html", context)
@@ -879,27 +1092,40 @@ def student_profile(request, student_id):
 @login_required
 def edit_student(request, student_id):
     """
-    Edit a student's core details. Admins and general teachers can edit any
-    student; class teachers may only edit students within their own scope.
-
-    FIX (ERROR 14): missing entirely.
+    Edit a student's core details. Admins can edit any student;
+    class teachers can only edit students in their own stream+form.
+    Normal teachers cannot edit students.
     """
     student = get_object_or_404(Student, id=student_id, is_active=True)
 
-    if not request.user.is_superuser:
+    is_class_teacher = request.user.groups.filter(name="ClassTeacher").exists()
+    is_admin = request.user.is_superuser
+
+    if not is_admin and not is_class_teacher:
+        messages.error(request, "You do not have permission to edit students.")
+        return redirect("/teacher-dashboard/")
+
+    if is_class_teacher and not is_admin:
         profile = get_teacher_profile(request.user)
-        is_class_teacher = request.user.groups.filter(name="ClassTeacher").exists()
-        if is_class_teacher:
-            if not profile or not _class_teacher_scope(profile).filter(id=student.id).exists():
-                messages.error(request, "You do not have permission to edit this student.")
-                return redirect("/class-teacher-dashboard/")
+        if not profile or not _class_teacher_scope(profile).filter(id=student.id).exists():
+            messages.error(request, "You do not have permission to edit this student.")
+            return redirect("/class-teacher-dashboard/")
 
     if request.method == "POST":
+        action = request.POST.get("action", "")
+
+        if action == "delete_picture":
+            student.profile_picture = None
+            student.save(update_fields=["profile_picture"])
+            messages.success(request, "Profile picture removed.")
+            return redirect("core:student_profile", student_id=student.id)
+
         name = request.POST.get("name", "").strip()
         admission_number = request.POST.get("admission_number", "").strip()
-        stream_id = request.POST.get("stream_id")
-        form = request.POST.get("form", "").strip()
         optional_notes = request.POST.get("optional_notes", "").strip()
+
+        is_class_teacher_view = request.user.groups.filter(name="ClassTeacher").exists()
+        is_admin_view = request.user.is_superuser
 
         errors = []
         if not name:
@@ -914,11 +1140,39 @@ def edit_student(request, student_id):
             errors.append("Another student already has that admission number.")
 
         stream = None
-        if stream_id:
+        if not is_class_teacher_view:
+            stream_val = request.POST.get("stream", "")
+            if stream_val:
+                try:
+                    stream = Stream.objects.get(id=stream_val, is_active=True)
+                except Stream.DoesNotExist:
+                    errors.append("Invalid stream selected.")
+        else:
+            stream = student.stream
+
+        form_value = None
+        if not is_class_teacher_view:
+            form_value = request.POST.get("form", "").strip()
+        else:
+            form_value = student.form
+
+        grade_level = None
+        if is_admin_view:
+            grade_level_id = request.POST.get("grade_level", "")
+            if grade_level_id:
+                try:
+                    grade_level = GradeLevel.objects.get(id=grade_level_id, is_active=True)
+                except GradeLevel.DoesNotExist:
+                    pass
+        else:
+            grade_level = student.grade_level
+
+        year_value = request.POST.get("year", "")
+        if year_value and is_admin_view:
             try:
-                stream = Stream.objects.get(id=stream_id, is_active=True)
-            except Stream.DoesNotExist:
-                errors.append("Invalid stream selected.")
+                year_value = int(year_value)
+            except (ValueError, TypeError):
+                year_value = None
 
         if errors:
             for error in errors:
@@ -928,17 +1182,40 @@ def edit_student(request, student_id):
             student.admission_number = admission_number
             if stream:
                 student.stream = stream
-            if form:
-                student.form = form
+            if form_value:
+                student.form = form_value
+            if grade_level is not None:
+                student.grade_level = grade_level
+            if year_value is not None:
+                student.year = year_value
             student.optional_notes = optional_notes
             student.save()
+
+            upload = request.FILES.get("profile_picture")
+            if upload:
+                max_size_bytes = 5 * 1024 * 1024
+                allowed_extensions = {".jpg", ".jpeg", ".png", ".webp"}
+                ext = os.path.splitext(upload.name)[1].lower()
+                if upload.size <= max_size_bytes and ext in allowed_extensions:
+                    student.profile_picture = upload
+                    student.save(update_fields=["profile_picture"])
+                else:
+                    if upload.size > max_size_bytes:
+                        messages.warning(request, "Profile picture too large. Must be under 5MB. Picture not changed.")
+                    else:
+                        messages.warning(request, "Only JPG, PNG, and WEBP images are allowed. Picture not changed.")
+
             messages.success(request, f"{student.name} updated successfully.")
             return redirect("core:student_profile", student_id=student.id)
 
+    is_class_teacher = request.user.groups.filter(name="ClassTeacher").exists()
     context = {
         "student": student,
         "streams": _get_active_streams(),
         "forms": _get_form_choices(),
+        "grade_levels": GradeLevel.objects.filter(is_active=True).order_by("order"),
+        "is_class_teacher": is_class_teacher,
+        "is_admin": request.user.is_superuser,
         **_get_notification_context(request),
     }
     return render(request, "edit_student.html", context)
@@ -990,7 +1267,10 @@ def user_profile_settings(request):
             new_password = request.POST.get("new_password", "")
             confirm_password = request.POST.get("confirm_password", "")
 
-            if not request.user.check_password(current_password):
+            profile = get_teacher_profile(request.user)
+            must_reset = bool(profile and profile.must_reset_password)
+
+            if not must_reset and not request.user.check_password(current_password):
                 messages.error(request, "Current password is incorrect.")
             elif len(new_password) < 8:
                 messages.error(request, "New password must be at least 8 characters.")
@@ -999,6 +1279,9 @@ def user_profile_settings(request):
             else:
                 request.user.set_password(new_password)
                 request.user.save()
+                if must_reset and profile:
+                    profile.must_reset_password = False
+                    profile.save(update_fields=["must_reset_password"])
                 update_session_auth_hash(request, request.user)
                 messages.success(request, "Password changed successfully.")
             return redirect("core:user_profile_settings")
@@ -2091,14 +2374,69 @@ def school_setup(request):
             grade = get_object_or_404(GradeLevel, id=request.POST.get("grade_id"))
             grade_name = grade.name
             student_count = Student.objects.filter(grade_level=grade).count()
+
             if student_count > 0:
-                Student.objects.filter(grade_level=grade).update(grade_level=None)
+                reassign_to_id = request.POST.get("reassign_to")
+                if not reassign_to_id:
+                    messages.error(
+                        request,
+                        f'"{grade_name}" has {student_count} students. Choose a grade to move '
+                        "them to before deleting, or deactivate the grade instead.",
+                    )
+                    return redirect("core:school_setup")
+                try:
+                    reassign_to = GradeLevel.objects.get(
+                        id=reassign_to_id, school=school, is_active=True
+                    )
+                except GradeLevel.DoesNotExist:
+                    messages.error(request, "Invalid reassignment grade.")
+                    return redirect("core:school_setup")
+                Student.objects.filter(grade_level=grade).update(grade_level=reassign_to)
                 messages.warning(
                     request,
-                    f'{student_count} students had "{grade_name}" grade removed from their records.',
+                    f'{student_count} students moved from "{grade_name}" to "{reassign_to.name}".',
                 )
+
             grade.delete()
             messages.success(request, f'Grade "{grade_name}" deleted.')
+            return redirect("core:school_setup")
+
+        elif action == "edit_grade":
+            grade = get_object_or_404(GradeLevel, id=request.POST.get("edit_grade_id"))
+            new_name = request.POST.get("edit_grade_name", "").strip()
+            new_code = request.POST.get("edit_grade_code", "").strip()
+
+            if not new_name:
+                messages.error(request, "Grade name cannot be empty.")
+                return redirect("core:school_setup")
+
+            existing = GradeLevel.objects.filter(school=school, name=new_name).exclude(id=grade.id)
+            if existing.exists():
+                messages.error(request, f'Grade "{new_name}" already exists!')
+                return redirect("core:school_setup")
+
+            grade.name = new_name
+            if new_code:
+                grade.code = new_code
+            grade.save()
+            messages.success(request, f'Grade "{grade.name}" updated.')
+            return redirect("core:school_setup")
+
+        elif action == "transfer_form":
+            source_form = request.POST.get("transfer_source_form", "")
+            target_form = request.POST.get("transfer_target_form", "")
+            if not source_form or not target_form:
+                messages.error(request, "Select both source and target forms.")
+                return redirect("core:school_setup")
+            if source_form == target_form:
+                messages.error(request, "Source and target forms must be different.")
+                return redirect("core:school_setup")
+            transfer_count = Student.objects.filter(form=source_form).update(form=target_form)
+            if transfer_count > 0:
+                messages.success(request, f"Transferred {transfer_count} student(s) from {source_form} to {target_form}.")
+            else:
+                messages.info(request, "No students found in the selected form.")
+            invalidate_lookup_caches()
             return redirect("core:school_setup")
 
         elif action == "add_stream":
@@ -2154,6 +2492,46 @@ def school_setup(request):
             messages.success(request, f'Stream "{stream_name}" deleted.')
             return redirect("core:school_setup")
 
+        elif action == "edit_stream":
+            stream = get_object_or_404(Stream, id=request.POST.get("edit_stream_id"))
+            new_name = request.POST.get("edit_stream_name", "").strip()
+            new_code = request.POST.get("edit_stream_code", "").strip()
+            transfer_to_id = request.POST.get("edit_transfer_to", "")
+            old_name = stream.name
+
+            if not new_name:
+                messages.error(request, "Stream name cannot be empty.")
+                return redirect("core:school_setup")
+
+            existing = Stream.objects.filter(school=school, name=new_name).exclude(id=stream.id)
+            if existing.exists():
+                messages.error(request, f'Stream "{new_name}" already exists!')
+                return redirect("core:school_setup")
+
+            stream.name = new_name
+            if new_code:
+                stream.code = new_code
+            stream.save()
+            invalidate_lookup_caches()
+
+            if transfer_to_id:
+                try:
+                    transfer_to = Stream.objects.get(id=transfer_to_id, is_active=True)
+                    student_count = Student.objects.filter(stream=stream).count()
+                    if student_count > 0:
+                        Student.objects.filter(stream=stream).update(stream=transfer_to)
+                        messages.warning(
+                            request,
+                            f'Stream renamed to "{new_name}". {student_count} student(s) transferred to "{transfer_to.name}".',
+                        )
+                    else:
+                        messages.success(request, f'Stream "{old_name}" renamed to "{new_name}".')
+                except Stream.DoesNotExist:
+                    messages.success(request, f'Stream "{old_name}" renamed to "{new_name}".')
+            else:
+                messages.success(request, f'Stream "{old_name}" renamed to "{new_name}".')
+            return redirect("core:school_setup")
+
         elif action == "add_term":
             try:
                 term_number = int(request.POST.get("term_number", 1))
@@ -2198,13 +2576,16 @@ def school_setup(request):
     last_upload_summary = request.session.pop("last_upload_summary", None)
     context = {
         "school": school,
-        "grades": GradeLevel.objects.filter(school=school).order_by("order", "name"),
+        "grades": GradeLevel.objects.filter(school=school).order_by("order", "name").annotate(
+            student_count=Count("students")
+        ),
         "streams": Stream.objects.filter(school=school, is_active=True).order_by(
             "name"
         ),
         "terms": AcademicTerm.objects.filter(school=school).order_by(
             "-year", "-term_number"
         ),
+        "forms": _get_form_choices(),
         "last_upload_summary": last_upload_summary,
         "last_upload_ai_summary": (last_upload_summary or {}).get("ai_summary"),
         **_get_notification_context(request),
@@ -3841,29 +4222,36 @@ def admin_reset_requests(request):
 @require_POST
 def approve_reset(request, reset_id):
     """
-    Approve a pending password reset: generate a new random password and
-    hand it to the user via an in-app notification.
-
-    NOTE (SECURITY ISSUE 5): delivering a plaintext password through the
-    in-app notification system means anyone who can read that user's
-    notifications also learns their new password. This is preserved as the
-    existing behavior (no email backend is assumed to be configured) but is
-    flagged here - the safer long-term fix is a single-use, time-limited
-    reset link emailed directly to the user instead.
-
-    FIX (CRITICAL ERROR 2): the function body here had been overwritten with
-    code that belonged to a completely different view (the client-side
-    error-reporting endpoint below), which meant approving a reset never
-    actually generated or delivered a new password at all.
+    Approve a pending password reset. For teacher accounts this marks the
+    profile so the user can log in without a password and is forced to set
+    a new one immediately. For accounts without a teacher profile (e.g.
+    superusers), a temporary password is generated and delivered via
+    notification as before.
     """
     reset = get_object_or_404(PasswordReset, id=reset_id, status="pending")
     user = reset.user
 
-    new_password = get_random_string(
-        length=12, allowed_chars="abcdefghjkmnpqrstuvwxyzABCDEFGHJKMNPQRSTUVWXYZ23456789"
-    )
-    user.set_password(new_password)
-    user.save()
+    profile = get_teacher_profile(user)
+    if profile:
+        profile.must_reset_password = True
+        profile.save(update_fields=["must_reset_password"])
+        notification_message = (
+            "Your password reset has been approved by an administrator.\n"
+            "You can now log in with your username (no password required) and "
+            "you will be prompted to set a new password immediately."
+        )
+    else:
+        new_password = get_random_string(
+            length=12, allowed_chars="abcdefghjkmnpqrstuvwxyzABCDEFGHJKMNPQRSTUVWXYZ23456789"
+        )
+        user.set_password(new_password)
+        user.save()
+        notification_message = (
+            "Your password has been reset by an administrator.\n"
+            f"Your new temporary password is: {new_password}\n"
+            "Please log in and change it immediately from your profile settings. "
+            "This message is the only copy of the password."
+        )
 
     reset.status = "approved"
     reset.resolved_at = timezone.now()
@@ -3873,12 +4261,7 @@ def approve_reset(request, reset_id):
 
     notification = Notification.objects.create(
         title="Password Reset Approved",
-        message=(
-            "Your password has been reset by an administrator.\n"
-            f"Your new temporary password is: {new_password}\n"
-            "Please log in and change it immediately from your profile settings. "
-            "This message is the only copy of the password."
-        ),
+        message=notification_message,
         notification_type="warning",
     )
     notification.target_users.add(user)
@@ -3886,7 +4269,7 @@ def approve_reset(request, reset_id):
     messages.success(
         request,
         f"Password reset for {user.username} approved. "
-        f"Temporary password (share once, then they should change it): {new_password}",
+        f"{'The user can now log in without a password and will be forced to reset it.' if profile else f'Temporary password (share once): {new_password}'}",
     )
     return redirect("core:admin_reset_requests")
 
@@ -4157,7 +4540,7 @@ def export_class_reports(request):
             _class_teacher_scope(profile).select_related("stream").order_by("name")
         )
 
-        if not students_list.exists():
+        if not students.exists():
             messages.warning(request, "No students found in your class.")
             return redirect("/class-teacher-dashboard/")
 
@@ -4168,7 +4551,7 @@ def export_class_reports(request):
         writer = csv.writer(response)
         writer.writerow([f"CLASS REPORT - {assigned_stream.name} - {assigned_form}"])
         writer.writerow([f'Generated: {datetime.now().strftime("%Y-%m-%d %H:%M")}'])
-        writer.writerow([f"Total Students: {students_list.count()}"])
+        writer.writerow([f"Total Students: {students.count()}"])
         writer.writerow([])
         writer.writerow(
             [
@@ -4548,6 +4931,260 @@ def assign_class_teacher(request):
     return redirect("/manage-users/")
 
 
+# ============================================
+# ROLE REQUESTS
+# ============================================
+
+@login_required
+def request_role(request):
+    """
+    A teacher or class teacher requests a role change.
+    """
+    if not request.user.groups.filter(name="Teacher").exists() and not request.user.groups.filter(name="ClassTeacher").exists():
+        messages.error(request, "Only teachers can request role changes.")
+        return redirect("/dashboard/")
+
+    if request.method == "POST":
+        requested_role = request.POST.get("requested_role", "")
+        target_stream_id = request.POST.get("target_stream", "")
+        target_form = request.POST.get("target_form", "")
+        target_grade_id = request.POST.get("target_grade", "")
+
+        if not requested_role:
+            messages.error(request, "Please select a role.")
+            return redirect("/profile/")
+
+        try:
+            role_request = RoleRequest.objects.create(
+                requester=request.user,
+                requested_role=requested_role,
+                target_stream_id=target_stream_id if target_stream_id else None,
+                target_form=target_form if target_form else None,
+                target_grade_id=target_grade_id if target_grade_id else None,
+            )
+
+            admins = User.objects.filter(is_superuser=True)
+            if admins.exists():
+                notif = Notification.objects.create(
+                    title=f"New Role Request: {request.user.get_full_name() or request.user.username}",
+                    message=f"{request.user.get_full_name() or request.user.username} has requested to become {requested_role}. "
+                            f"Stream: {target_stream_id}, Form: {target_form}, Grade: {target_grade_id}.",
+                    notification_type="info",
+                )
+                notif.target_users.set(admins)
+
+            messages.success(request, "Role request submitted. Admin will be notified.")
+            return redirect("/profile/")
+        except Exception as e:
+            messages.error(request, f"Error submitting role request: {e}")
+            return redirect("/profile/")
+
+    streams = Stream.objects.filter(is_active=True).order_by("name")
+    grade_levels = GradeLevel.objects.filter(is_active=True).order_by("order")
+    context = {
+        "streams": streams,
+        "grade_levels": grade_levels,
+        "forms": Student.FORM_CHOICES,
+        "is_teacher": request.user.groups.filter(name="Teacher").exists(),
+        "is_class_teacher": request.user.groups.filter(name="ClassTeacher").exists(),
+        **_get_notification_context(request),
+    }
+    return render(request, "role_request.html", context)
+
+
+@login_required
+@user_passes_test(admin_required)
+def role_requests(request):
+    """Admin view: all pending role requests + manual assignment."""
+    pending_requests = RoleRequest.objects.filter(status="pending").select_related("requester").order_by("-created_at")
+    all_requests = RoleRequest.objects.select_related("requester", "reviewed_by").order_by("-created_at")
+    all_users = User.objects.select_related("teacher_profile").filter(
+        groups__name="Teacher"
+    ) | User.objects.filter(is_superuser=True) | User.objects.filter(
+        groups__name="ClassTeacher"
+    )
+    all_users = all_users.distinct().order_by("first_name", "last_name")
+    context = {
+        "pending_requests": pending_requests,
+        "all_requests": all_requests,
+        "all_users": all_users,
+        "streams": _get_active_streams(),
+        **_get_notification_context(request),
+    }
+    return render(request, "role_requests.html", context)
+
+
+@login_required
+@user_passes_test(admin_required)
+def approve_role_request(request, request_id):
+    """Admin approves a role request."""
+    try:
+        role_req = get_object_or_404(RoleRequest, id=request_id)
+    except RoleRequest.DoesNotExist:
+        messages.error(request, "Role request not found.")
+        return redirect("/role-requests/")
+
+    if role_req.status != "pending":
+        messages.error(request, "This request has already been processed.")
+        return redirect("/role-requests/")
+
+    requester = role_req.requester
+    requested_role = role_req.requested_role
+
+    try:
+        if requested_role == "Admin":
+            requester.is_superuser = True
+            requester.save()
+            admin_group, _ = Group.objects.get_or_create(name="Admin")
+            requester.groups.add(admin_group)
+            role_req.status = "approved"
+
+        elif requested_role == "ClassTeacher":
+            profile, created = TeacherProfile.objects.get_or_create(user=requester)
+            if role_req.target_stream and role_req.target_form:
+                profile.assigned_stream = role_req.target_stream
+                profile.assigned_form = role_req.target_form
+                profile.has_chosen_stream = True
+            profile.is_approved = True
+            profile.save()
+            ct_group, _ = Group.objects.get_or_create(name="ClassTeacher")
+            requester.groups.add(ct_group)
+            role_req.status = "approved"
+
+        elif requested_role == "Teacher":
+            ct_group = Group.objects.filter(name="ClassTeacher").first()
+            if ct_group and requester.groups.filter(name="ClassTeacher").exists():
+                requester.groups.remove(ct_group)
+            teacher_group, _ = Group.objects.get_or_create(name="Teacher")
+            requester.groups.add(teacher_group)
+            requester.is_superuser = False
+            requester.save()
+            profile = get_teacher_profile(requester)
+            if profile:
+                profile.assigned_stream = None
+                profile.assigned_form = None
+                profile.has_chosen_stream = False
+                profile.save()
+            role_req.status = "approved"
+
+        role_req.reviewed_by = request.user
+        role_req.reviewed_at = timezone.now()
+        role_req.save()
+
+        notif = Notification.objects.create(
+            title=f"Role Request Approved: {requested_role}",
+            message=f"Your request to become {requested_role} has been approved by {request.user.get_full_name() or request.user.username}.",
+            notification_type="success",
+        )
+        notif.target_users.add(requester)
+
+        messages.success(request, f"Role request approved. {requester.get_full_name()} is now {requested_role}.")
+    except Exception as e:
+        messages.error(request, f"Error approving role request: {e}")
+
+    return redirect("/role-requests/")
+
+
+@login_required
+@user_passes_test(admin_required)
+def reject_role_request(request, request_id):
+    """Admin rejects a role request."""
+    try:
+        role_req = get_object_or_404(RoleRequest, id=request_id)
+    except RoleRequest.DoesNotExist:
+        messages.error(request, "Role request not found.")
+        return redirect("/role-requests/")
+
+    if role_req.status != "pending":
+        messages.error(request, "This request has already been processed.")
+        return redirect("/role-requests/")
+
+    role_req.status = "rejected"
+    role_req.reviewed_by = request.user
+    role_req.reviewed_at = timezone.now()
+    role_req.save()
+
+    notif = Notification.objects.create(
+        title="Role Request Rejected",
+        message=f"Your request to become {role_req.requested_role} has been rejected by {request.user.get_full_name() or request.user.username}.",
+        notification_type="warning",
+    )
+    notif.target_users.add(role_req.requester)
+
+    messages.success(request, "Role request rejected.")
+    return redirect("/role-requests/")
+
+
+@login_required
+@user_passes_test(admin_required)
+def manual_role_assign(request):
+    """Admin manually assigns a role and class to a user."""
+    if request.method == "POST":
+        user_id = request.POST.get("user_id")
+        assign_role = request.POST.get("assign_role")
+        assign_stream_id = request.POST.get("assign_stream", "")
+        assign_form = request.POST.get("assign_form", "")
+
+        if not user_id or not assign_role:
+            messages.error(request, "Please select a user and role.")
+            return redirect("/role-requests/")
+
+        try:
+            user = get_object_or_404(User, id=user_id)
+            profile = get_teacher_profile(user) or TeacherProfile.objects.create(user=user)
+
+            # Remove all teacher groups first
+            user.groups.clear()
+
+            if assign_role == "Admin":
+                user.is_superuser = True
+                user.save()
+                admin_group, _ = Group.objects.get_or_create(name="Admin")
+                user.groups.add(admin_group)
+                profile.assigned_stream = None
+                profile.assigned_form = None
+                profile.has_chosen_stream = False
+                profile.save()
+
+            elif assign_role == "ClassTeacher":
+                user.is_superuser = False
+                user.save()
+                ct_group, _ = Group.objects.get_or_create(name="ClassTeacher")
+                user.groups.add(ct_group)
+                if assign_stream_id:
+                    try:
+                        stream = Stream.objects.get(id=assign_stream_id, is_active=True)
+                        profile.assigned_stream = stream
+                    except Stream.DoesNotExist:
+                        pass
+                profile.assigned_form = assign_form if assign_form else "A"
+                profile.has_chosen_stream = True
+                profile.is_approved = True
+                profile.save()
+
+            elif assign_role == "Teacher":
+                user.is_superuser = False
+                user.save()
+                teacher_group, _ = Group.objects.get_or_create(name="Teacher")
+                user.groups.add(teacher_group)
+                profile.assigned_stream = None
+                profile.assigned_form = None
+                profile.has_chosen_stream = False
+                profile.save()
+
+            messages.success(
+                request,
+                f"{user.get_full_name() or user.username} is now {assign_role}"
+                + (f" assigned to {profile.assigned_stream.name} - {profile.assigned_form}" if assign_role == "ClassTeacher" and profile.assigned_stream else ""),
+            )
+        except Exception as e:
+            messages.error(request, f"Error assigning role: {e}")
+
+        return redirect("/role-requests/")
+
+    return redirect("/role-requests/")
+
+
 @login_required
 def test_streams(request):
     """Renders test_streams.html with stream and grade data for template debugging."""
@@ -4823,6 +5460,7 @@ def add_student(request):
             messages.error(request, "Choose your class before adding students.")
             return redirect("core:choose_stream")
         streams = Stream.objects.filter(id=profile.assigned_stream_id)
+        grade_levels = GradeLevel.objects.filter(is_active=True).order_by("order")
 
     form_context = {
         "streams": streams,
@@ -4839,6 +5477,7 @@ def add_student(request):
         grade_level_id = request.POST.get("grade_level")
         form = request.POST.get("form")
         optional_notes = request.POST.get("optional_notes", "").strip()
+        profile_picture = request.FILES.get("profile_picture")
 
         try:
             year = int(request.POST.get("year") or timezone.now().year)
@@ -4879,6 +5518,19 @@ def add_student(request):
                 optional_notes=optional_notes,
                 created_by=request.user,
             )
+            if profile_picture:
+                max_size_bytes = 5 * 1024 * 1024
+                allowed_extensions = {".jpg", ".jpeg", ".png", ".webp"}
+                ext = os.path.splitext(profile_picture.name)[1].lower()
+                if profile_picture.size <= max_size_bytes and ext in allowed_extensions:
+                    student.profile_picture = profile_picture
+                    student.save(update_fields=["profile_picture"])
+                else:
+                    if profile_picture.size > max_size_bytes:
+                        messages.warning(request, "Profile picture too large. Must be under 5MB. Picture not saved.")
+                    else:
+                        messages.warning(request, "Only JPG, PNG, and WEBP images are allowed. Picture not saved.")
+
             messages.success(request, f"Student '{student.name}' added successfully!")
             return redirect("core:student_profile", student_id=student.id)
         except Stream.DoesNotExist:

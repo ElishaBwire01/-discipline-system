@@ -126,6 +126,39 @@
         font-size: 0.7rem;
         font-weight: 600;
     }
+    .student-row {
+        cursor: pointer;
+    }
+    /* Student Action Popup */
+    .student-action-popup {
+        position: fixed;
+        top: 0; left: 0; right: 0; bottom: 0;
+        z-index: 9999;
+        display: none;
+        align-items: center;
+        justify-content: center;
+    }
+    .student-action-popup.show { display: flex; }
+    .student-action-popup[hidden] { display: none !important; }
+    .student-action-popup-backdrop {
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: rgba(0,0,0,0.45);
+        backdrop-filter: blur(3px);
+    }
+    .student-action-popup-card {
+        position: relative;
+        background: white;
+        border-radius: var(--radius-lg);
+        padding: 1.5rem;
+        width: 90%;
+        max-width: 360px;
+        box-shadow: var(--shadow-xl);
+        z-index: 9999;
+        animation: popupFadeIn 0.2s ease-out;
+    }
+    @keyframes popupFadeIn { from { opacity:0; transform: scale(0.95); } to { opacity:1; transform: scale(1); } }
+    .student-action-popup-card .btn-modern { min-height: 44px; }
 </style>
 {% endblock %}
 
@@ -155,31 +188,31 @@
 
 <!-- Stats Grid -->
 <div class="stat-grid">
-    <div class="stat-card">
+    <a href="/admin-dashboard/" class="stat-card" style="text-decoration:none;color:inherit;">
         <div class="stat-icon primary"><i class="fa-solid fa-users"></i></div>
         <div class="stat-value">{{ total_students|default:0 }}</div>
         <div class="stat-label">Total Students</div>
         <i class="fa-solid fa-users stat-bg-icon"></i>
-    </div>
-    <div class="stat-card">
+    </a>
+    <a href="/student/search/" class="stat-card" style="text-decoration:none;color:inherit;">
         <div class="stat-icon danger"><i class="fa-solid fa-triangle-exclamation"></i></div>
         <div class="stat-value">{{ critical_students|default:0 }}</div>
         <div class="stat-label">Critical Cases</div>
         <i class="fa-solid fa-triangle-exclamation stat-bg-icon"></i>
-    </div>
-    <div class="stat-card">
+    </a>
+    <a href="/admin-dashboard/" class="stat-card" style="text-decoration:none;color:inherit;">
         <div class="stat-icon warning"><i class="fa-solid fa-file-lines"></i></div>
         <div class="stat-value">{{ total_reports|default:0 }}</div>
         <div class="stat-label">Total Reports</div>
         <div class="stat-change up"><i class="fa-solid fa-arrow-up me-1"></i>{{ reports_today|default:0 }} today</div>
         <i class="fa-solid fa-file-lines stat-bg-icon"></i>
-    </div>
-    <div class="stat-card">
-        <div class="stat-icon success"><i class="fa-solid fa-wifi"></i></div>
+    </a>
+    <a href="/manage-users/" class="stat-card" style="text-decoration:none;color:inherit;">
+        <div class="stat-icon success"><i class="fa-solid fa-user-check"></i></div>
         <div class="stat-value">{{ online_teachers|default:0 }}</div>
-        <div class="stat-label">Online Teachers</div>
-        <i class="fa-solid fa-wifi stat-bg-icon"></i>
-    </div>
+        <div class="stat-label">Active Staff</div>
+        <i class="fa-solid fa-user-check stat-bg-icon"></i>
+    </a>
 </div>
 
 <!-- System Management — desktop buttons + mobile ⋮ dropdown -->
@@ -240,11 +273,11 @@
         Export Reports
         <span class="ms-auto badge bg-light text-dark">Admin Only</span>
         <!-- Mobile dropdown -->
-        <div class="dropdown ms-2 d-lg-none">
-            <button class="btn btn-sm btn-outline-light dropdown-toggle" data-bs-toggle="dropdown">
+        <div class="dropdown ms-2 d-lg-none" style="position: relative; z-index: 1100;">
+            <button class="btn btn-sm btn-outline-light dropdown-toggle" data-bs-toggle="dropdown" style="min-height: 36px; min-width: 36px;">
                 <i class="fa-solid fa-ellipsis-vertical"></i>
             </button>
-            <ul class="dropdown-menu dropdown-menu-end">
+            <ul class="dropdown-menu dropdown-menu-end" style="z-index: 1100;">
                 <li><a class="dropdown-item" href="{% url 'core:export_reports' 'csv' %}"><i class="fa-solid fa-file-csv me-2 text-primary"></i>CSV Report</a></li>
                 <li><a class="dropdown-item" href="{% url 'core:export_reports' 'excel' %}"><i class="fa-solid fa-file-excel me-2 text-success"></i>Excel Report</a></li>
                 <li><a class="dropdown-item" href="{% url 'core:export_summary_report' %}"><i class="fa-solid fa-chart-bar me-2 text-purple"></i>Summary</a></li>
@@ -278,27 +311,30 @@
 <div class="card-modern mb-4" data-aos="fade-up">
     <div class="card-header-modern">
         Risk Distribution
-        <span class="ms-auto badge bg-light text-dark">Overall Status</span>
+        <span class="ms-auto badge bg-light text-dark">{{ total_students|default:0 }} Students</span>
     </div>
     <div class="card-body p-3">
         <div class="row text-center">
             <div class="col-4">
-                <span class="text-danger fw-bold">{{ critical_percentage|default:"0" }}%</span>
-                <div class="text-muted small">Critical</div>
+                <span class="text-danger fw-bold">{{ critical_percentage|default:0 }}%</span>
+                <div class="text-muted small">Critical ({{ critical_students_count|default:0 }})</div>
             </div>
             <div class="col-4">
-                <span class="text-warning fw-bold">{{ warning_percentage|default:"0" }}%</span>
-                <div class="text-muted small">Warning</div>
+                <span class="text-warning fw-bold">{{ warning_percentage|default:0 }}%</span>
+                <div class="text-muted small">Warning ({{ warning_students_count|default:0 }})</div>
             </div>
             <div class="col-4">
-                <span class="text-success fw-bold">{{ good_percentage|default:"0" }}%</span>
-                <div class="text-muted small">Good</div>
+                <span class="text-success fw-bold">{{ good_percentage|default:0 }}%</span>
+                <div class="text-muted small">Good ({{ good_students_count|default:0 }})</div>
             </div>
         </div>
         <div class="progress-modern mt-2" style="height: 8px;">
             <div class="progress-bar bg-danger" style="width: {{ critical_percentage|default:0 }}%;"></div>
             <div class="progress-bar bg-warning" style="width: {{ warning_percentage|default:0 }}%;"></div>
             <div class="progress-bar bg-success" style="width: {{ good_percentage|default:0 }}%;"></div>
+        </div>
+        <div class="mt-2 text-center">
+            <span class="text-muted small">Average Risk Score: <strong class="text-dark">{{ avg_risk_score|floatformat:1|default:"0" }}%</strong></span>
         </div>
     </div>
 </div>
@@ -366,32 +402,44 @@
         </form>
         
         <div class="table-responsive">
-            <table class="table-modern">
-                <thead>
-                    <tr>
-                        <th>Admission</th>
-                        <th>Name</th>
-                        <th>Stream</th>
-                        <th>Form</th>
-                        <th>Reports</th>
-                        <th>Risk Score</th>
-                        <th>Status</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody>
+            <form method="post" id="bulkEditForm">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="bulk_edit">
+                <table class="table-modern">
+                    <thead>
+                        <tr>
+                            <th style="width:40px;" data-label="Select"><input type="checkbox" id="selectAllStudents" title="Select All"></th>
+                            <th data-label="Admission">Admission</th>
+                            <th data-label="Name">Name</th>
+                            <th data-label="Stream">Stream</th>
+                            <th data-label="Form">Form</th>
+                            <th data-label="Reports">Reports</th>
+                            <th data-label="Risk">Risk</th>
+                            <th data-label="Status">Status</th>
+                            <th data-label="Action">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
                     {% for student in students %}
-                    <tr>
-                        <td><strong>{{ student.admission_number }}</strong></td>
-                        <td>{{ student.name }}</td>
-                        <td><span class="badge-modern badge-info">{{ student.stream.name|default:"-" }}</span></td>
-                        <td>{{ student.form|default:"-" }}</td>
-                        <td>
+                    <tr class="student-row"
+                        data-student-id="{{ student.id }}"
+                        data-student-name="{{ student.name|escapejs }}"
+                        data-view-url="{% url 'core:student_profile' student.id %}"
+                        data-edit-url="{% url 'core:edit_student' student.id %}"
+                        data-ai-url="{% url 'core:student_profile' student.id %}?ai=true">
+                        <td data-label="Select"><input type="checkbox" name="student_ids" value="{{ student.id }}"></td>
+                        <td data-label="Admission"><strong>{{ student.admission_number }}</strong></td>
+                        <td data-label="Name">
+                            <strong>{{ student.name }}</strong>
+                        </td>
+                        <td data-label="Stream"><span class="badge-modern badge-info">{{ student.stream.name|default:"-" }}</span></td>
+                        <td data-label="Form">{{ student.form|default:"-" }}</td>
+                        <td data-label="Reports">
                             <span class="badge-modern {% if student.total_reports >= 20 %}badge-critical{% elif student.total_reports >= 10 %}badge-warning{% else %}badge-info{% endif %}">
                                 {{ student.total_reports }}
                             </span>
                         </td>
-                        <td>
+                        <td data-label="Risk">
                             <div class="d-flex align-items-center gap-2">
                                 <div class="progress-modern" style="width:80px;">
                                     <div class="progress-bar-modern" style="width:{{ student.risk_score }}%;background:{% if student.risk_score >= 60 %}linear-gradient(135deg,#ef4444,#dc2626){% elif student.risk_score >= 30 %}linear-gradient(135deg,#f59e0b,#d97706){% else %}linear-gradient(135deg,#10b981,#059669){% endif %};"></div>
@@ -399,7 +447,7 @@
                                 <span class="fw-bold" style="font-size:.813rem;">{{ student.risk_score }}%</span>
                             </div>
                         </td>
-                        <td>
+                        <td data-label="Status">
                             {% if student.risk_score >= 60 %}
                                 <span class="badge-modern badge-critical"><i class="fa-solid fa-circle-xmark me-1"></i>Critical</span>
                             {% elif student.risk_score >= 30 %}
@@ -408,26 +456,20 @@
                                 <span class="badge-modern badge-success"><i class="fa-solid fa-circle-check me-1"></i>Good</span>
                             {% endif %}
                         </td>
-                        <td>
-                            <!-- Mobile: 3-dot dropdown -->
-                            <div class="d-flex gap-1 d-none d-md-flex">
+                        <td data-label="Action">
+                            <div class="d-flex gap-1 d-none d-md-flex row-actions">
                                 <a href="{% url 'core:student_profile' student.id %}" class="btn-modern btn-modern-primary btn-modern-sm" title="View">
                                     <i class="fa-solid fa-eye"></i>
                                 </a>
-                                <a href="{% url 'core:student_profile' student.id %}?ai=true" class="btn-modern btn-modern-sm btn-modern-sm" style="background:linear-gradient(135deg,#7c3aed,#2563eb);color:white;" title="AI">
+                                <a href="{% url 'core:edit_student' student.id %}" class="btn-modern btn-modern-sm btn-modern-secondary" title="Edit">
+                                    <i class="fa-solid fa-pen"></i>
+                                </a>
+                                <a href="{% url 'core:student_profile' student.id %}?ai=true" class="btn-modern btn-modern-sm" style="background:linear-gradient(135deg,#7c3aed,#2563eb);color:white;" title="AI">
                                     <i class="fa-solid fa-robot"></i>
                                 </a>
-                                <button class="btn-modern btn-modern-danger btn-modern-sm" onclick="openReportModal({{ student.id }}, '{{ student.name }}')" title="Report">
+                                <button class="btn-modern btn-modern-danger btn-modern-sm" onclick="openReportModal({{ student.id }}, '{{ student.name|escapejs }}')" title="Report">
                                     <i class="fa-solid fa-flag"></i>
                                 </button>
-                            </div>
-                            <div class="dropdown d-md-none">
-                                <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="dropdown"><i class="fa-solid fa-ellipsis-vertical"></i></button>
-                                <ul class="dropdown-menu dropdown-menu-end">
-                                    <li><a class="dropdown-item" href="{% url 'core:student_profile' student.id %}"><i class="fa-solid fa-eye me-2"></i>View Profile</a></li>
-                                    <li><a class="dropdown-item" href="{% url 'core:student_profile' student.id %}?ai=true"><i class="fa-solid fa-robot me-2"></i>AI Analysis</a></li>
-                                    <li><button class="dropdown-item text-danger" onclick="openReportModal({{ student.id }}, '{{ student.name }}')"><i class="fa-solid fa-flag me-2"></i>Report</button></li>
-                                </ul>
                             </div>
                         </td>
                     </tr>
@@ -440,12 +482,242 @@
                     {% endfor %}
                 </tbody>
             </table>
+            <!-- Bulk Edit Toolbar -->
+            <div id="bulkEditToolbar" style="display:none;" class="mt-3 p-3 rounded-lg bg-light border">
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                    <strong><i class="fa-solid fa-users me-1"></i><span id="selectedCount">0</span> selected</strong>
+                    <div class="d-flex gap-2 flex-wrap align-items-end">
+                        <div>
+                            <label class="form-label-modern" style="font-size:.75rem;">Action</label>
+                            <select name="edit_field" class="form-control-modern" style="width:160px;" id="bulkEditField">
+                                <option value="">-- Select --</option>
+                                <option value="stream_id">Change Stream</option>
+                                <option value="grade_level_id">Change Grade</option>
+                                <option value="form">Change Form</option>
+                                <option value="year">Change Year</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="form-label-modern" style="font-size:.75rem;" id="bulkEditLabel">Value</label>
+                            <input type="text" name="edit_value" class="form-control-modern" style="width:160px;" id="bulkEditValue" placeholder="Enter value...">
+                        </div>
+                        <button type="submit" class="btn-modern btn-modern-primary">
+                            <i class="fa-solid fa-check me-1"></i>Apply
+                        </button>
+                        <button type="button" class="btn-modern btn-modern-secondary" onclick="deselectAll()">
+                            <i class="fa-solid fa-xmark me-1"></i>Clear
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Bulk Transfer Students -->
+        <div class="mt-3 mb-3">
+            <button type="button" class="btn-modern btn-modern-primary" onclick="toggleBulkTransfer()">
+                <i class="fa-solid fa-arrow-right-arrow-left me-1"></i>Bulk Transfer Students
+            </button>
+        </div>
+        <div id="bulkTransferForm" style="display:none;" class="card-modern mb-3">
+            <div class="card-body p-4">
+                <form method="post" class="row g-3 align-items-end">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="bulk_transfer">
+                    <div class="col-md-3">
+                        <label class="form-label-modern" style="font-size:.75rem;">Source Stream</label>
+                        <select name="transfer_source_stream" class="form-control-modern" required>
+                            <option value="">-- Select Source --</option>
+                            {% for stream in streams %}
+                            <option value="{{ stream.id }}">{{ stream.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label-modern" style="font-size:.75rem;">Target Stream</label>
+                        <select name="transfer_target_stream" class="form-control-modern" required>
+                            <option value="">-- Select Target --</option>
+                            {% for stream in streams %}
+                            <option value="{{ stream.id }}">{{ stream.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label-modern" style="font-size:.75rem;">Grade Level</label>
+                        <select name="transfer_grade" class="form-control-modern">
+                            <option value="">All Grades</option>
+                            {% for grade in grade_levels %}
+                            <option value="{{ grade.id }}">{{ grade.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label-modern" style="font-size:.75rem;">Form</label>
+                        <select name="transfer_form" class="form-control-modern">
+                            <option value="">All Forms</option>
+                            {% for form_key, form_name in forms %}
+                            <option value="{{ form_key }}">{{ form_name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <button type="submit" class="btn-modern btn-modern-primary w-100">
+                            <i class="fa-solid fa-arrow-right me-1"></i>Transfer All
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
         
         <!-- Pagination with per_page support -->
         {% include "includes/pagination_unified.html" with page_obj=students per_page=per_page %}
     </div>
 </div>
+
+<div id="bulkEditStreams" data-streams='[{% for stream in streams %}{% if not forloop.first %},{% endif %}{"id":{{ stream.id }},"name":"{{ stream.name }}"}{% endfor %}]'></div>
+
+<script>
+document.getElementById('selectAllStudents').addEventListener('change', function() {
+    var checkboxes = document.querySelectorAll('input[name="student_ids"]');
+    var toolbar = document.getElementById('bulkEditToolbar');
+    var count = 0;
+    checkboxes.forEach(function(cb) {
+        cb.checked = this.checked;
+        if (cb.checked) count++;
+    }.bind(this));
+    toolbar.style.display = count > 0 ? 'block' : 'none';
+    document.getElementById('selectedCount').textContent = count;
+});
+
+document.querySelectorAll('input[name="student_ids"]').forEach(function(cb) {
+    cb.addEventListener('change', function() {
+        var toolbar = document.getElementById('bulkEditToolbar');
+        var count = document.querySelectorAll('input[name="student_ids"]:checked').length;
+        toolbar.style.display = count > 0 ? 'block' : 'none';
+        document.getElementById('selectedCount').textContent = count;
+        document.getElementById('selectAllStudents').checked = count === document.querySelectorAll('input[name="student_ids"]').length;
+    });
+});
+
+function deselectAll() {
+    document.querySelectorAll('input[name="student_ids"]').forEach(function(cb) { cb.checked = false; });
+    document.getElementById('selectAllStudents').checked = false;
+    document.getElementById('bulkEditToolbar').style.display = 'none';
+    document.getElementById('selectedCount').textContent = '0';
+}
+
+// Update value label based on field
+document.getElementById('bulkEditField').addEventListener('change', function() {
+    var label = document.getElementById('bulkEditLabel');
+    var field = this.value;
+    var valueInput = document.getElementById('bulkEditValue');
+    var streamsData = JSON.parse(document.getElementById('bulkEditStreams').dataset.streams || '[]');
+    
+    if (field === 'stream_id') {
+        label.textContent = 'Select Stream';
+        if (!valueInput.tagName || valueInput.tagName.toLowerCase() !== 'select') {
+            var select = document.createElement('select');
+            select.name = 'edit_value';
+            select.className = 'form-control-modern';
+            select.style.width = '160px';
+            select.id = 'bulkEditValue';
+            var emptyOpt = document.createElement('option');
+            emptyOpt.value = '';
+            emptyOpt.textContent = '-- Select Stream --';
+            select.appendChild(emptyOpt);
+            streamsData.forEach(function(s) {
+                var opt = document.createElement('option');
+                opt.value = s.id;
+                opt.textContent = s.name;
+                select.appendChild(opt);
+            });
+            valueInput.parentNode.replaceChild(select, valueInput);
+        }
+    } else {
+        label.textContent = field === 'grade_level_id' ? 'Grade Level ID' : field === 'form' ? 'Form (A/B/C...)' : field === 'year' ? 'Year' : 'Value';
+        if (valueInput.tagName && valueInput.tagName.toLowerCase() === 'select') {
+            var input = document.createElement('input');
+            input.type = 'text';
+            input.name = 'edit_value';
+            input.className = 'form-control-modern';
+            input.style.width = '160px';
+            input.id = 'bulkEditValue';
+            input.placeholder = 'Enter value...';
+            valueInput.parentNode.replaceChild(input, valueInput);
+        }
+    }
+});
+
+function toggleBulkTransfer() {
+    var form = document.getElementById('bulkTransferForm');
+    if (form.style.display === 'none') {
+        form.style.display = 'block';
+    } else {
+        form.style.display = 'none';
+    }
+}
+
+// Student popup
+function openStudentPopup(row) {
+    var popup = document.getElementById('studentActionPopup');
+    if (!popup || !row) return;
+
+    popup.dataset.studentId = row.dataset.studentId;
+    popup.dataset.studentName = row.dataset.studentName;
+    popup.dataset.viewUrl = row.dataset.viewUrl;
+    popup.dataset.editUrl = row.dataset.editUrl;
+    popup.dataset.aiUrl = row.dataset.aiUrl;
+    document.getElementById('popupStudentName').textContent = row.dataset.studentName;
+    popup.hidden = false;
+    requestAnimationFrame(function() {
+        popup.classList.add('show');
+    });
+}
+
+function closeStudentPopup() {
+    var popup = document.getElementById('studentActionPopup');
+    if (!popup) return;
+    popup.classList.remove('show');
+    popup.hidden = true;
+}
+
+document.querySelectorAll('.student-row').forEach(function(row) {
+    row.addEventListener('click', function(event) {
+        if (event.target.closest('a, button, input, select, textarea, label')) return;
+        openStudentPopup(row);
+        event.stopPropagation();
+    });
+});
+
+document.addEventListener('click', function(e) {
+    var action = e.target.closest('[data-popup-action]');
+    if (action) {
+        var popup = document.getElementById('studentActionPopup');
+        var studentId = popup.dataset.studentId;
+        var studentName = popup.dataset.studentName;
+        var actionName = action.dataset.popupAction;
+
+        if (actionName === 'view') {
+            window.location.href = popup.dataset.viewUrl;
+        } else if (actionName === 'edit') {
+            window.location.href = popup.dataset.editUrl;
+        } else if (actionName === 'ai') {
+            window.location.href = popup.dataset.aiUrl;
+        } else if (actionName === 'report') {
+            closeStudentPopup();
+            openReportModal(studentId, studentName);
+        }
+        return;
+    }
+
+    var popup = document.getElementById('studentActionPopup');
+    if (popup && !popup.hidden && !e.target.closest('#studentActionPopup')) {
+        closeStudentPopup();
+    }
+});
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') closeStudentPopup();
+});
+</script>
 
 <!-- Report Modal -->
 <div class="modal fade" id="reportModal" tabindex="-1">
@@ -512,4 +784,21 @@ document.addEventListener('keydown', function(e) {
     }
 });
 </script>
+
+<!-- Student Action Popup -->
+<div id="studentActionPopup" class="student-action-popup" hidden>
+    <div class="student-action-popup-backdrop" onclick="closeStudentPopup()"></div>
+    <div class="student-action-popup-card" role="dialog" aria-modal="true" aria-labelledby="popupStudentName">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h6 class="mb-0"><i class="fa-solid fa-circle-info me-1"></i>Actions for <strong id="popupStudentName"></strong></h6>
+            <button type="button" class="btn-close" onclick="closeStudentPopup()" aria-label="Close"></button>
+        </div>
+        <div class="d-flex flex-wrap gap-2 justify-content-center">
+            <button type="button" class="btn-modern btn-modern-primary" data-popup-action="view"><i class="fa-solid fa-eye me-1"></i>View</button>
+            <button type="button" class="btn-modern btn-modern-secondary" data-popup-action="edit"><i class="fa-solid fa-pen me-1"></i>Edit</button>
+            <button type="button" class="btn-modern" style="background:linear-gradient(135deg,#7c3aed,#2563eb);color:white;" data-popup-action="ai"><i class="fa-solid fa-robot me-1"></i>AI</button>
+            <button type="button" class="btn-modern btn-modern-danger" data-popup-action="report"><i class="fa-solid fa-flag me-1"></i>Report</button>
+        </div>
+    </div>
+</div>
 {% endblock %}

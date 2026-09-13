@@ -1657,3 +1657,476 @@ Traceback (most recent call last):
 ValueError: Need 2 values to unpack in for loop; got 6. 
 
 ================================================================================
+
+================================================================================
+Time: 2026-09-13 02:05:32
+URL: /ai/chat/api/
+Method: POST
+User: bwire
+IP: 127.0.0.1
+Error: AttributeError: 'PollinationAIChat' object has no attribute '_has_real_data'
+--------------------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\CMC BANGLADESH\QRCODE\venv\Lib\site-packages\django\core\handlers\base.py", line 198, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\CMC BANGLADESH\QRCODE\venv\Lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\CMC BANGLADESH\OneDrive\Desktop\disciplinev12\core\views.py", line 118, in wrapped
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\CMC BANGLADESH\OneDrive\Desktop\disciplinev12\core\views.py", line 3105, in ai_chat_api
+    result = ai.chat(
+        user_message=user_message,
+        student_id=student_id,
+        conversation_history=conversation_history,
+    )
+  File "C:\Users\CMC BANGLADESH\OneDrive\Desktop\disciplinev12\core\ai_chat.py", line 1479, in chat
+    if not self._has_real_data(student_names_list):
+           ^^^^^^^^^^^^^^^^^^^
+AttributeError: 'PollinationAIChat' object has no attribute '_has_real_data'
+
+================================================================================
+
+================================================================================
+Time: 2026-09-13 02:06:24
+URL: /ai/chat/api/
+Method: POST
+User: bwire
+IP: 127.0.0.1
+Error: AttributeError: 'PollinationAIChat' object has no attribute '_has_real_data'
+--------------------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\CMC BANGLADESH\QRCODE\venv\Lib\site-packages\django\core\handlers\base.py", line 198, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\CMC BANGLADESH\QRCODE\venv\Lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\CMC BANGLADESH\OneDrive\Desktop\disciplinev12\core\views.py", line 118, in wrapped
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\CMC BANGLADESH\OneDrive\Desktop\disciplinev12\core\views.py", line 3105, in ai_chat_api
+    result = ai.chat(
+        user_message=user_message,
+        student_id=student_id,
+        conversation_history=conversation_history,
+    )
+  File "C:\Users\CMC BANGLADESH\OneDrive\Desktop\disciplinev12\core\ai_chat.py", line 1471, in chat
+    if not self._has_real_data(student_data):
+           ^^^^^^^^^^^^^^^^^^^
+AttributeError: 'PollinationAIChat' object has no attribute '_has_real_data'
+
+================================================================================
+
+================================================================================
+Time: 2026-09-13 02:06:36
+URL: /ai/chat/api/
+Method: POST
+User: bwire
+IP: 127.0.0.1
+Error: AttributeError: 'PollinationAIChat' object has no attribute '_has_real_data'
+--------------------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\CMC BANGLADESH\QRCODE\venv\Lib\site-packages\django\core\handlers\base.py", line 198, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\CMC BANGLADESH\QRCODE\venv\Lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\CMC BANGLADESH\OneDrive\Desktop\disciplinev12\core\views.py", line 118, in wrapped
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\CMC BANGLADESH\OneDrive\Desktop\disciplinev12\core\views.py", line 3105, in ai_chat_api
+    result = ai.chat(
+        user_message=user_message,
+        student_id=student_id,
+        conversation_history=conversation_history,
+    )
+  File "C:\Users\CMC BANGLADESH\OneDrive\Desktop\disciplinev12\core\ai_chat.py", line 1471, in chat
+    if not self._has_real_data(student_data):
+           ^^^^^^^^^^^^^^^^^^^
+AttributeError: 'PollinationAIChat' object has no attribute '_has_real_data'
+
+================================================================================
+
+================================================================================
+Time: 2026-09-13 02:06:39
+URL: /ai/chat/api/
+Method: POST
+User: bwire
+IP: 127.0.0.1
+Error: AttributeError: 'PollinationAIChat' object has no attribute '_has_real_data'
+--------------------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\CMC BANGLADESH\QRCODE\venv\Lib\site-packages\django\core\handlers\base.py", line 198, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\CMC BANGLADESH\QRCODE\venv\Lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\CMC BANGLADESH\OneDrive\Desktop\disciplinev12\core\views.py", line 118, in wrapped
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\CMC BANGLADESH\OneDrive\Desktop\disciplinev12\core\views.py", line 3105, in ai_chat_api
+    result = ai.chat(
+        user_message=user_message,
+        student_id=student_id,
+        conversation_history=conversation_history,
+    )
+  File "C:\Users\CMC BANGLADESH\OneDrive\Desktop\disciplinev12\core\ai_chat.py", line 1471, in chat
+    if not self._has_real_data(student_data):
+           ^^^^^^^^^^^^^^^^^^^
+AttributeError: 'PollinationAIChat' object has no attribute '_has_real_data'
+
+================================================================================
+
+================================================================================
+Time: 2026-09-13 02:06:42
+URL: /ai/chat/api/
+Method: POST
+User: bwire
+IP: 127.0.0.1
+Error: AttributeError: 'PollinationAIChat' object has no attribute '_has_real_data'
+--------------------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\CMC BANGLADESH\QRCODE\venv\Lib\site-packages\django\core\handlers\base.py", line 198, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\CMC BANGLADESH\QRCODE\venv\Lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\CMC BANGLADESH\OneDrive\Desktop\disciplinev12\core\views.py", line 118, in wrapped
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\CMC BANGLADESH\OneDrive\Desktop\disciplinev12\core\views.py", line 3105, in ai_chat_api
+    result = ai.chat(
+        user_message=user_message,
+        student_id=student_id,
+        conversation_history=conversation_history,
+    )
+  File "C:\Users\CMC BANGLADESH\OneDrive\Desktop\disciplinev12\core\ai_chat.py", line 1471, in chat
+    if not self._has_real_data(student_data):
+           ^^^^^^^^^^^^^^^^^^^
+AttributeError: 'PollinationAIChat' object has no attribute '_has_real_data'
+
+================================================================================
+
+================================================================================
+Time: 2026-09-13 02:06:56
+URL: /ai/chat/api/
+Method: POST
+User: bwire
+IP: 127.0.0.1
+Error: AttributeError: 'PollinationAIChat' object has no attribute '_has_real_data'
+--------------------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\CMC BANGLADESH\QRCODE\venv\Lib\site-packages\django\core\handlers\base.py", line 198, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\CMC BANGLADESH\QRCODE\venv\Lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\CMC BANGLADESH\OneDrive\Desktop\disciplinev12\core\views.py", line 118, in wrapped
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\CMC BANGLADESH\OneDrive\Desktop\disciplinev12\core\views.py", line 3105, in ai_chat_api
+    result = ai.chat(
+        user_message=user_message,
+        student_id=student_id,
+        conversation_history=conversation_history,
+    )
+  File "C:\Users\CMC BANGLADESH\OneDrive\Desktop\disciplinev12\core\ai_chat.py", line 1471, in chat
+    if not self._has_real_data(student_data):
+           ^^^^^^^^^^^^^^^^^^^
+AttributeError: 'PollinationAIChat' object has no attribute '_has_real_data'
+
+================================================================================
+
+================================================================================
+Time: 2026-09-13 02:07:32
+URL: /ai/chat/api/
+Method: POST
+User: bwire
+IP: 127.0.0.1
+Error: AttributeError: 'PollinationAIChat' object has no attribute '_has_real_data'
+--------------------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\CMC BANGLADESH\QRCODE\venv\Lib\site-packages\django\core\handlers\base.py", line 198, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\CMC BANGLADESH\QRCODE\venv\Lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\CMC BANGLADESH\OneDrive\Desktop\disciplinev12\core\views.py", line 118, in wrapped
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\CMC BANGLADESH\OneDrive\Desktop\disciplinev12\core\views.py", line 3105, in ai_chat_api
+    result = ai.chat(
+        user_message=user_message,
+        student_id=student_id,
+        conversation_history=conversation_history,
+    )
+  File "C:\Users\CMC BANGLADESH\OneDrive\Desktop\disciplinev12\core\ai_chat.py", line 1471, in chat
+    if not self._has_real_data(student_data):
+           ^^^^^^^^^^^^^^^^^^^
+AttributeError: 'PollinationAIChat' object has no attribute '_has_real_data'
+
+================================================================================
+
+================================================================================
+Time: 2026-09-13 02:07:37
+URL: /ai/chat/api/
+Method: POST
+User: bwire
+IP: 127.0.0.1
+Error: AttributeError: 'PollinationAIChat' object has no attribute '_has_real_data'
+--------------------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\CMC BANGLADESH\QRCODE\venv\Lib\site-packages\django\core\handlers\base.py", line 198, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\CMC BANGLADESH\QRCODE\venv\Lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\CMC BANGLADESH\OneDrive\Desktop\disciplinev12\core\views.py", line 118, in wrapped
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\CMC BANGLADESH\OneDrive\Desktop\disciplinev12\core\views.py", line 3105, in ai_chat_api
+    result = ai.chat(
+        user_message=user_message,
+        student_id=student_id,
+        conversation_history=conversation_history,
+    )
+  File "C:\Users\CMC BANGLADESH\OneDrive\Desktop\disciplinev12\core\ai_chat.py", line 1471, in chat
+    if not self._has_real_data(student_data):
+           ^^^^^^^^^^^^^^^^^^^
+AttributeError: 'PollinationAIChat' object has no attribute '_has_real_data'
+
+================================================================================
+
+================================================================================
+Time: 2026-09-13 10:00:08
+URL: /request-role/
+Method: GET
+User: kilo
+IP: 127.0.0.1
+Error: ValueError: Need 2 values to unpack in for loop; got 6. 
+--------------------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\CMC BANGLADESH\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\CMC BANGLADESH\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\CMC BANGLADESH\OneDrive\Desktop\disciplinev12\core\views.py", line 4850, in request_role
+    return render(request, "role_request.html", context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\CMC BANGLADESH\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\CMC BANGLADESH\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\template\loader.py", line 62, in render_to_string
+    return template.render(context, request)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\CMC BANGLADESH\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\template\backends\django.py", line 107, in render
+    return self.template.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\CMC BANGLADESH\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\template\base.py", line 172, in render
+    return self._render(context)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\CMC BANGLADESH\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\test\utils.py", line 114, in instrumented_test_render
+    return self.nodelist.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\CMC BANGLADESH\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\template\base.py", line 1018, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\CMC BANGLADESH\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\template\base.py", line 1018, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\CMC BANGLADESH\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\template\base.py", line 979, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\CMC BANGLADESH\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\template\loader_tags.py", line 159, in render
+    return compiled_parent._render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\CMC BANGLADESH\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\test\utils.py", line 114, in instrumented_test_render
+    return self.nodelist.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\CMC BANGLADESH\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\template\base.py", line 1018, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\CMC BANGLADESH\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\template\base.py", line 1018, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\CMC BANGLADESH\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\template\base.py", line 979, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\CMC BANGLADESH\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\template\loader_tags.py", line 65, in render
+    result = block.nodelist.render(context)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\CMC BANGLADESH\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\template\base.py", line 1018, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\CMC BANGLADESH\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\template\base.py", line 1018, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\CMC BANGLADESH\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\template\base.py", line 979, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\CMC BANGLADESH\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\template\defaulttags.py", line 231, in render
+    raise ValueError(
+ValueError: Need 2 values to unpack in for loop; got 6. 
+
+================================================================================
+
+================================================================================
+Time: 2026-09-13 10:30:33
+URL: /role-requests/
+Method: GET
+User: bwire
+IP: 127.0.0.1
+Error: VariableDoesNotExist: Failed lookup for key [username] in None
+--------------------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\CMC BANGLADESH\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\template\base.py", line 892, in _resolve_lookup
+    raise TypeError
+TypeError
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\CMC BANGLADESH\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\template\base.py", line 903, in _resolve_lookup
+    current = getattr(current, bit)
+              ^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'username'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\CMC BANGLADESH\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\template\base.py", line 909, in _resolve_lookup
+    current = current[int(bit)]
+                      ^^^^^^^^
+ValueError: invalid literal for int() with base 10: 'username'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\CMC BANGLADESH\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\CMC BANGLADESH\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\CMC BANGLADESH\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\CMC BANGLADESH\OneDrive\Desktop\disciplinev12\core\views.py", line 4870, in role_requests
+    return render(request, "role_requests.html", context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\CMC BANGLADESH\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\CMC BANGLADESH\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\template\loader.py", line 62, in render_to_string
+    return template.render(context, request)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\CMC BANGLADESH\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\template\backends\django.py", line 107, in render
+    return self.template.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\CMC BANGLADESH\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\template\base.py", line 172, in render
+    return self._render(context)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\CMC BANGLADESH\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\test\utils.py", line 114, in instrumented_test_render
+    return self.nodelist.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\CMC BANGLADESH\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\template\base.py", line 1018, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\CMC BANGLADESH\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\template\base.py", line 1018, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\CMC BANGLADESH\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\template\base.py", line 979, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\CMC BANGLADESH\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\template\loader_tags.py", line 159, in render
+    return compiled_parent._render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\CMC BANGLADESH\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\test\utils.py", line 114, in instrumented_test_render
+    return self.nodelist.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\CMC BANGLADESH\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\template\base.py", line 1018, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\CMC BANGLADESH\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\template\base.py", line 1018, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\CMC BANGLADESH\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\template\base.py", line 979, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\CMC BANGLADESH\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\template\loader_tags.py", line 65, in render
+    result = block.nodelist.render(context)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\CMC BANGLADESH\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\template\base.py", line 1018, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\CMC BANGLADESH\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\template\base.py", line 1018, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\CMC BANGLADESH\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\template\base.py", line 979, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\CMC BANGLADESH\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\template\defaulttags.py", line 327, in render
+    return nodelist.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\CMC BANGLADESH\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\template\base.py", line 1018, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\CMC BANGLADESH\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\template\base.py", line 1018, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\CMC BANGLADESH\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\template\base.py", line 979, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\CMC BANGLADESH\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\template\defaulttags.py", line 243, in render
+    nodelist.append(node.render_annotated(context))
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\CMC BANGLADESH\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\template\base.py", line 979, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\CMC BANGLADESH\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\template\base.py", line 1077, in render
+    output = self.filter_expression.resolve(context)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\CMC BANGLADESH\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\template\base.py", line 744, in resolve
+    arg_vals.append(arg.resolve(context))
+                    ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\CMC BANGLADESH\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\template\base.py", line 856, in resolve
+    value = self._resolve_lookup(context)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\CMC BANGLADESH\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\template\base.py", line 916, in _resolve_lookup
+    raise VariableDoesNotExist(
+django.template.base.VariableDoesNotExist: Failed lookup for key [username] in None
+
+================================================================================
+
+================================================================================
+Time: 2026-09-13 10:35:40
+URL: /class-summary/
+Method: GET
+User: kilo
+IP: 127.0.0.1
+Error: AttributeError: 'QuerySet' object has no attribute 'reports'
+--------------------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\CMC BANGLADESH\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\CMC BANGLADESH\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\CMC BANGLADESH\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\CMC BANGLADESH\OneDrive\Desktop\disciplinev12\core\views.py", line 869, in class_summary
+    students.reports.values("category__name")
+    ^^^^^^^^^^^^^^^^
+AttributeError: 'QuerySet' object has no attribute 'reports'
+
+================================================================================
+
+================================================================================
+Time: 2026-09-13 10:35:51
+URL: /teacher-dashboard/
+Method: GET
+User: kilo
+IP: 127.0.0.1
+Error: PermissionDenied: Teacher access required
+--------------------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\CMC BANGLADESH\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\CMC BANGLADESH\AppData\Local\Programs\Python\Python311\Lib\site-packages\django\contrib\auth\decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\CMC BANGLADESH\OneDrive\Desktop\disciplinev12\core\views.py", line 686, in teacher_dashboard
+    raise PermissionDenied("Teacher access required")
+django.core.exceptions.PermissionDenied: Teacher access required
+
+================================================================================

@@ -367,7 +367,7 @@
 
         if (action === 'approve') {
             title.textContent = 'Approve Password Reset';
-            message.textContent = `Are you sure you want to approve the password reset for "${username}"? A new temporary password will be generated and sent to the user.`;
+            message.textContent = `Are you sure you want to approve the password reset for "${username}"? The user will be able to log in without a password and will be forced to set a new one.`;
             confirmBtn.style.background = '#10b981';
             form.action = '/approve-reset/' + resetId + '/';
         } else {

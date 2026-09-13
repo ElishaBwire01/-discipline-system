@@ -285,13 +285,13 @@
         .offcanvas-body { padding: 0.75rem; }
         .offcanvas-nav-link {
             display: flex; align-items: center; gap: 0.75rem;
-            padding: 0.75rem 1rem; border-radius: var(--radius);
+            padding: 0.85rem 1rem; border-radius: var(--radius);
             font-size: 0.9rem; font-weight: 500; color: var(--gray-700);
             text-decoration: none; transition: var(--transition);
-            margin-bottom: 2px;
+            margin-bottom: 2px; min-height: 48px;
         }
         .offcanvas-nav-link:hover, .offcanvas-nav-link.active { background: rgba(37,99,235,0.08); color: var(--primary); }
-        .offcanvas-nav-link i { width: 1.25rem; text-align: center; color: var(--gray-500); font-size: 0.95rem; }
+        .offcanvas-nav-link i { width: 1.25rem; text-align: center; color: var(--gray-500); font-size: 0.95rem; flex-shrink: 0; }
         .offcanvas-nav-link:hover i { color: var(--primary); }
         .offcanvas-nav-link.pill-blue {
             background: linear-gradient(135deg, var(--primary), var(--secondary));
@@ -306,6 +306,11 @@
         .offcanvas-section-label {
             font-size: 0.68rem; text-transform: uppercase; letter-spacing: .07em;
             color: var(--gray-400); font-weight: 700; padding: 0.75rem 1rem 0.25rem;
+            display: flex; align-items: center; gap: 0.4rem;
+        }
+        .offcanvas-section-label::before {
+            content: ""; width: 3px; height: 12px;
+            background: var(--primary); border-radius: 2px;
         }
         .offcanvas-user-card {
             display: flex; align-items: center; gap: 0.75rem;
@@ -333,7 +338,8 @@
         .stat-card .stat-value { font-size: 1.75rem; font-weight: 700; color: var(--dark); line-height: 1.2; }
         .stat-card .stat-label { font-size: 0.875rem; color: var(--gray-500); font-weight: 500; }
 
-        .card-modern { background: white; border-radius: var(--radius-lg); border: 1px solid var(--gray-200); box-shadow: var(--shadow); transition: var(--transition); overflow: hidden; margin-bottom: 1.5rem; }
+        .card-modern { background: white; border-radius: var(--radius-lg); border: 1px solid var(--gray-200); box-shadow: var(--shadow); transition: var(--transition); margin-bottom: 1.5rem; }
+        .dropdown-menu { z-index: 1080; }
         .card-modern:hover { box-shadow: var(--shadow-lg); transform: translateY(-1px); }
         .card-header-modern { padding: 1rem 1.5rem; background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; border: none; font-weight: 600; display: flex; align-items: center; gap: 0.75rem; }
         .card-header-modern .header-icon { width: 30px; height: 30px; background: rgba(255,255,255,0.2); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 0.875rem; }
@@ -382,6 +388,45 @@
         ::-webkit-scrollbar-thumb:hover { background: var(--gray-400); }
 
         /* ===== MOBILE / ANDROID ===== */
+        /* Bottom Navigation */
+        .mobile-bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255,255,255,0.98);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-top: 1px solid var(--gray-200);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            height: 56px;
+            z-index: 1050;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.06);
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+        .mobile-nav-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 2px;
+            text-decoration: none;
+            color: var(--gray-500);
+            font-size: 0.6rem;
+            font-weight: 500;
+            height: 100%;
+            transition: var(--transition);
+            -webkit-tap-highlight-color: transparent;
+            min-height: 44px;
+        }
+        .mobile-nav-item i { font-size: 1.15rem; }
+        .mobile-nav-item.active { color: var(--primary); }
+        .mobile-nav-item.active i { color: var(--primary); }
+        .mobile-nav-item:hover { color: var(--primary); background: rgba(37,99,235,0.06); }
+
         @media (max-width: 991px) {
             .navbar-nav { display: none; } /* hidden on mobile – offcanvas handles it */
             /* Touch-friendly tap targets */
@@ -397,6 +442,8 @@
             .brand-text .school-motto { display: none; }
             .user-name { display: none; }
             .notif-dropdown { min-width: calc(100vw - 1.75rem); right: -0.875rem; }
+            /* Bottom nav padding */
+            .container.py-3.py-md-4 { padding-bottom: 75px !important; }
         }
         select.form-control-modern,
         select.form-control-modern option,
@@ -424,14 +471,18 @@
             {% if user.is_superuser %}
             <a class="nav-link" href="/admin-dashboard/"><i class="fa-solid fa-gauge-high"></i> Dashboard</a>
             <a class="nav-link" href="/manage-users/"><i class="fa-solid fa-users-gear"></i> Users</a>
+            <a class="nav-link" href="/role-requests/"><i class="fa-solid fa-user-gear"></i> Role Requests</a>
             <a class="nav-link" href="/add-student/"><i class="fa-solid fa-user-plus"></i> Add Student</a>
             <a class="nav-link" href="/school-setup/"><i class="fa-solid fa-gear"></i> Setup</a>
             <a class="nav-link" href="/admin-agent/" style="background:linear-gradient(135deg,#7c3aed,#2563eb);color:white!important;border-radius:8px;padding:.35rem .7rem;font-weight:700;font-size:.75rem;"><i class="fa-solid fa-robot me-1"></i>Agent</a>
             {% elif user.groups.all.0.name == "ClassTeacher" %}
-            <a class="nav-link" href="/class-teacher-dashboard/"><i class="fa-solid fa-chalkboard-user"></i> My Class</a>
+            <a class="nav-link" href="/class-summary/"><i class="fa-solid fa-chalkboard-user"></i> My Class</a>
+            <a class="nav-link" href="/teacher-dashboard/"><i class="fa-solid fa-school"></i> School View</a>
+            <a class="nav-link" href="/request-role/"><i class="fa-solid fa-user-gear"></i> Request Role</a>
             <a class="nav-link" href="/add-student/"><i class="fa-solid fa-user-plus"></i> Add Student</a>
             {% else %}
             <a class="nav-link" href="/teacher-dashboard/"><i class="fa-solid fa-gauge"></i> Dashboard</a>
+            <a class="nav-link" href="/request-role/"><i class="fa-solid fa-user-gear"></i> Request Role</a>
             {% endif %}
             <a class="nav-link ai-nav-link ms-1" href="/ai/dashboard/"><i class="fa-solid fa-robot"></i> AI Dashboard</a>
             <a class="nav-link ai-chat-link ms-1" href="/ai/chat/"><i class="fa-solid fa-comments"></i> AI Chat</a>
@@ -574,7 +625,7 @@
         </div>
 
         <!-- Navigation links -->
-        <div class="offcanvas-section-label">Navigation</div>
+        <div class="offcanvas-section-label">Quick Access</div>
 
         {% if user.is_superuser %}
         <a class="offcanvas-nav-link" href="/admin-dashboard/"><i class="fa-solid fa-gauge-high"></i> Admin Dashboard</a>
@@ -587,15 +638,18 @@
             {% if pending_resets > 0 %}<span class="badge bg-danger ms-auto">{{ pending_resets }}</span>{% endif %}
         </a>
         {% elif user.groups.all.0.name == "ClassTeacher" %}
-        <a class="offcanvas-nav-link" href="/class-teacher-dashboard/"><i class="fa-solid fa-chalkboard-user"></i> My Class</a>
+        <a class="offcanvas-nav-link" href="/class-summary/"><i class="fa-solid fa-chalkboard-user"></i> My Class</a>
+        <a class="offcanvas-nav-link" href="/teacher-dashboard/"><i class="fa-solid fa-school"></i> School View</a>
+        <a class="offcanvas-nav-link" href="/request-role/"><i class="fa-solid fa-user-gear"></i> Request Role</a>
         <a class="offcanvas-nav-link" href="/add-student/"><i class="fa-solid fa-user-plus"></i> Add Student</a>
         <a class="offcanvas-nav-link" href="/student/search/"><i class="fa-solid fa-magnifying-glass"></i> Search Students</a>
         {% else %}
         <a class="offcanvas-nav-link" href="/teacher-dashboard/"><i class="fa-solid fa-gauge"></i> Dashboard</a>
+        <a class="offcanvas-nav-link" href="/request-role/"><i class="fa-solid fa-user-gear"></i> Request Role</a>
         <a class="offcanvas-nav-link" href="/student/search/"><i class="fa-solid fa-magnifying-glass"></i> Search Students</a>
         {% endif %}
 
-        <div class="offcanvas-section-label mt-1">AI Tools</div>
+        <div class="offcanvas-section-label">AI Tools</div>
         {% if user.is_superuser %}
         <a class="offcanvas-nav-link" href="/admin-agent/" style="background:linear-gradient(135deg,#7c3aed,#2563eb);color:white;border-radius:999px;justify-content:center;font-weight:700;margin-bottom:4px;"><i class="fa-solid fa-robot me-1"></i> Admin Agent</a>
         {% endif %}
@@ -618,13 +672,55 @@
         {% endif %}
 
         <!-- Account links -->
-        <div class="offcanvas-section-label mt-2">Account</div>
+        <div class="offcanvas-section-label">Account</div>
         <a class="offcanvas-nav-link" href="/profile/"><i class="fa-solid fa-user"></i> My Profile</a>
         <a class="offcanvas-nav-link" href="/request-reset/"><i class="fa-solid fa-lock-open"></i> Request Password Reset</a>
         <a class="offcanvas-nav-link text-danger" href="/logout/"><i class="fa-solid fa-right-from-bracket text-danger"></i> Log Out</a>
     </div>
 </div>
 {% endif %}
+
+<!-- ===== MOBILE BOTTOM NAV ===== -->
+<div class="mobile-bottom-nav d-lg-none">
+    <a href="/dashboard/" class="mobile-nav-item" data-active-paths="/,/dashboard/">
+        <i class="fa-solid fa-gauge-high"></i>
+        <span>Home</span>
+    </a>
+    <a href="/add-student/" class="mobile-nav-item" data-active-paths="/add-student/,/student/">
+        <i class="fa-solid fa-user-plus"></i>
+        <span>Students</span>
+    </a>
+    {% if user.groups.all.0.name == "ClassTeacher" %}
+    <a href="/class-summary/" class="mobile-nav-item" data-active-paths="/class-summary/,/class-teacher/">
+        <i class="fa-solid fa-chalkboard-user"></i>
+        <span>My Class</span>
+    </a>
+    {% else %}
+    <a href="/teacher-dashboard/" class="mobile-nav-item" data-active-paths="/teacher-dashboard/,/class-teacher/">
+        <i class="fa-solid fa-school"></i>
+        <span>School</span>
+    </a>
+    {% endif %}
+    <a href="/school-setup/" class="mobile-nav-item" data-active-paths="/school-setup/">
+        <i class="fa-solid fa-gear"></i>
+        <span>Setup</span>
+    </a>
+    <a href="/profile/" class="mobile-nav-item" data-active-paths="/profile/">
+        <i class="fa-solid fa-user"></i>
+        <span>Profile</span>
+    </a>
+</div>
+<script>
+(function() {
+    var path = window.location.pathname;
+    document.querySelectorAll('.mobile-nav-item[data-active-paths]').forEach(function(item) {
+        var paths = (item.dataset.activePaths || '').split(',');
+        if (paths.some(function(p) { return p && path.startsWith(p); })) {
+            item.classList.add('active');
+        }
+    });
+})();
+</script>
 
 <!-- ===== MAIN CONTENT ===== -->
 <div class="container py-3 py-md-4">

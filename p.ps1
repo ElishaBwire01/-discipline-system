@@ -1,339 +1,246 @@
 # ============================================================
-# DISCIPLINE SYSTEM - SAFE SECRET DISCOVERY & MIGRATION
+# VERCEL DJANGO LOGGING FIX
 # ============================================================
 
-$ErrorActionPreference = "Continue"
+$ErrorActionPreference = "Stop"
 
-$ProjectRoot = (Get-Location).Path
-$EnvFile = Join-Path $ProjectRoot ".env"
-$Timestamp = Get-Date -Format "yyyyMMdd_HHmmss"
-$BackupRoot = Join-Path $ProjectRoot "secret_migration_backup_$Timestamp"
+$settingsFile = "disciplinary_program/settings.py"
+$backupFile = "disciplinary_program/settings.py.backup_before_vercel_fix"
 
 Write-Host ""
-Write-Host "============================================================" -ForegroundColor Cyan
-Write-Host " DISCIPLINE SYSTEM - SECRET MIGRATION" -ForegroundColor Cyan
-Write-Host "============================================================" -ForegroundColor Cyan
+Write-Host "========================================" -ForegroundColor Cyan
+Write-Host "   DJANGO VERCEL LOGGING FIX" -ForegroundColor Yellow
+Write-Host "========================================" -ForegroundColor Cyan
 Write-Host ""
 
-# ============================================================
-# 1. BACKUP
-# ============================================================
+# ------------------------------------------------------------
+# 1. Check settings.py exists
+# ------------------------------------------------------------
 
-Write-Host "[1] Creating safety backup..." -ForegroundColor Yellow
-
-New-Item -ItemType Directory -Path $BackupRoot -Force | Out-Null
-
-if (Test-Path $EnvFile) {
-    Copy-Item $EnvFile (Join-Path $BackupRoot ".env") -Force
+if (-not (Test-Path $settingsFile)) {
+    Write-Host "ERROR: $settingsFile was not found." -ForegroundColor Red
+    exit 1
 }
 
-Write-Host "  Backup created." -ForegroundColor Green
+# ------------------------------------------------------------
+# 2. Create backup
+# ------------------------------------------------------------
+
+Copy-Item $settingsFile $backupFile -Force
+
+Write-Host "Backup created:" -ForegroundColor Green
+Write-Host "  $backupFile"
 Write-Host ""
 
-# ============================================================
-# 2. READ EXISTING .ENV
-# ============================================================
+# ------------------------------------------------------------
+# 3. Read settings.py
+# ------------------------------------------------------------
 
-Write-Host "[2] Reading existing .env..." -ForegroundColor Yellow
+$settings = Get-Content $settingsFile -Raw
 
-$ExistingEnv = @{}
+# ------------------------------------------------------------
+# 4. Find LOGGING section
+# ------------------------------------------------------------
 
-if (Test-Path $EnvFile) {
+$loggingStart = $settings.IndexOf("LOGGING = {")
 
-    foreach ($Line in Get-Content $EnvFile) {
+if ($loggingStart -lt 0) {
+    Write-Host "ERROR: Could not find 'LOGGING = {' in settings.py." -ForegroundColor Red
+    Write-Host "Your original file has NOT been changed." -ForegroundColor Yellow
+    exit 1
+}
 
-        if ($Line -match '^\s*([A-Za-z_][A-Za-z0-9_]*)\s*=\s*(.*)$') {
+# ------------------------------------------------------------
+# 5. Find the end of the LOGGING dictionary
+# ------------------------------------------------------------
 
-            $Name = $Matches[1]
-            $Value = $Matches[2]
+$braceCount = 0
+$loggingEnd = -1
+$started = $false
 
-            $ExistingEnv[$Name] = $Value
+for ($i = $loggingStart; $i -lt $settings.Length; $i++) {
+
+    $char = $settings[$i]
+
+    if ($char -eq "{") {
+        $braceCount++
+        $started = $true
+    }
+    elseif ($char -eq "}") {
+        $braceCount--
+
+        if ($started -and $braceCount -eq 0) {
+            $loggingEnd = $i + 1
+            break
         }
     }
 }
 
-Write-Host "  Existing variables: $($ExistingEnv.Count)" -ForegroundColor Green
-Write-Host ""
-
-# ============================================================
-# 3. DIRECTORIES TO SKIP
-# ============================================================
-
-$ExcludedDirectories = @(
-    ".git",
-    ".venv",
-    "venv",
-    "env",
-    "ENV",
-    ".kilo",
-    ".fix_backup",
-    "backups",
-    "backup",
-    "staticfiles",
-    "__pycache__",
-    "node_modules",
-    ".pytest_cache",
-    ".mypy_cache",
-    ".ruff_cache",
-    ".idea",
-    ".vscode"
-)
-
-# ============================================================
-# 4. FILES TO SCAN
-# ============================================================
-
-Write-Host "[3] Finding configuration files..." -ForegroundColor Yellow
-
-$Extensions = @(
-    "*.py",
-    "*.ps1",
-    "*.env",
-    "*.toml",
-    "*.ini",
-    "*.cfg",
-    "*.conf",
-    "*.json",
-    "*.yaml",
-    "*.yml"
-)
-
-$Files = @()
-
-foreach ($Extension in $Extensions) {
-
-    $FoundFiles = Get-ChildItem `
-        -Path $ProjectRoot `
-        -Filter $Extension `
-        -File `
-        -Recurse `
-        -ErrorAction SilentlyContinue
-
-    foreach ($File in $FoundFiles) {
-
-        $RelativePath = $File.FullName.Substring($ProjectRoot.Length).TrimStart("\")
-        $Parts = $RelativePath.Split("\")
-        $Skip = $false
-
-        foreach ($Excluded in $ExcludedDirectories) {
-
-            if ($Parts -contains $Excluded) {
-                $Skip = $true
-                break
-            }
-        }
-
-        if (-not $Skip) {
-            $Files += $File
-        }
-    }
+if ($loggingEnd -lt 0) {
+    Write-Host "ERROR: Could not determine the end of LOGGING section." -ForegroundColor Red
+    Write-Host "Your original file has NOT been changed." -ForegroundColor Yellow
+    exit 1
 }
 
-$Files = $Files | Sort-Object FullName -Unique
+# ------------------------------------------------------------
+# 6. Find existing LOGS_DIR section before LOGGING
+# ------------------------------------------------------------
 
-Write-Host "  Files selected for scanning: $($Files.Count)" -ForegroundColor Green
-Write-Host ""
+$logsMarker = "# ============================================================"
+$logsSearchStart = $settings.LastIndexOf("LOGS_DIR", $loggingStart)
 
-# ============================================================
-# 5. SECRET PATTERNS
-# ============================================================
+if ($logsSearchStart -ge 0) {
 
-Write-Host "[4] Searching for possible secrets..." -ForegroundColor Yellow
+    $previousSectionStart = $settings.LastIndexOf("LOGGING", $logsSearchStart)
 
-$SecretPatterns = @{}
-
-$SecretPatterns["GROQ_API_KEY"] = "(?i)(?:GROQ_API_KEY|GROQ_KEY)\s*=\s*['""]([^'""]+)['""]"
-
-$SecretPatterns["GEMINI_API_KEY"] = "(?i)(?:GEMINI_API_KEY|GOOGLE_API_KEY|GOOGLE_GENERATIVE_AI_KEY)\s*=\s*['""]([^'""]+)['""]"
-
-$SecretPatterns["OPENAI_API_KEY"] = "(?i)(?:OPENAI_API_KEY)\s*=\s*['""]([^'""]+)['""]"
-
-$SecretPatterns["SUPABASE_SERVICE_ROLE_KEY"] = "(?i)(?:SUPABASE_SERVICE_ROLE_KEY)\s*=\s*['""]([^'""]+)['""]"
-
-$SecretPatterns["SUPABASE_ANON_KEY"] = "(?i)(?:SUPABASE_ANON_KEY)\s*=\s*['""]([^'""]+)['""]"
-
-$SecretPatterns["SUPABASE_JWT_SECRET"] = "(?i)(?:SUPABASE_JWT_SECRET)\s*=\s*['""]([^'""]+)['""]"
-
-$SecretPatterns["SUPABASE_URL"] = "(?i)(?:SUPABASE_URL)\s*=\s*['""]([^'""]+)['""]"
-
-$SecretPatterns["DATABASE_URL"] = "(?i)(?:DATABASE_URL)\s*=\s*['""]([^'""]+)['""]"
-
-$SecretPatterns["SECRET_KEY"] = "(?i)(?:SECRET_KEY|DJANGO_SECRET_KEY)\s*=\s*['""]([^'""]+)['""]"
-
-$SecretPatterns["AWS_ACCESS_KEY_ID"] = "(?i)(?:AWS_ACCESS_KEY_ID)\s*=\s*['""]([^'""]+)['""]"
-
-$SecretPatterns["AWS_SECRET_ACCESS_KEY"] = "(?i)(?:AWS_SECRET_ACCESS_KEY)\s*=\s*['""]([^'""]+)['""]"
-
-$Discovered = @{}
-
-foreach ($File in $Files) {
-
-    try {
-        $Content = Get-Content $File.FullName -Raw -ErrorAction Stop
-    }
-    catch {
-        continue
-    }
-
-    foreach ($Name in $SecretPatterns.Keys) {
-
-        $Pattern = $SecretPatterns[$Name]
-
-        try {
-            $MatchesFound = [regex]::Matches($Content, $Pattern)
-        }
-        catch {
-            continue
-        }
-
-        foreach ($Match in $MatchesFound) {
-
-            if ($Match.Groups.Count -lt 2) {
-                continue
-            }
-
-            $Value = $Match.Groups[1].Value.Trim()
-
-            if ([string]::IsNullOrWhiteSpace($Value)) {
-                continue
-            }
-
-            if ($Value -match '^(your_|change_me|replace_|example|xxx|\.\.\.)') {
-                continue
-            }
-
-            if (-not $Discovered.ContainsKey($Name)) {
-
-                $Discovered[$Name] = @{
-                    Value = $Value
-                    Files = @()
-                }
-            }
-
-            $Discovered[$Name].Files += $File.FullName
-        }
-    }
-}
-
-Write-Host ""
-Write-Host "  Possible secret variables found: $($Discovered.Count)" -ForegroundColor Green
-Write-Host ""
-
-# ============================================================
-# 6. WRITE DISCOVERED VALUES TO .ENV
-# ============================================================
-
-Write-Host "[5] Moving discovered values into .env..." -ForegroundColor Yellow
-
-$EnvLines = @()
-
-if (Test-Path $EnvFile) {
-    $EnvLines = @(Get-Content $EnvFile)
-}
-
-$Added = 0
-
-foreach ($Name in ($Discovered.Keys | Sort-Object)) {
-
-    $Value = $Discovered[$Name].Value
-
-    if ($ExistingEnv.ContainsKey($Name)) {
-
-        Write-Host "  [KEEP] $Name already exists" -ForegroundColor Gray
-
+    if ($previousSectionStart -ge 0) {
+        $logsStart = $previousSectionStart
     }
     else {
-
-        $EnvLines += "$Name=$Value"
-
-        $ExistingEnv[$Name] = $Value
-
-        $Added++
-
-        Write-Host "  [ADD]  $Name" -ForegroundColor Green
-    }
-}
-
-Set-Content `
-    -Path $EnvFile `
-    -Value $EnvLines `
-    -Encoding UTF8
-
-Write-Host ""
-Write-Host "  Added: $Added variable(s)" -ForegroundColor Green
-Write-Host ""
-
-# ============================================================
-# 7. ENSURE .ENV IS IGNORED
-# ============================================================
-
-Write-Host "[6] Protecting .env from Git..." -ForegroundColor Yellow
-
-$GitIgnore = Join-Path $ProjectRoot ".gitignore"
-
-if (Test-Path $GitIgnore) {
-
-    $GitIgnoreContent = Get-Content $GitIgnore -Raw
-
-    if ($GitIgnoreContent -notmatch '(?m)^\.env\s*$') {
-
-        Add-Content `
-            -Path $GitIgnore `
-            -Value "`r`n# Environment secrets`r`n.env`r`n.env.*`r`n!.env.example"
-
-        Write-Host "  .env added to .gitignore." -ForegroundColor Green
-    }
-    else {
-
-        Write-Host "  .env is already ignored." -ForegroundColor Green
+        $logsStart = $logsSearchStart
     }
 }
 else {
-
-    Set-Content `
-        -Path $GitIgnore `
-        -Value ".env`r`n.env.*`r`n!.env.example" `
-        -Encoding UTF8
-
-    Write-Host "  Created .gitignore protection." -ForegroundColor Green
+    $logsStart = $loggingStart
 }
 
-Write-Host ""
+# ------------------------------------------------------------
+# 7. Build Vercel-safe logging configuration
+# ------------------------------------------------------------
 
+$newLogging = @'
 # ============================================================
-# 8. SUMMARY
+# LOGGING - VERCEL SAFE
 # ============================================================
 
-Write-Host "============================================================" -ForegroundColor Cyan
-Write-Host " SECRET DISCOVERY COMPLETE" -ForegroundColor Green
-Write-Host "============================================================" -ForegroundColor Cyan
-Write-Host ""
+if IS_VERCEL:
+    # Vercel filesystem is read-only except for /tmp
+    LOGS_DIR = Path("/tmp/logs")
+else:
+    LOGS_DIR = BASE_DIR / "logs"
 
-Write-Host "Variables detected:" -ForegroundColor Yellow
+# Safely create the logging directory
+try:
+    LOGS_DIR.mkdir(parents=True, exist_ok=True)
+except OSError:
+    LOGS_DIR = None
 
-if ($Discovered.Count -eq 0) {
+LOG_FILE = LOGS_DIR / "django.log" if LOGS_DIR else None
 
-    Write-Host "  No matching secret assignments were found." -ForegroundColor Gray
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+
+    "formatters": {
+        "json": {
+            "format": '{"level": "{levelname}", "time": "{asctime}", "module": "{name}", "message": "{message}"}',
+            "style": "{",
+        },
+        "simple": {
+            "format": "{levelname} {message}",
+            "style": "{",
+        },
+    },
+
+    "handlers": {
+        "console": {
+            "level": "INFO",
+            "class": "logging.StreamHandler",
+            "formatter": "json" if IS_VERCEL else "simple",
+        },
+    },
+
+    "root": {
+        "handlers": ["console"],
+        "level": "INFO",
+    },
+
+    "loggers": {
+        "django": {
+            "handlers": ["console"],
+            "level": "ERROR",
+            "propagate": False,
+        },
+        "core": {
+            "handlers": ["console"],
+            "level": "INFO",
+            "propagate": False,
+        },
+    },
 }
-else {
 
-    foreach ($Name in ($Discovered.Keys | Sort-Object)) {
+# File logging is optional.
+# Vercel should primarily use console logging.
+if LOGS_DIR and LOG_FILE:
+    try:
+        LOGGING["handlers"]["file"] = {
+            "level": "ERROR",
+            "class": "logging.FileHandler",
+            "filename": str(LOG_FILE),
+            "formatter": "simple",
+        }
 
-        Write-Host "  [FOUND] $Name" -ForegroundColor Green
-    }
+        LOGGING["root"]["handlers"].append("file")
+
+    except (OSError, PermissionError):
+        pass
+'@
+
+# ------------------------------------------------------------
+# 8. Replace the logging block
+# ------------------------------------------------------------
+
+$before = $settings.Substring(0, $logsStart)
+$after = $settings.Substring($loggingEnd)
+
+$newSettings = $before + $newLogging + "`r`n`r`n" + $after
+
+# ------------------------------------------------------------
+# 9. Write modified settings.py
+# ------------------------------------------------------------
+
+Set-Content $settingsFile $newSettings -Encoding UTF8
+
+Write-Host "settings.py updated successfully." -ForegroundColor Green
+Write-Host ""
+
+# ------------------------------------------------------------
+# 10. Check Django
+# ------------------------------------------------------------
+
+Write-Host "Running Django system check..." -ForegroundColor Cyan
+Write-Host ""
+
+python manage.py check
+
+if ($LASTEXITCODE -ne 0) {
+    Write-Host ""
+    Write-Host "Django check FAILED." -ForegroundColor Red
+    Write-Host "Restoring original settings.py..." -ForegroundColor Yellow
+
+    Copy-Item $backupFile $settingsFile -Force
+
+    Write-Host "Original settings.py restored." -ForegroundColor Green
+    exit 1
 }
 
 Write-Host ""
-Write-Host "IMPORTANT:" -ForegroundColor Red
-Write-Host "  Secret values were NOT displayed."
-Write-Host "  .env was updated where appropriate."
-Write-Host "  Backup location:"
-Write-Host "  $BackupRoot"
+Write-Host "========================================" -ForegroundColor Cyan
+Write-Host "       VERCEL FIX COMPLETED" -ForegroundColor Green
+Write-Host "========================================" -ForegroundColor Cyan
 Write-Host ""
 
-Write-Host "NEXT CHECK:" -ForegroundColor Yellow
-Write-Host "  git status --short"
+Write-Host "Django system check passed." -ForegroundColor Green
 Write-Host ""
-
-Write-Host "DO NOT commit .env." -ForegroundColor Red
+Write-Host "Backup:"
+Write-Host "  $backupFile"
+Write-Host ""
+Write-Host "Next steps:" -ForegroundColor Yellow
+Write-Host ""
+Write-Host "  git diff -- disciplinary_program/settings.py"
+Write-Host "  git add disciplinary_program/settings.py"
+Write-Host "  git commit -m `"fix: Vercel read-only filesystem logging`""
+Write-Host "  git push origin fix/ai-gemini-groq-sanitize"
+Write-Host ""
+Write-Host "Then redeploy on Vercel." -ForegroundColor Green
 Write-Host ""

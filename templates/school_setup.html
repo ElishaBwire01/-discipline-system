@@ -300,25 +300,104 @@
 
                 <div class="mt-3">
                     {% for grade in grades %}
-                    <div class="d-flex justify-content-between align-items-center p-2 mb-2" style="background: #f8f9fa; border-radius: 8px;">
+                    <div class="d-flex justify-content-between align-items-center p-2 mb-2" style="background: #f8f9fa; border-radius: 8px;" id="grade-display-{{ grade.id }}">
                         <div>
                             <strong>{{ grade.name }}</strong>
                             <span class="badge bg-secondary ms-2">{{ grade.code }}</span>
                             <span class="badge bg-info ms-1">Order: {{ grade.order }}</span>
+                            {% if grade.student_count > 0 %}
+                            <span class="badge badge-modern badge-warning ms-1">{{ grade.student_count }} students</span>
+                            {% endif %}
                         </div>
-                        <form method="post" onsubmit="return confirm('Delete {{ grade.name }}?')">
-                            {% csrf_token %}
-                            <input type="hidden" name="action" value="delete_grade">
-                            <input type="hidden" name="grade_id" value="{{ grade.id }}">
-                            <button type="submit" class="btn-modern btn-modern-danger btn-modern-sm">
-                                <i class="fa-solid fa-trash"></i>
+                        <div class="d-flex gap-1 align-items-center">
+                            <button type="button" class="btn-modern btn-modern-secondary btn-modern-sm" onclick="showGradeEdit({{ grade.id }})">
+                                <i class="fa-solid fa-pen"></i>
                             </button>
+                            {% if grade.student_count > 0 %}
+                            <form method="post" style="display:inline">
+                                {% csrf_token %}
+                                <input type="hidden" name="action" value="delete_grade">
+                                <input type="hidden" name="grade_id" value="{{ grade.id }}">
+                                <select name="reassign_to" class="form-control-modern" style="width:120px;display:inline-block;height:34px;font-size:.8rem;padding:.3rem;" required>
+                                    <option value="">Move to...</option>
+                                    {% for g in grades %}
+                                    {% if g.id != grade.id %}
+                                    <option value="{{ g.id }}">{{ g.name }}</option>
+                                    {% endif %}
+                                    {% endfor %}
+                                </select>
+                                <button type="submit" class="btn-modern btn-modern-danger btn-modern-sm" onclick="return confirm('Move {{ grade.student_count }} students to selected grade, then delete?')">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                            </form>
+                            {% else %}
+                            <form method="post" onsubmit="return confirm('Delete {{ grade.name }}?')">
+                                {% csrf_token %}
+                                <input type="hidden" name="action" value="delete_grade">
+                                <input type="hidden" name="grade_id" value="{{ grade.id }}">
+                                <button type="submit" class="btn-modern btn-modern-danger btn-modern-sm">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                            </form>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="p-2 mb-2" style="background: #eef2ff; border-radius: 8px; border: 1px solid #c7d2fe; display:none;" id="grade-edit-{{ grade.id }}">
+                        <form method="post" class="row g-2 align-items-end">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="edit_grade">
+                            <input type="hidden" name="edit_grade_id" value="{{ grade.id }}">
+                            <div class="col-md-4">
+                                <label class="form-label-modern" style="font-size:.7rem;">Name</label>
+                                <input type="text" name="edit_grade_name" class="form-control-modern" value="{{ grade.name }}" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label-modern" style="font-size:.7rem;">Code</label>
+                                <input type="text" name="edit_grade_code" class="form-control-modern" value="{{ grade.code }}">
+                            </div>
+                            <div class="col-md-4 d-flex gap-1">
+                                <button type="submit" class="btn-modern btn-modern-success btn-modern-sm flex-fill">
+                                    <i class="fa-solid fa-check"></i> Save
+                                </button>
+                                <button type="button" class="btn-modern btn-modern-secondary btn-modern-sm" onclick="hideGradeEdit({{ grade.id }})">
+                                    <i class="fa-solid fa-xmark"></i>
+                                </button>
+                            </div>
                         </form>
                     </div>
                     {% empty %}
                     <p class="text-muted text-center">No grades added yet</p>
                     {% endfor %}
                 </div>
+
+                <!-- Transfer Students Between Forms -->
+                <hr class="my-4">
+                <h6 class="mb-3"><i class="fa-solid fa-arrow-right-arrow-left me-1"></i>Transfer Students Between Forms</h6>
+                <form method="post" class="row g-2 align-items-end">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="transfer_form">
+                    <div class="col-md-3">
+                        <select name="transfer_source_form" class="form-control-modern" required>
+                            <option value="">-- Source Form --</option>
+                            {% for form_key, form_name in forms %}
+                            <option value="{{ form_key }}">{{ form_name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <select name="transfer_target_form" class="form-control-modern" required>
+                            <option value="">-- Target Form --</option>
+                            {% for form_key, form_name in forms %}
+                            <option value="{{ form_key }}">{{ form_name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <button type="submit" class="btn-modern btn-modern-primary w-100">
+                            <i class="fa-solid fa-arrow-right me-1"></i>Transfer All
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
@@ -357,19 +436,58 @@
 
                 <div class="mt-3">
                     {% for stream in streams %}
-                    <div class="d-flex justify-content-between align-items-center p-2 mb-2" style="background: #f8f9fa; border-radius: 8px;">
+                    <div class="d-flex justify-content-between align-items-center p-2 mb-2" style="background: #f8f9fa; border-radius: 8px;" id="stream-display-{{ stream.id }}">
                         <div>
                             <strong>{{ stream.name }}</strong>
                             <span class="badge bg-secondary ms-2">{{ stream.code }}</span>
                             <span class="badge bg-success ms-1">Active</span>
                         </div>
-                        <form method="post" onsubmit="return confirm('Delete {{ stream.name }}? This will delete all students in this stream.')">
-                            {% csrf_token %}
-                            <input type="hidden" name="action" value="delete_stream">
-                            <input type="hidden" name="stream_id" value="{{ stream.id }}">
-                            <button type="submit" class="btn-modern btn-modern-danger btn-modern-sm">
-                                <i class="fa-solid fa-trash"></i>
+                        <div class="d-flex gap-1">
+                            <button type="button" class="btn-modern btn-modern-secondary btn-modern-sm" onclick="showStreamEdit({{ stream.id }})">
+                                <i class="fa-solid fa-pen"></i>
                             </button>
+                            <form method="post" onsubmit="return confirm('Delete {{ stream.name }}? This will delete all students in this stream.')" style="display:inline">
+                                {% csrf_token %}
+                                <input type="hidden" name="action" value="delete_stream">
+                                <input type="hidden" name="stream_id" value="{{ stream.id }}">
+                                <button type="submit" class="btn-modern btn-modern-danger btn-modern-sm">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="p-2 mb-2" style="background: #eef2ff; border-radius: 8px; border: 1px solid #c7d2fe; display:none;" id="stream-edit-{{ stream.id }}">
+                        <form method="post" class="row g-2 align-items-end">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="edit_stream">
+                            <input type="hidden" name="edit_stream_id" value="{{ stream.id }}">
+                            <div class="col-md-3">
+                                <label class="form-label-modern" style="font-size:.7rem;">Name</label>
+                                <input type="text" name="edit_stream_name" class="form-control-modern" value="{{ stream.name }}" required>
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label-modern" style="font-size:.7rem;">Code</label>
+                                <input type="text" name="edit_stream_code" class="form-control-modern" value="{{ stream.code }}">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label-modern" style="font-size:.7rem;">Transfer Students To</label>
+                                <select name="edit_transfer_to" class="form-control-modern">
+                                    <option value="">Keep Students</option>
+                                    {% for s in streams %}
+                                    {% if s.id != stream.id %}
+                                    <option value="{{ s.id }}">{{ s.name }}</option>
+                                    {% endif %}
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-2 d-flex gap-1">
+                                <button type="submit" class="btn-modern btn-modern-success btn-modern-sm flex-fill">
+                                    <i class="fa-solid fa-check"></i> Save
+                                </button>
+                                <button type="button" class="btn-modern btn-modern-secondary btn-modern-sm" onclick="hideStreamEdit({{ stream.id }})">
+                                    <i class="fa-solid fa-xmark"></i>
+                                </button>
+                            </div>
                         </form>
                     </div>
                     {% empty %}
@@ -727,5 +845,33 @@ document.getElementById('uploadFile')?.addEventListener('change', function() {
     // Optionally auto-submit after 2 seconds
     // setTimeout(function() { document.getElementById('bulkUploadForm').submit(); }, 2000);
 });
+
+function showStreamEdit(streamId) {
+    var display = document.getElementById('stream-display-' + streamId);
+    var edit = document.getElementById('stream-edit-' + streamId);
+    if (display) display.style.display = 'none';
+    if (edit) edit.style.display = 'block';
+}
+
+function hideStreamEdit(streamId) {
+    var display = document.getElementById('stream-display-' + streamId);
+    var edit = document.getElementById('stream-edit-' + streamId);
+    if (display) display.style.display = 'flex';
+    if (edit) edit.style.display = 'none';
+}
+
+function showGradeEdit(gradeId) {
+    var display = document.getElementById('grade-display-' + gradeId);
+    var edit = document.getElementById('grade-edit-' + gradeId);
+    if (display) display.style.display = 'none';
+    if (edit) edit.style.display = 'block';
+}
+
+function hideGradeEdit(gradeId) {
+    var display = document.getElementById('grade-display-' + gradeId);
+    var edit = document.getElementById('grade-edit-' + gradeId);
+    if (display) display.style.display = 'flex';
+    if (edit) edit.style.display = 'none';
+}
 </script>
 {% endblock %}

@@ -566,6 +566,12 @@
     </div>
     {% endif %}
 
+    {% if not viewing_other and profile and profile.must_reset_password %}
+    <div class="alert alert-danger alert-modern mb-3">
+        <strong>Password reset required:</strong> Your account has been approved for a password reset. Please set a new password below to continue using the system.
+    </div>
+    {% endif %}
+
     <div class="profile-shell">
 
         <!-- ================= LEFT: PHOTO + FULL INFORMATION ================= -->
@@ -725,6 +731,11 @@
                 {% if viewing_other %}
                 <a href="/profile/" class="btn-profile btn-profile-primary btn-profile-block">
                     <i class="fa-solid fa-user-gear me-1"></i>My Profile
+                </a>
+                {% endif %}
+                {% if not user.is_superuser %}
+                <a href="/request-role/" class="btn-profile btn-profile-block" style="background: linear-gradient(135deg, #f59e0b, #d97706); color: white;">
+                    <i class="fa-solid fa-user-gear me-1"></i>Request Role Change
                 </a>
                 {% endif %}
             </div>
@@ -893,10 +904,18 @@
                                 <input type="hidden" name="action" value="change_password">
                                 <div class="settings-form">
                                     <div class="form-row">
+                                        {% if profile.must_reset_password %}
+                                        <div class="full-width">
+                                            <div class="alert alert-info alert-modern mb-3">
+                                                <strong>No current password needed.</strong> Because your password was reset by an administrator, you can set a new password directly below.
+                                            </div>
+                                        </div>
+                                        {% else %}
                                         <div class="full-width">
                                             <label class="form-label-modern">Current password</label>
                                             <input type="password" name="current_password" class="form-control-modern" placeholder="Enter current password" required>
                                         </div>
+                                        {% endif %}
                                         <div>
                                             <label class="form-label-modern">New password</label>
                                             <input type="password" name="new_password" id="new-password" class="form-control-modern" placeholder="Min 8 characters" minlength="8" required oninput="checkPasswordStrength(); checkPasswordMatch();">
@@ -910,7 +929,8 @@
                                         </div>
                                         <div class="full-width">
                                             <button type="submit" class="btn-profile btn-profile-warning btn-profile-block">
-                                                <i class="fa-solid fa-key me-1"></i>Change Password
+                                                <i class="fa-solid fa-key me-1"></i>
+                                                {% if profile.must_reset_password %}Set New Password{% else %}Change Password{% endif %}
                                             </button>
                                         </div>
                                     </div>
@@ -1042,5 +1062,11 @@
         };
         reader.readAsDataURL(file);
     }
+
+    {% if profile.must_reset_password %}
+    document.addEventListener('DOMContentLoaded', function() {
+        toggleAccordion('acc-password');
+    });
+    {% endif %}
 </script>
 {% endblock %}

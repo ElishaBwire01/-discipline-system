@@ -1,29 +1,241 @@
 {% extends 'base.html' %}
+{% load static %}
 
-{% block title %}Forgot Password{% endblock %}
+{% block title %}Forgot Password — {{ school_name|default:"Disciplinary System" }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .request-reset-wrapper {
+        min-height: calc(100vh - 20px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 1.5rem 1rem;
+    }
+
+    .request-reset-card {
+        background: white;
+        border-radius: 24px;
+        padding: 2.25rem;
+        box-shadow: 0 20px 60px rgba(37, 99, 235, 0.12);
+        border: 1px solid #e5e7eb;
+        width: 100%;
+        max-width: 420px;
+    }
+
+    .request-reset-brand {
+        text-align: center;
+        margin-bottom: 1.75rem;
+    }
+
+    .request-reset-brand .brand-icon {
+        width: 64px;
+        height: 64px;
+        background: linear-gradient(135deg, #2563eb, #7c3aed);
+        border-radius: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1rem;
+        font-size: 1.75rem;
+        color: white;
+        box-shadow: 0 8px 24px rgba(37, 99, 235, 0.3);
+    }
+
+    .request-reset-brand h1 {
+        font-size: 1.4rem;
+        font-weight: 800;
+        color: #0f172a;
+        margin: 0 0 0.25rem;
+    }
+
+    .request-reset-brand p {
+        color: #64748b;
+        font-size: 0.875rem;
+        margin: 0;
+    }
+
+    .form-group-modern {
+        margin-bottom: 1rem;
+    }
+
+    .form-group-modern label {
+        font-weight: 600;
+        font-size: 0.813rem;
+        color: #334155;
+        margin-bottom: 0.375rem;
+        display: block;
+    }
+
+    .input-wrapper {
+        position: relative;
+    }
+
+    .input-icon {
+        position: absolute;
+        left: 0.875rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #94a3b8;
+        font-size: 0.95rem;
+        z-index: 2;
+        pointer-events: none;
+    }
+
+    .input-wrapper input {
+        width: 100%;
+        padding: 0.75rem 1rem 0.75rem 2.75rem;
+        border: 2px solid #e2e8f0;
+        border-radius: 12px;
+        font-size: 0.9375rem;
+        transition: all 0.3s;
+        background: #f8fafc;
+        color: #0f172a;
+        -webkit-appearance: none;
+    }
+
+    .input-wrapper input:focus {
+        border-color: #2563eb;
+        background: white;
+        outline: none;
+        box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+    }
+
+    .btn-submit {
+        width: 100%;
+        padding: 0.875rem;
+        background: linear-gradient(135deg, #2563eb, #7c3aed);
+        color: white;
+        border: none;
+        border-radius: 12px;
+        font-size: 1rem;
+        font-weight: 600;
+        transition: all 0.3s;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        min-height: 50px;
+        margin-top: 0.25rem;
+    }
+
+    .btn-submit:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(37, 99, 235, 0.35);
+    }
+
+    .btn-submit:active { transform: translateY(0); }
+
+    .alert-banner {
+        border-radius: 12px;
+        border: none;
+        padding: 0.875rem 1rem;
+        font-size: 0.875rem;
+        display: flex;
+        align-items: flex-start;
+        gap: 0.625rem;
+        margin-bottom: 1rem;
+        animation: slideDown 0.4s ease;
+    }
+
+    @keyframes slideDown {
+        from { opacity: 0; transform: translateY(-8px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .alert-banner.success { background: #d1fae5; color: #065f46; }
+    .alert-banner.danger  { background: #fef2f2; color: #991b1b; }
+    .alert-banner.warning { background: #fef3c7; color: #92400e; }
+    .alert-banner.info    { background: #eff6ff; color: #1e40af; }
+    .alert-banner i       { margin-top: 1px; flex-shrink: 0; }
+
+    .back-link {
+        text-align: center;
+        margin-top: 1rem;
+    }
+
+    .back-link a {
+        color: #2563eb;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.875rem;
+    }
+
+    .back-link a:hover { text-decoration: underline; }
+
+    @media (max-width: 480px) {
+        .request-reset-card { padding: 1.5rem 1.25rem; border-radius: 20px; }
+        .request-reset-brand h1 { font-size: 1.2rem; }
+        .request-reset-brand .brand-icon { width: 56px; height: 56px; font-size: 1.5rem; }
+    }
+</style>
+{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center" style="min-height: 70vh; align-items: center;">
-    <div class="col-lg-5 col-md-7" data-aos="fade-up">
-        <div class="card-modern">
-            <div class="card-body p-4 p-lg-5 text-center">
-                <div style="width: 64px; height: 64px; background: linear-gradient(135deg, #2563eb, #7c3aed); border-radius: 16px; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.25rem;">
-                </div>
-                <h2 class="fw-bold">Forgot Password?</h2>
-                <p class="text-muted">Enter your username to request a reset</p>
-                
-                
-                <form method="post" action="/request-reset/">
-                    {% csrf_token %}
-                    <div class="mb-3 text-start">
-                        <label class="form-label-modern">Username</label>
-                        <input type="text" name="username" class="form-control-modern" placeholder="Enter your username" required>
-                    </div>
-                </form>
-                
+<div class="request-reset-wrapper">
+    <div class="request-reset-card">
+        <div class="request-reset-brand">
+            <div class="brand-icon">
+                <i class="fa-solid fa-key"></i>
             </div>
+            <h1>{{ school_name|default:"Disciplinary System" }}</h1>
+            <p>Request a password reset</p>
+        </div>
+
+        {% if messages %}
+            {% for message in messages %}
+            <div class="alert-banner {{ message.tags }}">
+                {% if message.tags == 'success' %}<i class="fa-solid fa-circle-check"></i>
+                {% elif message.tags == 'danger' or message.tags == 'error' %}<i class="fa-solid fa-circle-xmark"></i>
+                {% elif message.tags == 'warning' %}<i class="fa-solid fa-triangle-exclamation"></i>
+                {% else %}<i class="fa-solid fa-circle-info"></i>{% endif %}
+                <span>{{ message }}</span>
+            </div>
+            {% endfor %}
+        {% endif %}
+
+        {% if error %}
+        <div class="alert-banner danger">
+            <i class="fa-solid fa-circle-xmark"></i>
+            <span>{{ error }}</span>
+        </div>
+        {% endif %}
+
+        {% if warning %}
+        <div class="alert-banner warning">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+            <span>{{ warning }}</span>
+        </div>
+        {% endif %}
+
+        <form method="post" autocomplete="on">
+            {% csrf_token %}
+
+            <div class="form-group-modern">
+                <label for="username">
+                    <i class="fa-solid fa-user me-1"></i> Username
+                </label>
+                <div class="input-wrapper">
+                    <span class="input-icon"><i class="fa-solid fa-user"></i></span>
+                    <input type="text" id="username" name="username"
+                           placeholder="Enter your username"
+                           required autofocus autocomplete="username"
+                           inputmode="text">
+                </div>
+            </div>
+
+            <button type="submit" class="btn-submit">
+                <i class="fa-solid fa-paper-plane"></i>
+                Submit Request
+            </button>
+        </form>
+
+        <div class="back-link">
+            <a href="/login/">
+                <i class="fa-solid fa-arrow-left me-1"></i>Back to login
+            </a>
         </div>
     </div>
 </div>
 {% endblock %}
-
